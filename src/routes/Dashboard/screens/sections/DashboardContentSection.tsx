@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   ChevronDownIcon,
   MapPinIcon,
@@ -18,6 +19,7 @@ import { Card, CardContent } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 import { useAuth } from "../../../../lib/auth";
 import { fetchMyOrders, Order } from "../../../../lib/queries/orders";
+import { fetchDashboardStats, fetchRevenueStats } from "../../../../lib/queries/dashboard";
 
 const actionButtons = [
   {
@@ -74,25 +76,71 @@ export const DashboardContentSection = (): JSX.Element => {
     },
   ]);
 
-  // Fetch orders on mount
+  // Determine primary role for dashboard context
+  const primaryRole = roles.find(r => r.status === 'active')?.role;
+  const dashboardRole: 'buyer' | 'seller' =
+    primaryRole === 'freelance' || primaryRole === 'influencer' ? 'seller' : 'buyer';
+
+  // Fetch dashboard stats and orders on mount
   useEffect(() => {
-    if (user?.id) {
-      fetchMyOrders(user.id, 'buyer').then(({ data }) => {
-        if (data) {
-          setOrders(data.slice(0, 5));
-          const activeOrders = data.filter(o => !['completed', 'cancelled', 'refunded'].includes(o.status)).length;
-          setStatsCards(prev => prev.map((card, idx) => {
-            if (idx === 0) return { ...card, value: String(activeOrders) };
-            return card;
-          }));
+    if (!user?.id) return;
+
+    const loadDashboard = async () => {
+      // Fetch dashboard stats (active orders, revenue, unread messages)
+      const { data: stats } = await fetchDashboardStats(user.id, dashboardRole);
+
+      // Fetch orders for display
+      const { data: ordersData } = await fetchMyOrders(user.id, dashboardRole);
+      if (ordersData) {
+        setOrders(ordersData.slice(0, 5));
+      }
+
+      // For sellers, also fetch detailed revenue stats
+      let revenueChange = 0;
+      if (dashboardRole === 'seller') {
+        const { data: revenueData } = await fetchRevenueStats(user.id);
+        if (revenueData) {
+          revenueChange = revenueData.percentageChange;
         }
-      });
-    }
-  }, [user?.id]);
+      }
+
+      // Update stats cards with real data
+      if (stats) {
+        setStatsCards([
+          {
+            title: "Commandes en cours",
+            value: String(stats.activeOrders),
+            change: stats.activeOrders > 0 ? "+1" : "0",
+            changeText: "cette semaine",
+            trending: "up" as const,
+            icon: "https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon-2.png",
+          },
+          {
+            title: "Revenues 30j",
+            value: `€${stats.totalRevenue.toFixed(0)}`,
+            change: `${revenueChange >= 0 ? '+' : ''}${revenueChange.toFixed(1)}%`,
+            changeText: "vs mois précédent",
+            trending: revenueChange >= 0 ? "up" as const : "down" as const,
+            icon: "https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon.png",
+          },
+          {
+            title: "Messages\nnon-lues",
+            value: String(stats.unreadMessages),
+            change: stats.unreadMessages > 0 ? "Nouveau" : "",
+            changeText: "",
+            trending: "up" as const,
+            icon: "https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon-1.png",
+          },
+        ]);
+      }
+    };
+
+    loadDashboard();
+  }, [user?.id, dashboardRole]);
 
   const displayName = profile?.display_name || profile?.username || user?.email?.split('@')[0] || 'Utilisateur';
   const avatarUrl = profile?.avatar_url || "https://c.animaapp.com/mjs8bxbnJhG6tv/img/man-438081-960-720.png";
-  const primaryRole = roles.find(r => r.status === 'active')?.role || 'Membre';
+  const displayRole = primaryRole || 'Membre';
 
   // Get the latest order for display
   const latestOrder = orders[0];
@@ -161,7 +209,7 @@ export const DashboardContentSection = (): JSX.Element => {
                   {displayName}
                 </div>
                 <div className="[font-family:'Nunito_Sans',Helvetica] font-semibold text-[#565656] text-xs capitalize">
-                  {primaryRole}
+                  {displayRole}
                 </div>
               </div>
               <Button variant="ghost" size="icon" className="h-auto p-0">
