@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { AuthProvider, ProtectedRoute } from "./lib/auth";
+import { AuthProvider, ProtectedRoute, RedirectIfAuthenticated } from "./lib/auth";
 import { AuthModalProvider } from "./lib/authModal";
 import { FrameScreen } from "./screens/FrameScreen";
 import { Dashboard } from "./routes/Dashboard/screens/Dashboard";
@@ -13,14 +13,23 @@ export const App = (): JSX.Element => {
       <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <AuthModalProvider>
           <Routes>
-            <Route path="/" element={<FrameScreen />} />
+            {/* Home page - redirect to dashboard if already authenticated */}
+            <Route path="/" element={
+              <RedirectIfAuthenticated>
+                <FrameScreen />
+              </RedirectIfAuthenticated>
+            } />
+
+            {/* Protected dashboard routes */}
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />
               </ProtectedRoute>
             } />
 
+            {/* Public pages */}
             <Route path="/public" element={<PagePublic />} />
+            <Route path="/public/:username" element={<PagePublic />} />
             <Route path="/service" element={<PageService />} />
             <Route path="/service/:slug" element={<PageService />} />
           </Routes>

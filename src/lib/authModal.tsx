@@ -61,18 +61,20 @@ export function AuthModalProvider({ children }: AuthModalProviderProps): JSX.Ele
 
 function AuthModal(): JSX.Element {
     const { view, closeModal, switchView } = useAuthModal();
-    const { signIn, signUp, isLoading } = useAuth();
+    const { signIn, signUp, resetPassword, isLoading } = useAuth();
     const navigate = useNavigate();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
+        setSuccessMessage(null);
         setIsSubmitting(true);
 
         try {
@@ -101,6 +103,15 @@ function AuthModal(): JSX.Element {
                 } else {
                     closeModal();
                     navigate('/dashboard');
+                }
+            } else if (view === 'forgot-password') {
+                const { error: resetError, success } = await resetPassword(email);
+                if (resetError) {
+                    setError(resetError.message);
+                } else if (success) {
+                    setSuccessMessage('Un email de réinitialisation a été envoyé. Vérifiez votre boîte de réception.');
+                    // Reset form after success
+                    setEmail('');
                 }
             }
         } catch (err) {
@@ -140,6 +151,13 @@ function AuthModal(): JSX.Element {
                 {error && (
                     <div className="mb-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded-lg text-sm">
                         {error}
+                    </div>
+                )}
+
+                {/* Success */}
+                {successMessage && (
+                    <div className="mb-4 p-3 bg-green-100 border border-green-300 text-green-700 rounded-lg text-sm">
+                        {successMessage}
                     </div>
                 )}
 
