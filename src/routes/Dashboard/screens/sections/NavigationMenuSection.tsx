@@ -6,28 +6,40 @@ import { useAuth } from "../../../../lib/auth";
 
 interface MenuItem {
   label: string;
-  icon: string;
   path?: string;
-  action?: () => void;
+  highlighted?: boolean;
 }
 
+// Main menu items matching the design
 const mainMenuItems: MenuItem[] = [
-  { label: "Dashboard", icon: "📊", path: "/dashboard" },
-  { label: "Mes Commandes", icon: "📋", path: "/dashboard/orders" },
-  { label: "Messages", icon: "📧", path: "/dashboard/messages" },
-  { label: "Mes Services", icon: "📦", path: "/dashboard/services" },
-  { label: "Favoris", icon: "⭐", path: "/dashboard/favorites" },
+  { label: "Mon Dashboard", path: "/dashboard" },
+  { label: "Services", path: "/dashboard/services" },
+  { label: "Commandes", path: "/dashboard/orders" },
+  { label: "Messages", path: "/dashboard/messages" },
+  { label: "Facturation", path: "/dashboard/invoices" },
+  { label: "Appels d'offres", path: "/dashboard/tenders" },
+  { label: "Revenue", path: "/dashboard/revenues" },
 ];
 
+// Affiliation section
+const affiliationMenuItems: MenuItem[] = [
+  { label: "Mes Affiliation", path: "/dashboard/affiliations" },
+  { label: "Services d'affiliation", path: "/dashboard/affiliate-services" },
+];
+
+// Other pages
 const pagesMenuItems: MenuItem[] = [
-  { label: "Marketplace", icon: "🛒", path: "/" },
-  { label: "Mon Profil", icon: "👤", path: "/dashboard/profile" },
-  { label: "Revenus", icon: "💰", path: "/dashboard/revenues" },
+  { label: "Contact", path: "/dashboard/contact", highlighted: true },
+  { label: "Invoice", path: "/dashboard/invoice" },
+  { label: "UI Elements", path: "/dashboard/ui-elements" },
+  { label: "Team", path: "/dashboard/team" },
+  { label: "Table", path: "/dashboard/table" },
 ];
 
+// Bottom items
 const bottomMenuItems: MenuItem[] = [
-  { label: "Paramètres", icon: "⚙", path: "/dashboard/settings" },
-  { label: "Déconnexion", icon: "🚪" },  // action handled separately
+  { label: "Settings", path: "/dashboard/settings" },
+  { label: "Logout" },
 ];
 
 export const NavigationMenuSection = (): JSX.Element => {
@@ -42,7 +54,7 @@ export const NavigationMenuSection = (): JSX.Element => {
   };
 
   const handleClick = (item: MenuItem) => {
-    if (item.label === 'Déconnexion') {
+    if (item.label === 'Logout') {
       signOut();
       navigate('/');
     } else if (item.path) {
@@ -62,10 +74,7 @@ export const NavigationMenuSection = (): JSX.Element => {
         }`}
       >
         {active && <div className="absolute left-0 w-[9px] h-full bg-[#4880ff] rounded-r-lg" />}
-        <span className="absolute left-[18.44%] [font-family:'DM_Sans',Helvetica] font-medium text-[#202224] text-[22px] text-center tracking-[0] leading-[normal]">
-          {item.icon}
-        </span>
-        <span className={`absolute left-[31.97%] [font-family:'Nunito_Sans',Helvetica] font-semibold text-sm tracking-[0.30px] leading-[normal] ${
+        <span className={`absolute left-[18%] [font-family:'Nunito_Sans',Helvetica] font-semibold text-sm tracking-[0.30px] leading-[normal] ${
           active ? 'text-[#4880ff]' : 'text-[#1f392c]'
         }`}>
           {item.label}
@@ -88,7 +97,15 @@ export const NavigationMenuSection = (): JSX.Element => {
 
         <Separator className="w-60 h-px bg-[#e5e5e5]" />
 
-        <div className="self-stretch opacity-60 [font-family:'Nunito_Sans',Helvetica] font-bold text-[#202224] text-xs tracking-[0.26px] leading-[normal] px-6">
+        <div className="self-stretch opacity-60 [font-family:'Nunito_Sans',Helvetica] font-bold text-[#202224] text-xs tracking-[0.26px] leading-[normal] px-6 py-2">
+          AFFILIATION
+        </div>
+
+        {affiliationMenuItems.map((item, index) => renderMenuItem(item, index, 'affiliation'))}
+
+        <Separator className="w-60 h-px bg-[#e5e5e5]" />
+
+        <div className="self-stretch opacity-60 [font-family:'Nunito_Sans',Helvetica] font-bold text-[#202224] text-xs tracking-[0.26px] leading-[normal] px-6 py-2">
           PAGES
         </div>
 
