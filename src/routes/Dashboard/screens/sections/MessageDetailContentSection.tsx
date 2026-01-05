@@ -114,7 +114,14 @@ export const MessageDetailContentSection = ({ conversationId }: MessageDetailCon
     const displayName = otherUser?.display_name || otherUser?.username || 'Utilisateur';
 
     return (
-        <div className="flex-1 w-full bg-[#F5F5F0] min-h-screen flex flex-col">
+        <div className="flex-1 w-full bg-[#F5F5F0] min-h-screen flex flex-col relative">
+            {/* Decorative Background */}
+            <img
+                className="absolute top-0 left-0 w-full h-[1313.24px] object-cover -z-10 pointer-events-none"
+                alt="Main bg color"
+                src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/main-bg-color.svg"
+            />
+
             {/* Header */}
             <header className="w-full h-[70px] bg-[#f8f5f0] border-b border-[#97979766] px-8 flex items-center justify-between">
                 <div className="flex items-center gap-4">
