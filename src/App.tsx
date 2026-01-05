@@ -1,0 +1,31 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider, ProtectedRoute } from "./lib/auth";
+import { AuthModalProvider } from "./lib/authModal";
+import { FrameScreen } from "./screens/FrameScreen";
+import { Dashboard } from "./routes/Dashboard/screens/Dashboard";
+import { PagePublic } from "./routes/PagePublic/PagePublic";
+import { PageService } from "./routes/PageService/PageService";
+
+
+export const App = (): JSX.Element => {
+  return (
+    <AuthProvider>
+      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <AuthModalProvider>
+          <Routes>
+            <Route path="/" element={<FrameScreen />} />
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/public" element={<PagePublic />} />
+            <Route path="/service" element={<PageService />} />
+            <Route path="/service/:slug" element={<PageService />} />
+          </Routes>
+        </AuthModalProvider>
+      </Router>
+    </AuthProvider>
+  );
+};

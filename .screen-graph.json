@@ -1,0 +1,35 @@
+{
+  "nodes": [
+    {
+      "id": "src/screens/FrameScreen/FrameScreen.tsx",
+      "label": "FrameScreen",
+      "routes": [
+        "/"
+      ],
+      "dataModelId": "155:5077",
+      "isRoot": true
+    },
+    {
+      "id": "src/routes/Dashbord/screens/Dashbord.tsx",
+      "label": "Dashbord",
+      "routes": [
+        "/dashboard"
+      ]
+    },
+    {
+      "id": "src/routes/PagePublic/PagePublic.tsx",
+      "label": "PagePublic",
+      "routes": [
+        "/public"
+      ]
+    },
+    {
+      "id": "src/routes/PageService/PageService.tsx",
+      "label": "PageService",
+      "routes": [
+        "/service"
+      ]
+    }
+  ],
+  "edges": []
+}
