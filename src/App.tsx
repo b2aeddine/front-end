@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider, ProtectedRoute, RedirectIfAuthenticated } from "./lib/auth";
 import { AuthModalProvider } from "./lib/authModal";
+import { MaintenanceBanner } from "./components/MaintenanceBanner";
 import { FrameScreen } from "./screens/FrameScreen";
 import { Dashboard } from "./routes/Dashboard/screens/Dashboard";
 import { OrdersPage } from "./routes/Dashboard/screens/OrdersPage";
@@ -13,6 +14,8 @@ export const App = (): JSX.Element => {
     <AuthProvider>
       <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <AuthModalProvider>
+          {/* Maintenance mode banner - shows at top when enabled */}
+          <MaintenanceBanner />
           <Routes>
             {/* Home page - redirect to dashboard if already authenticated */}
             <Route path="/" element={
