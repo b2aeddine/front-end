@@ -1,21 +1,23 @@
 import { supabase } from '../supabaseClient';
 import { postToEdge } from '../api';
+import type {
+    OrderStatus,
+    Order as OrderType,
+    OrderMessage as OrderMessageType,
+    CreateOrderRequest,
+    CreateOrderResponse,
+    CapturePaymentRequest,
+    CapturePaymentResponse,
+    DeliverOrderRequest,
+    DeliverOrderResponse,
+    ConfirmDeliveryRequest,
+    ConfirmDeliveryResponse,
+    CancelOrderRequest,
+    CancelOrderResponse,
+} from '../types';
 
-// ============================================================================
-// Types (based on backend schema)
-// ============================================================================
-
-export type OrderStatus =
-    | 'pending'
-    | 'payment_pending'
-    | 'accepted'
-    | 'in_progress'
-    | 'delivered'
-    | 'revision_requested'
-    | 'completed'
-    | 'cancelled'
-    | 'refunded'
-    | 'disputed';
+// Re-export OrderStatus from centralized types
+export type { OrderStatus } from '../types';
 
 export interface Order {
     id: string;
@@ -293,53 +295,113 @@ export async function sendOrderMessage(
 
 // ============================================================================
 // Edge Function Wrappers (for mutations)
+// Using types from centralized types/index.ts
 // ============================================================================
-
-interface CreateOrderParams {
-    service_id: string;
-    package_name: 'basic' | 'standard' | 'premium';
-    affiliate_code?: string;
-    requirements?: Record<string, unknown>;
-}
-
-interface CreateOrderResponse {
-    order_id: string;
-    checkout_url: string;
-}
 
 /**
  * Create an order via Edge Function (safe transaction).
+ * Returns checkout_url for Stripe redirect.
  */
 export async function createOrder(
-    params: CreateOrderParams
+    params: CreateOrderRequest
 ): Promise<{ data: CreateOrderResponse | null; error: string | null }> {
     const result = await postToEdge<CreateOrderResponse>('create-order', params);
     return result;
 }
 
 /**
- * Confirm delivery (buyer action).
+ * Capture payment - Seller accepts the order.
+ * Only callable by the seller of the order.
+ * Transitions: payment_authorized → accepted
  */
-export async function confirmDelivery(
+export async function capturePayment(
     orderId: string
 ): Promise<{ success: boolean; error: string | null }> {
-    const result = await postToEdge<{ success: boolean }>('confirm-delivery', { order_id: orderId });
+    const result = await postToEdge<CapturePaymentResponse>('capture-payment', { order_id: orderId });
     return { success: result.data?.success || false, error: result.error };
 }
 
 /**
+ * Deliver order - Seller marks order as delivered.
+ * Only callable by the seller of the order.
+ * Transitions: in_progress → delivered
+ */
+export async function deliverOrder(
+    orderId: string,
+    message?: string,
+    fileUrls?: string[]
+): Promise<{ success: boolean; error: string | null }> {
+    const payload: DeliverOrderRequest = { order_id: orderId };
+    if (message) payload.message = message;
+    if (fileUrls?.length) payload.file_urls = fileUrls;
+
+    const result = await postToEdge<DeliverOrderResponse>('deliver-order', payload);
+    return { success: result.data?.success || false, error: result.error };
+}
+
+/**
+ * Confirm delivery - Buyer confirms order completion.
+ * Only callable by the buyer of the order.
+ * Transitions: delivered → completed
+ * Triggers: distribute_commissions()
+ */
+export async function confirmDelivery(
+    orderId: string
+): Promise<{ success: boolean; error: string | null }> {
+    const result = await postToEdge<ConfirmDeliveryResponse>('confirm-delivery', { order_id: orderId });
+    return { success: result.data?.success || false, error: result.error };
+}
+
+/**
+ * Complete order - Alias for confirm-delivery (buyer action).
+ */
+export async function completeOrder(
+    orderId: string
+): Promise<{ success: boolean; error: string | null }> {
+    const result = await postToEdge<ConfirmDeliveryResponse>('complete-order', { order_id: orderId });
+    return { success: result.data?.success || false, error: result.error };
+}
+
+/**
+ * Cancel order and refund.
+ * Callable by buyer, seller, or admin (with appropriate permissions).
+ * Transitions: various → cancelled/refunded
+ */
+export async function cancelOrderAndRefund(
+    orderId: string,
+    reason: string
+): Promise<{ success: boolean; refundId?: string; error: string | null }> {
+    const result = await postToEdge<CancelOrderResponse>('cancel-order-and-refund', {
+        order_id: orderId,
+        reason,
+    });
+    return {
+        success: result.data?.success || false,
+        refundId: result.data?.refund_id,
+        error: result.error,
+    };
+}
+
+/**
  * Request revision (buyer action).
+ * Transitions: delivered → revision_requested
  */
 export async function requestRevision(
     orderId: string,
     reason: string
 ): Promise<{ success: boolean; error: string | null }> {
-    // This might be a direct DB update or an Edge Function depending on backend
     try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) {
+            return { success: false, error: 'Not authenticated' };
+        }
+
+        // Update order status via RLS-protected update
         const { error } = await supabase
             .from('orders')
-            .update({ status: 'revision_requested' })
-            .eq('id', orderId);
+            .update({ status: 'revision_requested' as OrderStatus })
+            .eq('id', orderId)
+            .eq('buyer_id', session.user.id); // Ensure only buyer can request revision
 
         if (error) {
             return { success: false, error: error.message };
@@ -348,10 +410,40 @@ export async function requestRevision(
         // Send system message about revision
         await supabase.from('order_messages').insert({
             order_id: orderId,
-            sender_id: (await supabase.auth.getSession()).data.session?.user.id,
-            content: `Revision requested: ${reason}`,
+            sender_id: session.user.id,
+            content: `Révision demandée: ${reason}`,
             is_system: true,
         });
+
+        return { success: true, error: null };
+    } catch (err) {
+        const message = err instanceof Error ? err.message : 'Unknown error';
+        return { success: false, error: message };
+    }
+}
+
+/**
+ * Start working on order - Seller starts work.
+ * Transitions: accepted → in_progress
+ */
+export async function startOrder(
+    orderId: string
+): Promise<{ success: boolean; error: string | null }> {
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) {
+            return { success: false, error: 'Not authenticated' };
+        }
+
+        const { error } = await supabase
+            .from('orders')
+            .update({ status: 'in_progress' as OrderStatus })
+            .eq('id', orderId)
+            .eq('seller_id', session.user.id); // Ensure only seller can start
+
+        if (error) {
+            return { success: false, error: error.message };
+        }
 
         return { success: true, error: null };
     } catch (err) {
