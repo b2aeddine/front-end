@@ -3,6 +3,7 @@ import { AuthProvider, ProtectedRoute, RedirectIfAuthenticated } from "./lib/aut
 import { AuthModalProvider } from "./lib/authModal";
 import { FrameScreen } from "./screens/FrameScreen";
 import { Dashboard } from "./routes/Dashboard/screens/Dashboard";
+import { OrdersPage } from "./routes/Dashboard/screens/OrdersPage";
 import { PagePublic } from "./routes/PagePublic/PagePublic";
 import { PageService } from "./routes/PageService/PageService";
 
@@ -22,6 +23,23 @@ export const App = (): JSX.Element => {
 
             {/* Protected dashboard routes */}
             <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/orders" element={
+              <ProtectedRoute>
+                <OrdersPage />
+              </ProtectedRoute>
+            } />
+
+            {/* Checkout return pages (Stripe redirects here after payment) */}
+            <Route path="/checkout/success" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/checkout/cancel" element={
               <ProtectedRoute>
                 <Dashboard />
               </ProtectedRoute>
