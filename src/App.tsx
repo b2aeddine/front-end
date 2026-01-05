@@ -5,6 +5,9 @@ import { MaintenanceBanner } from "./components/MaintenanceBanner";
 import { FrameScreen } from "./screens/FrameScreen";
 import { Dashboard } from "./routes/Dashboard/screens/Dashboard";
 import { OrdersPage } from "./routes/Dashboard/screens/OrdersPage";
+import { RevenuePage } from "./routes/Dashboard/screens/RevenuePage";
+import { MessagesPage } from "./routes/Dashboard/screens/MessagesPage";
+import { MessageDetailPage } from "./routes/Dashboard/screens/MessageDetailPage";
 import { PagePublic } from "./routes/PagePublic/PagePublic";
 import { PageService } from "./routes/PageService/PageService";
 
@@ -33,6 +36,21 @@ export const App = (): JSX.Element => {
             <Route path="/dashboard/orders" element={
               <ProtectedRoute>
                 <OrdersPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/revenues" element={
+              <ProtectedRoute>
+                <RevenuePage />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/messages" element={
+              <ProtectedRoute>
+                <MessagesPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/messages/:conversationId" element={
+              <ProtectedRoute>
+                <MessageDetailPage />
               </ProtectedRoute>
             } />
 
