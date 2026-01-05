@@ -1,51 +1,77 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../../../../components/ui/button";
 import { Card, CardContent } from "../../../../components/ui/card";
+import { fetchServices, Service } from "../../../../lib/queries/services";
 
-const creatorsData = [
+// Fallback data for demo mode or when no services are available
+const fallbackCreatorsData = [
   {
-    id: 1,
+    id: "1",
     serviceImage:
       "https://c.animaapp.com/mjqxqi8lTyFq6W/img/image-ou-video-du-services-2.png",
     profileImage: "https://c.animaapp.com/mjqxqi8lTyFq6W/img/image-pdp.png",
     serviceName: "nom du service",
+    slug: "demo-service-1",
     deliveryType: "livraison",
     rating: "4,9",
     reviewCount: "49",
     firstName: "Prenom",
     city: "Ville",
     bio: "BIO decrivez ce que vous représenter en quelque ligne",
-    price: "A partir de 10 $",
+    price: "A partir de 10 €",
   },
   {
-    id: 2,
+    id: "2",
     serviceImage:
       "https://c.animaapp.com/mjqxqi8lTyFq6W/img/image-ou-video-du-services-2.png",
     profileImage: "https://c.animaapp.com/mjqxqi8lTyFq6W/img/image-pdp-1.png",
     serviceName: "nom du service",
+    slug: "demo-service-2",
     deliveryType: "livraison",
     rating: "4,9",
     reviewCount: "49",
     firstName: "Prenom",
     city: "Ville",
     bio: "BIO decrivez ce que vous représenter en quelque ligne",
-    price: "A partir de 10 $",
+    price: "A partir de 10 €",
   },
   {
-    id: 3,
+    id: "3",
     serviceImage:
       "https://c.animaapp.com/mjqxqi8lTyFq6W/img/image-ou-video-du-services-2.png",
     profileImage: "https://c.animaapp.com/mjqxqi8lTyFq6W/img/image-pdp-2.png",
     serviceName: "nom du service",
+    slug: "demo-service-3",
     deliveryType: "livraison",
     rating: "4,9",
     reviewCount: "49",
     firstName: "Prenom",
     city: "Ville",
     bio: "BIO decrivez ce que vous représenter en quelque ligne",
-    price: "A partir de 10 $",
+    price: "A partir de 10 €",
   },
 ];
+
+// Transform Service from backend to display format
+function mapServiceToDisplay(service: Service) {
+  const primaryMedia = service.media?.find(m => m.is_primary) || service.media?.[0];
+
+  return {
+    id: service.id,
+    serviceImage: primaryMedia?.url || "https://c.animaapp.com/mjqxqi8lTyFq6W/img/image-ou-video-du-services-2.png",
+    profileImage: service.seller?.avatar_url || "https://c.animaapp.com/mjqxqi8lTyFq6W/img/image-pdp.png",
+    serviceName: service.title,
+    slug: service.slug,
+    deliveryType: `${service.min_delivery_days}j livraison`,
+    rating: service.rating_average?.toFixed(1)?.replace('.', ',') || "5,0",
+    reviewCount: String(service.rating_count || 0),
+    firstName: service.seller?.display_name || service.seller?.username || "Créateur",
+    city: "", // Not in the backend schema for now
+    bio: service.description?.substring(0, 80) + (service.description?.length > 80 ? '...' : '') || "",
+    price: `A partir de ${service.base_price} €`,
+  };
+}
 
 const socialIcons = [
   {
@@ -66,6 +92,39 @@ const socialIcons = [
 ];
 
 export const MainContentSection = (): JSX.Element => {
+  const navigate = useNavigate();
+  const [creators, setCreators] = useState(fallbackCreatorsData);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadServices() {
+      try {
+        const { data, error } = await fetchServices({}, { limit: 6 });
+
+        if (mounted && !error && data.length > 0) {
+          setCreators(data.map(mapServiceToDisplay));
+        }
+        // If no data or error, keep fallback data
+      } catch (err) {
+        console.error('[MainContent] Failed to load services:', err);
+      } finally {
+        if (mounted) setIsLoading(false);
+      }
+    }
+
+    loadServices();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const handleViewDetails = (slug: string) => {
+    navigate(`/service/${slug}`);
+  };
+
   return (
     <section className="flex flex-col w-full items-center gap-[33px] p-2.5 relative">
       <header className="inline-flex items-start justify-end gap-2.5 p-2.5 relative translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:0ms]">
@@ -81,7 +140,7 @@ export const MainContentSection = (): JSX.Element => {
       </header>
 
       <div className="flex flex-wrap justify-center items-center gap-10 md:gap-[85px] relative w-full">
-        {creatorsData.map((creator, index) => (
+        {creators.map((creator, index) => (
           <Card
             key={creator.id}
             className="flex flex-col w-full max-w-[389px] h-[383px] items-start justify-end gap-2.5 px-1 py-[5px] relative border-0 shadow-none bg-transparent translate-y-[-1rem] animate-fade-in opacity-0"
@@ -197,7 +256,10 @@ export const MainContentSection = (): JSX.Element => {
                     {creator.price}
                   </p>
 
-                  <Button className="w-[126px] h-9 bg-[#fea38e] hover:bg-[#fe8f77] rounded-[10px] transition-colors">
+                  <Button
+                    onClick={() => handleViewDetails(creator.slug)}
+                    className="w-[126px] h-9 bg-[#fea38e] hover:bg-[#fe8f77] rounded-[10px] transition-colors"
+                  >
                     <span className="[font-family:'DM_Sans',Helvetica] font-extrabold italic text-[#f8f5f0] text-sm text-center tracking-[0] leading-[normal]">
                       Voir les details
                     </span>

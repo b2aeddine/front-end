@@ -1,6 +1,14 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";
 import { Separator } from "../../components/ui/separator";
+import { useServiceContext } from "../../PageService";
+import { ServicePackage } from "../../../../lib/queries/services";
+import { createOrder } from "../../../../lib/queries/orders";
+import { useAuth } from "../../../../lib/auth";
+import { useAuthModal } from "../../../../lib/authModal";
+import { canCreateOrder } from "../../../../lib/featureFlags";
 
 const navLinks = [
   { label: "Partners" },
@@ -9,8 +17,10 @@ const navLinks = [
   { label: "Charity" },
 ];
 
-const pricingTiers = [
+// Fallback pricing tiers for demo mode
+const fallbackPricingTiers = [
   {
+    name: "premium" as const,
     title: "Ultra complet",
     price: "€ 299",
     duration: "⏱ 7j",
@@ -25,6 +35,7 @@ const pricingTiers = [
     textColor: "text-[#313d4f]",
   },
   {
+    name: "basic" as const,
     title: "Pour démarrer",
     price: "€ 129",
     duration: "⏱ 14j",
@@ -39,6 +50,7 @@ const pricingTiers = [
     textColor: "text-[#202224]",
   },
   {
+    name: "standard" as const,
     title: "Le meilleur choix",
     price: "€ 199",
     duration: "⏱ 10j",
@@ -54,7 +66,102 @@ const pricingTiers = [
   },
 ];
 
+// Map backend packages to display format
+function mapPackageToDisplay(pkg: ServicePackage, index: number) {
+  const titleMap: Record<string, string> = {
+    basic: "Pour démarrer",
+    standard: "Le meilleur choix",
+    premium: "Ultra complet",
+  };
+
+  const textColors = ["text-[#313d4f]", "text-[#202224]", "text-[#313d4f]"];
+
+  return {
+    name: pkg.name,
+    title: pkg.title || titleMap[pkg.name] || pkg.name,
+    price: `€ ${pkg.price}`,
+    duration: `⏱ ${pkg.delivery_days}j`,
+    revisions: pkg.revisions === -1 ? "↺ ∞" : `↺ ${pkg.revisions}`,
+    concepts: "",
+    features: pkg.features?.map((f, i) => ({
+      name: f,
+      included: true,
+    })) || [],
+    textColor: textColors[index % 3],
+  };
+}
+
 export const ProfileOverviewSection = (): JSX.Element => {
+  const navigate = useNavigate();
+  const { service, isLoading } = useServiceContext();
+  const { isAuthenticated } = useAuth();
+  const { openModal } = useAuthModal();
+  const [selectedPackage, setSelectedPackage] = useState<"basic" | "standard" | "premium">("basic");
+  const [isOrdering, setIsOrdering] = useState(false);
+
+  // Get pricing tiers from service or use fallback
+  const pricingTiers = service?.packages?.length
+    ? service.packages.map(mapPackageToDisplay)
+    : fallbackPricingTiers;
+
+  // Get service data or fallback
+  const serviceTitle = service?.title || "Titre du service";
+  const serviceDescription = service?.description || "Je réalise des vidéos percutantes qui racontent votre histoire et génèrent des résultats. Qu'il s'agisse de promos de marque, de publicités pour les réseaux sociaux ou de campagnes marketing, je fournis des visuels de haute qualité avec des transitions fluides, un message clair et un impact créatif.";
+  const sellerName = service?.seller?.display_name || service?.seller?.username || "Joscha";
+  const sellerUsername = service?.seller?.username || "joschamayer";
+  const sellerAvatar = service?.seller?.avatar_url || "https://c.animaapp.com/mjsa8xj74uh4Dq/img/joschamayer.png";
+  const sellerRating = service?.rating_average?.toFixed(1)?.replace('.', ',') || "4,9";
+  const reviewCount = service?.rating_count || 120;
+
+  // Handle order creation
+  const handleContactClick = async () => {
+    if (!isAuthenticated) {
+      openModal('login');
+      return;
+    }
+
+    if (!service) {
+      console.error('[Order] No service loaded');
+      return;
+    }
+
+    // Check feature flags
+    const { allowed, reason } = await canCreateOrder();
+    if (!allowed) {
+      console.error('[Order] Cannot create order:', reason);
+      return;
+    }
+
+    setIsOrdering(true);
+
+    try {
+      const { data, error } = await createOrder({
+        service_id: service.id,
+        package_name: selectedPackage,
+      });
+
+      if (error) {
+        console.error('[Order] Create failed:', error);
+        return;
+      }
+
+      if (data?.checkout_url) {
+        // Redirect to Stripe Checkout
+        window.location.href = data.checkout_url;
+      }
+    } catch (err) {
+      console.error('[Order] Exception:', err);
+    } finally {
+      setIsOrdering(false);
+    }
+  };
+
+  const handleViewProfile = () => {
+    if (service?.seller?.username) {
+      navigate(`/public/${service.seller.username}`);
+    }
+  };
+
   return (
     <section className="flex flex-col items-center gap-[70px] w-full">
       <div className="flex flex-col w-full max-w-[1192px] items-start gap-2.5">
@@ -129,7 +236,7 @@ export const ProfileOverviewSection = (): JSX.Element => {
         <div className="flex flex-col w-[855px] items-start gap-[41px]">
           <div className="flex flex-col items-center gap-[21px] w-full">
             <h1 className="[font-family:'DM_Sans',Helvetica] font-extrabold italic text-black text-xl text-center tracking-[0] leading-[normal]">
-              Titre du services
+              {serviceTitle}
             </h1>
 
             <div className="flex flex-col items-start gap-2.5 p-2.5 w-full">
@@ -138,17 +245,20 @@ export const ProfileOverviewSection = (): JSX.Element => {
                   <div className="relative w-40 h-40 bg-white rounded-[80px]">
                     <div className="absolute -top-2 -left-2 w-44 h-44 rounded-[88px] bg-[linear-gradient(225deg,rgba(254,163,142,1)_0%,rgba(254,163,142,1)_38%,rgba(254,163,142,0.5)_63%,rgba(254,163,142,0.3)_100%)]" />
                     <div className="absolute top-0 left-0 w-40 h-40 flex">
-                      <div className="flex-1 w-40 rounded-[80px] border-2 border-solid border-white bg-[url(https://c.animaapp.com/mjsa8xj74uh4Dq/img/joschamayer.png)] bg-cover bg-[50%_50%]" />
+                      <div
+                        className="flex-1 w-40 rounded-[80px] border-2 border-solid border-white bg-cover bg-[50%_50%]"
+                        style={{ backgroundImage: `url(${sellerAvatar})` }}
+                      />
                     </div>
                   </div>
 
                   <div className="flex flex-col w-[445.65px] items-start gap-2">
                     <div className="inline-flex items-center gap-2">
                       <h2 className="[font-family:'Inter',Helvetica] font-bold text-[#222325] text-[23.4px] tracking-[0] leading-8 whitespace-nowrap">
-                        Joscha
+                        {sellerName}
                       </h2>
                       <span className="[font-family:'Inter',Helvetica] font-normal text-[#74767e] text-lg tracking-[0] leading-[26px] whitespace-nowrap">
-                        @joschamayer
+                        @{sellerUsername}
                       </span>
                     </div>
 
@@ -159,11 +269,11 @@ export const ProfileOverviewSection = (): JSX.Element => {
                         src="https://c.animaapp.com/mjsa8xj74uh4Dq/img/svg-3.svg"
                       />
                       <div className="absolute top-0 left-5 w-[25px] h-6 flex items-center justify-center [font-family:'Inter',Helvetica] font-bold text-[#222325] text-[15.1px] tracking-[0] leading-6 whitespace-nowrap">
-                        4,9
+                        {sellerRating}
                       </div>
                       <div className="absolute top-1 left-12 w-9 h-4 flex items-center justify-center [font-family:'Inter',Helvetica] font-normal text-[#74767e] text-[14.8px] tracking-[0] leading-6 whitespace-nowrap">
                         <span>(</span>
-                        <span className="underline">120</span>
+                        <span className="underline">{reviewCount}</span>
                         <span>)</span>
                       </div>
                     </div>
@@ -189,7 +299,10 @@ export const ProfileOverviewSection = (): JSX.Element => {
                   </div>
                 </div>
 
-                <Button className="h-9 w-[126px] bg-[#fea38e] hover:bg-[#fea38e]/90 rounded-[10px] shadow-[0px_3px_3px_#00000040]">
+                <Button
+                  onClick={handleViewProfile}
+                  className="h-9 w-[126px] bg-[#fea38e] hover:bg-[#fea38e]/90 rounded-[10px] shadow-[0px_3px_3px_#00000040]"
+                >
                   <span className="[font-family:'DM_Sans',Helvetica] font-extrabold italic text-white text-sm text-center tracking-[0] leading-[normal]">
                     Voir mon profil
                   </span>
@@ -218,18 +331,14 @@ export const ProfileOverviewSection = (): JSX.Element => {
 
             <div className="flex flex-col h-[117px] items-start gap-2.5 px-0 py-[18px] w-full rounded-[14px] border border-solid border-[#74767e4c] relative">
               <p className="[font-family:'DM_Sans',Helvetica] font-medium text-[#404145] text-base tracking-[0] leading-6 w-[779.39px]">
-                Je réalise des vidéos percutantes qui racontent votre histoire
-                et génèrent des résultats. Qu&#39;il s&#39;agisse
-                <br />
-                de promos de marque, de publicités pour les réseaux sociaux ou
-                de campagnes marketing, je fournis
-                <br />
-                des visuels de haute qualité avec des transitions fluides, un
-                message clair et un impact cr...
+                {serviceDescription.substring(0, 250)}
+                {serviceDescription.length > 250 ? '...' : ''}
               </p>
-              <button className="absolute top-20 left-[704px] [font-family:'Inter',Helvetica] font-normal text-[#404145] text-base tracking-[0] leading-6 underline whitespace-nowrap hover:opacity-80 transition-opacity">
-                Plus d&apos;infos
-              </button>
+              {serviceDescription.length > 250 && (
+                <button className="absolute top-20 left-[704px] [font-family:'Inter',Helvetica] font-normal text-[#404145] text-base tracking-[0] leading-6 underline whitespace-nowrap hover:opacity-80 transition-opacity">
+                  Plus d&apos;infos
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -238,24 +347,33 @@ export const ProfileOverviewSection = (): JSX.Element => {
           <CardContent className="flex flex-col w-[362px] items-center gap-5 p-7 pt-[26px]">
             <div className="flex flex-col items-center gap-2 w-full">
               <div className="inline-flex items-center">
-                <div className="w-[31px] h-[33px] bg-[#fea38e] rounded-[15.5px/16.5px]" />
-                <div className="w-14 h-[5px] bg-[#fea38e]" />
-                <div className="w-14 h-[5px] bg-[#d9d9d9]" />
-                <div className="w-[31px] h-[33px] bg-[#d9d9d9] rounded-[15.5px/16.5px]" />
-                <div className="w-14 h-[5px] bg-[#d9d9d9]" />
-                <div className="w-14 h-[5px] bg-[#d9d9d9]" />
-                <div className="w-[31px] h-[33px] bg-[#d9d9d9] rounded-[15.5px/16.5px]" />
+                <div className={`w-[31px] h-[33px] ${selectedPackage === 'basic' ? 'bg-[#fea38e]' : 'bg-[#d9d9d9]'} rounded-[15.5px/16.5px] cursor-pointer`} onClick={() => setSelectedPackage('basic')} />
+                <div className={`w-14 h-[5px] ${selectedPackage === 'basic' ? 'bg-[#fea38e]' : 'bg-[#d9d9d9]'}`} />
+                <div className={`w-14 h-[5px] ${selectedPackage === 'standard' ? 'bg-[#fea38e]' : 'bg-[#d9d9d9]'}`} />
+                <div className={`w-[31px] h-[33px] ${selectedPackage === 'standard' ? 'bg-[#fea38e]' : 'bg-[#d9d9d9]'} rounded-[15.5px/16.5px] cursor-pointer`} onClick={() => setSelectedPackage('standard')} />
+                <div className={`w-14 h-[5px] ${selectedPackage === 'standard' ? 'bg-[#fea38e]' : 'bg-[#d9d9d9]'}`} />
+                <div className={`w-14 h-[5px] ${selectedPackage === 'premium' ? 'bg-[#fea38e]' : 'bg-[#d9d9d9]'}`} />
+                <div className={`w-[31px] h-[33px] ${selectedPackage === 'premium' ? 'bg-[#fea38e]' : 'bg-[#d9d9d9]'} rounded-[15.5px/16.5px] cursor-pointer`} onClick={() => setSelectedPackage('premium')} />
               </div>
 
               <div className="flex items-center gap-[74px] w-full">
-                <span className="[font-family:'Inter',Helvetica] font-normal text-black text-base text-center tracking-[0] leading-6 whitespace-nowrap w-[68px]">
+                <span
+                  onClick={() => setSelectedPackage('basic')}
+                  className={`[font-family:'Inter',Helvetica] font-normal text-black text-base text-center tracking-[0] leading-6 whitespace-nowrap w-[68px] cursor-pointer ${selectedPackage === 'basic' ? 'font-bold' : ''}`}
+                >
                   basic
                 </span>
-                <span className="[font-family:'Inter',Helvetica] font-normal text-black text-base text-center tracking-[0] leading-6 whitespace-nowrap w-[68px]">
-                  basic
+                <span
+                  onClick={() => setSelectedPackage('standard')}
+                  className={`[font-family:'Inter',Helvetica] font-normal text-black text-base text-center tracking-[0] leading-6 whitespace-nowrap w-[68px] cursor-pointer ${selectedPackage === 'standard' ? 'font-bold' : ''}`}
+                >
+                  standard
                 </span>
-                <span className="[font-family:'Inter',Helvetica] font-normal text-black text-base text-center tracking-[0] leading-6 whitespace-nowrap w-[68px]">
-                  basic
+                <span
+                  onClick={() => setSelectedPackage('premium')}
+                  className={`[font-family:'Inter',Helvetica] font-normal text-black text-base text-center tracking-[0] leading-6 whitespace-nowrap w-[68px] cursor-pointer ${selectedPackage === 'premium' ? 'font-bold' : ''}`}
+                >
+                  premium
                 </span>
               </div>
             </div>
@@ -332,14 +450,18 @@ export const ProfileOverviewSection = (): JSX.Element => {
               Temps de réponse moyen de 3 heures
             </p>
 
-            <Button className="h-12 w-full bg-[#fea38e] hover:bg-[#fea38e]/90 rounded-lg border border-solid border-transparent shadow-[0px_2px_5px_#0000001a,0px_9px_9px_#00000017,0px_20px_12px_#0000000d,0px_35px_14px_#00000003,0px_55px_15px_transparent] relative">
+            <Button
+              onClick={handleContactClick}
+              disabled={isOrdering}
+              className="h-12 w-full bg-[#fea38e] hover:bg-[#fea38e]/90 rounded-lg border border-solid border-transparent shadow-[0px_2px_5px_#0000001a,0px_9px_9px_#00000017,0px_20px_12px_#0000000d,0px_35px_14px_#00000003,0px_55px_15px_transparent] relative disabled:opacity-50"
+            >
               <img
                 className="absolute top-[calc(50.00%_-_8px)] left-[calc(50.00%_-_70px)] w-4 h-4"
                 alt="Contact"
                 src="https://c.animaapp.com/mjsa8xj74uh4Dq/img/svg-48.svg"
               />
               <span className="[font-family:'Inter',Helvetica] font-semibold text-white text-[15.9px] text-center tracking-[0] leading-[26px] whitespace-nowrap">
-                Contactez-moi
+                {isOrdering ? 'Chargement...' : 'Commander'}
               </span>
             </Button>
           </CardContent>
