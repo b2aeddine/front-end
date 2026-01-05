@@ -32,6 +32,7 @@ interface AuthContextType {
     signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
     signUp: (email: string, password: string, metadata?: Record<string, unknown>) => Promise<{ error: AuthError | null }>;
     signOut: () => Promise<void>;
+    resetPassword: (email: string) => Promise<{ error: AuthError | null; success: boolean }>;
     refreshProfile: () => Promise<void>;
 }
 
@@ -186,6 +187,17 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
         setRoles([]);
     };
 
+    const resetPassword = async (email: string) => {
+        if (isDemoMode) {
+            console.warn('[Auth] Cannot reset password - demo mode');
+            return { error: { message: 'Demo mode - configure Supabase to enable auth' } as AuthError, success: false };
+        }
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: `${window.location.origin}/reset-password`,
+        });
+        return { error, success: !error };
+    };
+
     const refreshProfile = async () => {
         if (user) {
             await fetchUserData(user.id);
@@ -203,6 +215,7 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
         signIn,
         signUp,
         signOut,
+        resetPassword,
         refreshProfile,
     };
 
@@ -255,6 +268,43 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps):
         if (!hasRole) {
             return <Navigate to="/dashboard" replace />;
         }
+    }
+
+    return <>{children}</>;
+}
+
+// ============================================================================
+// Redirect If Authenticated (for public pages like home)
+// ============================================================================
+
+interface RedirectIfAuthenticatedProps {
+    children: ReactNode;
+    redirectTo?: string;
+}
+
+/**
+ * Wrapper that redirects authenticated users to dashboard.
+ * Used for landing page and other public-only pages.
+ */
+export function RedirectIfAuthenticated({
+    children,
+    redirectTo = '/dashboard'
+}: RedirectIfAuthenticatedProps): JSX.Element {
+    const { isAuthenticated, isLoading, isDemoMode } = useAuth();
+
+    // In demo mode, show the page normally
+    if (isDemoMode) {
+        return <>{children}</>;
+    }
+
+    // Show nothing while loading (invisible - no UI change)
+    if (isLoading) {
+        return <div data-loading="true" style={{ visibility: 'hidden' }}>{children}</div>;
+    }
+
+    // Redirect to dashboard if already authenticated
+    if (isAuthenticated) {
+        return <Navigate to={redirectTo} replace />;
     }
 
     return <>{children}</>;
