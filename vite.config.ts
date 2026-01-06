@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => ({
     host: true,
     port: 3000,
   },
-  publicDir: "./static",
+  publicDir: "public",
   base: "./",
   css: {
     postcss: {

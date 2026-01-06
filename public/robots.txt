@@ -4,4 +4,4 @@ Disallow: /nogooglebot/
 User-agent: *
 Allow: /
 
-Sitemap: https://sans-titre-j3ibpk.teleporthq.app/sitemap.xml
+Sitemap: https://sans-titre-98gkdv.teleporthq.app/sitemap.xml

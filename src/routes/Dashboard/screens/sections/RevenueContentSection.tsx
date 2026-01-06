@@ -6,6 +6,7 @@ import {
     TrendingUpIcon,
 } from "lucide-react";
 import { Button } from "../../../../components/ui/button";
+import { Card, CardContent } from "../../../../components/ui/card";
 import {
     Select,
     SelectContent,
@@ -165,147 +166,157 @@ export const RevenueContentSection = (): JSX.Element => {
                 />
 
                 <div className="w-full max-w-7xl mx-auto px-8 py-8 flex flex-col gap-8">
-                <h1 className="text-3xl font-bold text-gray-900 [font-family:'Nunito_Sans',Helvetica]">
-                    Revenue
-                </h1>
+                    <h1 className="text-3xl font-bold text-gray-900 [font-family:'Nunito_Sans',Helvetica]">
+                        Revenue
+                    </h1>
 
-                {/* KPIs Section */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
-                    {statsCards.map((stat, index) => (
-                        <div
-                            key={index}
-                            className={`${stat.bgColor} rounded-[14px] p-6 shadow-sm border border-gray-100 relative overflow-hidden h-[160px] flex flex-col justify-between`}
-                        >
-                            <div className="w-full h-full flex flex-col justify-between">
-                                <div className="flex justify-between items-start w-full">
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-gray-600 text-sm font-semibold [font-family:'Nunito_Sans',Helvetica]">
-                                            {stat.title}
-                                        </span>
-                                        <span className="text-gray-900 text-3xl font-bold [font-family:'Nunito_Sans',Helvetica]">
+                    {/* KPIs Section */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+                        {statsCards.map((stat, index) => (
+                            <Card
+                                key={index}
+                                className="bg-[#f8f5f0] rounded-[6.64px] border border-solid border-[#97979766] shadow-[2.85px_2.85px_25.61px_#0000000d]"
+                            >
+                                <CardContent className="p-[7px] flex flex-col gap-2.5">
+                                    <div className="flex flex-col gap-0.5">
+                                        <div className="flex items-center justify-between gap-2">
+                                            <div className="opacity-80 [font-family:'Nunito_Sans',Helvetica] font-semibold text-[#202224] text-[10px] whitespace-pre-line">
+                                                {stat.title}
+                                            </div>
+                                            <img
+                                                className="w-[28.45px] h-[28.45px]"
+                                                alt="Icon"
+                                                src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon.png"
+                                            />
+                                        </div>
+
+                                        <div className="[font-family:'Nunito_Sans',Helvetica] font-bold text-[#202224] text-[13.3px] tracking-[0.47px]">
                                             {isLoading ? '...' : stat.value}
-                                        </span>
+                                        </div>
+
+                                        <div className="flex items-center gap-1">
+                                            {stat.change >= 0 ? (
+                                                <TrendingUpIcon className="w-3 h-3 text-[#00b69b]" />
+                                            ) : (
+                                                <TrendingDownIcon className="w-3 h-3 text-[#f93c65]" />
+                                            )}
+                                            <div className="[font-family:'Nunito_Sans',Helvetica] font-semibold text-[7.6px]">
+                                                <span
+                                                    className={
+                                                        stat.change >= 0
+                                                            ? "text-[#00b69b]"
+                                                            : "text-[#f93c65]"
+                                                    }
+                                                >
+                                                    {Math.abs(stat.change).toFixed(1)}%
+                                                </span>
+                                                <span className="text-[#606060]">
+                                                    {" "}
+                                                    {stat.change >= 0 ? 'Up' : 'Down'} from yesterday
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className={`w-12 h-12 ${stat.iconBg} rounded-2xl flex items-center justify-center`}>
-                                        {stat.change >= 0 ? (
-                                            <TrendingUpIcon className="w-6 h-6 text-current" />
-                                        ) : (
-                                            <TrendingDownIcon className="w-6 h-6 text-current" />
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-2 mt-2">
-                                    {stat.change >= 0 ? (
-                                        <TrendingUpIcon className="w-4 h-4 text-[#00b69b]" />
-                                    ) : (
-                                        <TrendingDownIcon className="w-4 h-4 text-[#f93c65]" />
-                                    )}
-                                    <span className={`font-bold text-sm ${stat.change >= 0 ? 'text-[#00b69b]' : 'text-[#f93c65]'}`}>
-                                        {Math.abs(stat.change).toFixed(1)}%
-                                    </span>
-                                    <span className="text-gray-400 text-xs font-semibold">
-                                        {stat.change >= 0 ? 'Up' : 'Down'} from yesterday
-                                    </span>
-                                </div>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+
+                    {/* Filter Bar */}
+                    <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2 border border-gray-200 rounded-md px-3 py-2 bg-transparent text-gray-600">
+                                <FilterIcon className="w-4 h-4" />
+                                <span className="text-sm font-bold [font-family:'Nunito_Sans',Helvetica]">Filter By</span>
                             </div>
+
+                            <Select value={sortOrder} onValueChange={setSortOrder}>
+                                <SelectTrigger className="w-[120px] bg-gray-50 border-none font-semibold focus:ring-0 rounded-full">
+                                    <SelectValue placeholder="Date" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="newest">Plus récent</SelectItem>
+                                    <SelectItem value="oldest">Plus ancien</SelectItem>
+                                </SelectContent>
+                            </Select>
+
+                            <Select value={statusFilter} onValueChange={setStatusFilter}>
+                                <SelectTrigger className="w-[150px] bg-gray-50 border-none font-semibold focus:ring-0 rounded-full">
+                                    <SelectValue placeholder="Order Status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Tous</SelectItem>
+                                    <SelectItem value="pending">En attente</SelectItem>
+                                    <SelectItem value="available">Disponible</SelectItem>
+                                    <SelectItem value="withdrawn">Retiré</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
-                    ))}
-                </div>
 
-                {/* Filter Bar */}
-                <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2 border border-gray-200 rounded-md px-3 py-2 bg-transparent text-gray-600">
-                            <FilterIcon className="w-4 h-4" />
-                            <span className="text-sm font-bold [font-family:'Nunito_Sans',Helvetica]">Filter By</span>
-                        </div>
-
-                        <Select value={sortOrder} onValueChange={setSortOrder}>
-                            <SelectTrigger className="w-[120px] bg-gray-50 border-none font-semibold focus:ring-0 rounded-full">
-                                <SelectValue placeholder="Date" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="newest">Plus récent</SelectItem>
-                                <SelectItem value="oldest">Plus ancien</SelectItem>
-                            </SelectContent>
-                        </Select>
-
-                        <Select value={statusFilter} onValueChange={setStatusFilter}>
-                            <SelectTrigger className="w-[150px] bg-gray-50 border-none font-semibold focus:ring-0 rounded-full">
-                                <SelectValue placeholder="Order Status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">Tous</SelectItem>
-                                <SelectItem value="pending">En attente</SelectItem>
-                                <SelectItem value="available">Disponible</SelectItem>
-                                <SelectItem value="withdrawn">Retiré</SelectItem>
-                            </SelectContent>
-                        </Select>
+                        <Button variant="ghost" className="text-red-500 hover:text-red-600 font-bold [font-family:'Nunito_Sans',Helvetica]" onClick={resetFilters}>
+                            <RotateCcwIcon className="w-4 h-4 mr-2" />
+                            Reset Filter
+                        </Button>
                     </div>
 
-                    <Button variant="ghost" className="text-red-500 hover:text-red-600 font-bold [font-family:'Nunito_Sans',Helvetica]" onClick={resetFilters}>
-                        <RotateCcwIcon className="w-4 h-4 mr-2" />
-                        Reset Filter
-                    </Button>
-                </div>
-
-                {/* Main Table */}
-                <div className="bg-white rounded-[14px] shadow-sm overflow-hidden border border-gray-100">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="bg-gray-50/50 border-b border-gray-100">
-                                    <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider [font-family:'Nunito_Sans',Helvetica] opacity-70">ID</th>
-                                    <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider [font-family:'Nunito_Sans',Helvetica] opacity-70">NAME</th>
-                                    <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider [font-family:'Nunito_Sans',Helvetica] opacity-70">ADDRESS</th>
-                                    <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider [font-family:'Nunito_Sans',Helvetica] opacity-70">DATE</th>
-                                    <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider [font-family:'Nunito_Sans',Helvetica] opacity-70">TYPE</th>
-                                    <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider [font-family:'Nunito_Sans',Helvetica] opacity-70">STATUS</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                {isLoading ? (
-                                    <tr>
-                                        <td colSpan={6} className="p-6 text-center text-gray-500">Chargement...</td>
+                    {/* Main Table */}
+                    <div className="bg-white rounded-[14px] shadow-sm overflow-hidden border border-gray-100">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="bg-gray-50/50 border-b border-gray-100">
+                                        <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider [font-family:'Nunito_Sans',Helvetica] opacity-70">ID</th>
+                                        <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider [font-family:'Nunito_Sans',Helvetica] opacity-70">NAME</th>
+                                        <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider [font-family:'Nunito_Sans',Helvetica] opacity-70">ADDRESS</th>
+                                        <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider [font-family:'Nunito_Sans',Helvetica] opacity-70">DATE</th>
+                                        <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider [font-family:'Nunito_Sans',Helvetica] opacity-70">TYPE</th>
+                                        <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider [font-family:'Nunito_Sans',Helvetica] opacity-70">STATUS</th>
                                     </tr>
-                                ) : filteredRevenues.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={6} className="p-6 text-center text-gray-500">Aucun revenu trouvé</td>
-                                    </tr>
-                                ) : (
-                                    filteredRevenues.map((revenue) => {
-                                        const statusDisplay = getStatusDisplay(revenue.status);
-                                        return (
-                                            <tr key={revenue.id} className="hover:bg-gray-50 transition-colors">
-                                                <td className="p-6 text-sm font-bold text-gray-900 [font-family:'Nunito_Sans',Helvetica]">
-                                                    {revenue.order_number?.slice(-5) || revenue.id.slice(-5)}
-                                                </td>
-                                                <td className="p-6 text-sm font-medium text-gray-900 [font-family:'Nunito_Sans',Helvetica]">
-                                                    {revenue.buyer_name || 'Client'}
-                                                </td>
-                                                <td className="p-6 text-sm text-gray-500 [font-family:'Nunito_Sans',Helvetica]">
-                                                    {revenue.service_title || 'Service'}
-                                                </td>
-                                                <td className="p-6 text-sm text-gray-500 [font-family:'Nunito_Sans',Helvetica]">
-                                                    {new Date(revenue.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
-                                                </td>
-                                                <td className="p-6 text-sm text-gray-900 [font-family:'Nunito_Sans',Helvetica]">
-                                                    €{revenue.amount?.toFixed(2) || '0.00'}
-                                                </td>
-                                                <td className="p-6">
-                                                    <span className={`inline-flex items-center px-4 py-1.5 rounded-lg text-xs font-bold [font-family:'Nunito_Sans',Helvetica] ${statusDisplay.color}`}>
-                                                        {statusDisplay.label}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div className="p-6 border-t border-gray-100 flex justify-between items-center text-sm text-gray-500 [font-family:'Nunito_Sans',Helvetica]">
-                        <span>Affichage de {filteredRevenues.length} transaction{filteredRevenues.length > 1 ? 's' : ''}</span>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100">
+                                    {isLoading ? (
+                                        <tr>
+                                            <td colSpan={6} className="p-6 text-center text-gray-500">Chargement...</td>
+                                        </tr>
+                                    ) : filteredRevenues.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={6} className="p-6 text-center text-gray-500">Aucun revenu trouvé</td>
+                                        </tr>
+                                    ) : (
+                                        filteredRevenues.map((revenue) => {
+                                            const statusDisplay = getStatusDisplay(revenue.status);
+                                            return (
+                                                <tr key={revenue.id} className="hover:bg-gray-50 transition-colors">
+                                                    <td className="p-6 text-sm font-bold text-gray-900 [font-family:'Nunito_Sans',Helvetica]">
+                                                        {revenue.order_number?.slice(-5) || revenue.id.slice(-5)}
+                                                    </td>
+                                                    <td className="p-6 text-sm font-medium text-gray-900 [font-family:'Nunito_Sans',Helvetica]">
+                                                        {revenue.buyer_name || 'Client'}
+                                                    </td>
+                                                    <td className="p-6 text-sm text-gray-500 [font-family:'Nunito_Sans',Helvetica]">
+                                                        {revenue.service_title || 'Service'}
+                                                    </td>
+                                                    <td className="p-6 text-sm text-gray-500 [font-family:'Nunito_Sans',Helvetica]">
+                                                        {new Date(revenue.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                                    </td>
+                                                    <td className="p-6 text-sm text-gray-900 [font-family:'Nunito_Sans',Helvetica]">
+                                                        €{revenue.amount?.toFixed(2) || '0.00'}
+                                                    </td>
+                                                    <td className="p-6">
+                                                        <span className={`inline-flex items-center px-4 py-1.5 rounded-lg text-xs font-bold [font-family:'Nunito_Sans',Helvetica] ${statusDisplay.color}`}>
+                                                            {statusDisplay.label}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div className="p-6 border-t border-gray-100 flex justify-between items-center text-sm text-gray-500 [font-family:'Nunito_Sans',Helvetica]">
+                            <span>Affichage de {filteredRevenues.length} transaction{filteredRevenues.length > 1 ? 's' : ''}</span>
+                        </div>
                     </div>
                 </div>
             </div>

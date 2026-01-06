@@ -10,6 +10,7 @@ import { MessagesPage } from "./routes/Dashboard/screens/MessagesPage";
 import { MessageDetailPage } from "./routes/Dashboard/screens/MessageDetailPage";
 import { PagePublic } from "./routes/PagePublic/PagePublic";
 import { PageService } from "./routes/PageService/PageService";
+import { ProfilePage } from "./routes/Dashboard/screens/ProfilePage";
 
 
 export const App = (): JSX.Element => {
@@ -51,6 +52,11 @@ export const App = (): JSX.Element => {
             <Route path="/dashboard/messages/:conversationId" element={
               <ProtectedRoute>
                 <MessageDetailPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/profile" element={
+              <ProtectedRoute>
+                <ProfilePage />
               </ProtectedRoute>
             } />
 

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Helmet } from "react-helmet";
-import "./OrderListSection.css";
 import {
     FilterIcon,
     RotateCcwIcon,
+    TrendingDownIcon,
+    TrendingUpIcon,
 } from "lucide-react";
 import { Button } from "../../../../components/ui/button";
+import { Card, CardContent } from "../../../../components/ui/card";
 import {
     Select,
     SelectContent,
@@ -43,7 +44,7 @@ interface OrderStats {
 }
 
 export const OrderListSection = (): JSX.Element => {
-    const { user, roles } = useAuth();
+    const { user, profile, roles } = useAuth();
     const [orders, setOrders] = useState<Order[]>([]);
     const [stats, setStats] = useState<OrderStats>({ total: 0, inProgress: 0, pending: 0, completed: 0 });
     const [isLoading, setIsLoading] = useState(true);
@@ -54,6 +55,10 @@ export const OrderListSection = (): JSX.Element => {
     const primaryRole = roles.find(r => r.status === 'active')?.role;
     const dashboardRole: 'buyer' | 'seller' =
         primaryRole === 'freelance' || primaryRole === 'influencer' ? 'seller' : 'buyer';
+
+    // Display name for header
+    const displayName = profile?.display_name || profile?.username || user?.email?.split('@')[0] || 'Utilisateur';
+    const avatarUrl = profile?.avatar_url || "https://c.animaapp.com/mjs8bxbnJhG6tv/img/man-438081-960-720.png";
 
     useEffect(() => {
         if (!user?.id) return;
@@ -98,186 +103,102 @@ export const OrderListSection = (): JSX.Element => {
         setSortOrder("newest");
     };
 
+    const statsCards = [
+        {
+            title: "Total des commandes",
+            value: stats.total.toString(),
+            change: 0, // Placeholder as we don't have historical data yet
+            changeText: "toutes vos commandes"
+        },
+        {
+            title: "En cours",
+            value: stats.inProgress.toString(),
+            change: 0,
+            changeText: "commandes actives"
+        },
+        {
+            title: "En attente",
+            value: stats.pending.toString(),
+            change: 0,
+            changeText: "attente de traitement"
+        },
+        {
+            title: "Terminées",
+            value: stats.completed.toString(),
+            change: 0,
+            changeText: "commandes livrées"
+        },
+    ];
+
     return (
-        <div className="dashbord-container1 w-full bg-[#F5F5F0]">
-            <Helmet>
-                <title>exported project</title>
-                <meta property="og:title" content="exported project" />
-            </Helmet>
-            <div className="dashbord-thq-dashbord-elm w-full justify-start"> {/* Modified simplify layout */}
-                <div className="dashbord-thq-frame14672-elm w-full border-none"> {/* removed fixed width to allow fluid */}
-                    <div className="dashbord-thq-navigation-top-bar1-elm w-full justify-between px-8 bg-[#F8F5F0]"> {/* fluid width and padding */}
-                        <div className="dashbord-thq-frame14705-elm relative top-0 left-0 w-full max-w-7xl mx-auto flex items-center justify-between h-full"> {/* Centered content wrapper */}
-                            <div className="dashbord-thq-search-elm1">
-                                {/* Search Input Placeholder - keeping structure */}
-                                <div className="relative w-full h-full flex items-center bg-[#F5F6FA] rounded-full px-4 border border-gray-200">
-                                    <span className="dashbord-thq-text-elm30 text-gray-400 text-sm">Search</span>
-                                    <div className="absolute right-4 flex gap-2">
-                                        <img
-                                            alt="Oval2733"
-                                            src="/oval2733-k2xi.svg"
-                                            className="w-4 h-4 opacity-50"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="dashbord-thq-frame14704-elm flex items-center gap-6">
-                                <div className="dashbord-thq-icon-elm10 relative w-8 h-8">
-                                    <div className="dashbord-thq-icon-elm11 w-full h-full">
-                                        <img
-                                            alt="CombinedShape2733"
-                                            src="/combinedshape2733-081b.svg"
-                                            className="dashbord-thq-combined-shape-elm1 w-full h-full"
-                                        />
-                                        {/* Notification Badge */}
-                                        <div className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></div>
-                                    </div>
-                                </div>
-
-                                <div className="dashbord-thq-english-elm flex items-center gap-2">
-                                    <div className="dashbord-thq-flag-elm w-6 h-4 relative overflow-hidden rounded-sm">
-                                        <img
-                                            alt="UKFlag2733"
-                                            src="/ukflag2733-i80a-200h.png"
-                                            className="w-full h-full object-cover"
-                                        />
-                                    </div>
-                                    <span className="dashbord-thq-text-elm31 font-semibold text-gray-600 text-sm">English</span>
-                                    <img
-                                        alt="Shape2733"
-                                        src="/shape2733-n9lp.svg"
-                                        className="w-2 h-2"
-                                    />
-                                </div>
-
-                                <div className="dashbord-thq-profile-elm flex items-center gap-3 pl-4 border-l border-gray-200">
-                                    <div className="dashbord-thq-man438081960720-elm w-10 h-10 rounded-full overflow-hidden">
-                                        <img
-                                            alt="allefvinicius343875unsplash2733"
-                                            src="/allefvinicius343875unsplash2733-cg9f-200h.png"
-                                            className="w-full h-full object-cover"
-                                        />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="dashbord-thq-text-elm32 font-bold text-gray-800 text-sm">Moni Roy</span>
-                                        <span className="dashbord-thq-text-elm33 font-semibold text-gray-500 text-xs text-left">Admin</span>
-                                    </div>
-                                    <div className="dashbord-thq-more-elm ml-2">
-                                        <div className="w-6 h-6 flex items-center justify-center border border-gray-300 rounded-full">
-                                            <img
-                                                alt="Shape2733"
-                                                src="/shape2733-ibg.svg"
-                                                className="w-2 h-2"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="dashbord-thq-frame14753-elm relative w-full h-[300px] overflow-hidden"> {/* Background container */}
-                        <div className="dashbord-thq-main-bg-color-elm absolute inset-0 w-full h-full">
-                            <img
-                                alt="MainBg2733"
-                                src="/mainbg2733-7wf-1300w.png"
-                                className="dashbord-thq-main-bg-elm w-full h-full object-cover absolute top-0 left-0"
-                            />
-                            {/* Decorative floating elements */}
-                            <img
-                                alt="Vector2733"
-                                src="/vector2733-slfb.svg"
-                                className="dashbord-thq-vector-elm1 absolute top-10 right-20 w-32 opacity-80"
-                            />
-                            <img
-                                alt="Removebg12733"
-                                src="/removebg12733-3td-200w.png"
-                                className="dashbord-thq-removebg1-elm absolute top-20 right-40 w-24"
-                            />
-                        </div>
+        <section className="flex flex-col w-full items-start border border-solid border-[#9797974c]">
+            {/* Header */}
+            <header className="relative w-full h-[70px] bg-[#f8f5f0] border-b border-[#97979766] px-8 flex items-center justify-end">
+                <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+                        <img
+                            src={avatarUrl}
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                        />
                     </div>
                 </div>
-            </div>
+            </header>
 
-            <div className="dashbord-thq-frame14724-elm w-full max-w-7xl mx-auto px-8 -mt-20 relative z-10 flex flex-col gap-8">
-                <span className="dashbord-thq-text-elm34 text-3xl font-bold text-gray-900">Order Lists</span>
+            {/* Content with decorative background */}
+            <div className="flex flex-col items-start gap-2.5 relative w-full min-h-screen">
+                <img
+                    className="absolute top-0 left-0 w-full h-[1313.24px] object-cover -z-10"
+                    alt="Main bg color"
+                    src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/main-bg-color.svg"
+                />
 
-                <div className="dashbord-thq-frame14723-elm w-full flex flex-col gap-8">
+                <div className="w-full max-w-7xl mx-auto px-8 py-8 flex flex-col gap-8">
+                    <h1 className="text-3xl font-bold text-gray-900 [font-family:'Nunito_Sans',Helvetica]">
+                        Commandes
+                    </h1>
 
                     {/* KPIs Section */}
-                    <div className="dashbord-thq-frame13968-elm grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full"> {/* Grid Layout */}
-                        {/* KPI 1 - Total */}
-                        <div className="dashbord-thq-frame14754-elm bg-[#fff8e5] rounded-[14px] p-6 shadow-sm border border-gray-100 relative overflow-hidden h-[160px] flex flex-col justify-between">
-                            <div className="dashbord-thq-total-order-elm1 w-full h-full flex flex-col justify-between">
-                                <div className="flex justify-between items-start w-full">
-                                    <div className="flex flex-col gap-1">
-                                        <span className="dashbord-thq-text-elm39 text-gray-600 text-sm font-semibold">Total des commandes</span>
-                                        <span className="dashbord-thq-text-elm40 text-gray-900 text-3xl font-bold">{isLoading ? '...' : stats.total}</span>
-                                    </div>
-                                    <div className="w-12 h-12 bg-[#feae00]/20 rounded-2xl flex items-center justify-center">
-                                        <img src="/combinedshape2793-3gk.svg" className="w-6 h-6 text-[#feae00]" alt="icon" />
-                                    </div>
-                                </div>
-                                <div className="dashbord-thq-frame85-upfromyesterday-elm1 flex items-center gap-2 mt-2">
-                                    <span className="text-gray-400 text-xs font-semibold">Toutes vos commandes</span>
-                                </div>
-                            </div>
-                        </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+                        {statsCards.map((stat, index) => (
+                            <Card
+                                key={index}
+                                className="bg-[#f8f5f0] rounded-[6.64px] border border-solid border-[#97979766] shadow-[2.85px_2.85px_25.61px_#0000000d]"
+                            >
+                                <CardContent className="p-[7px] flex flex-col gap-2.5">
+                                    <div className="flex flex-col gap-0.5">
+                                        <div className="flex items-center justify-between gap-2">
+                                            <div className="opacity-80 [font-family:'Nunito_Sans',Helvetica] font-semibold text-[#202224] text-[10px] whitespace-pre-line">
+                                                {stat.title}
+                                            </div>
+                                            <img
+                                                className="w-[28.45px] h-[28.45px]"
+                                                alt="Icon"
+                                                src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon-2.png" // Blue Folder Icon
+                                            />
+                                        </div>
 
-                        {/* KPI 2 - In Progress */}
-                        <div className="dashbord-thq-frame14755-elm bg-[#eef3ff] rounded-[14px] p-6 shadow-sm border border-gray-100 relative overflow-hidden h-[160px] flex flex-col justify-between">
-                            <div className="dashbord-thq-total-order-elm2 w-full h-full flex flex-col justify-between">
-                                <div className="flex justify-between items-start w-full">
-                                    <div className="flex flex-col gap-1">
-                                        <span className="dashbord-thq-text-elm45 text-gray-600 text-sm font-semibold">En cours</span>
-                                        <span className="dashbord-thq-text-elm46 text-gray-900 text-3xl font-bold">{isLoading ? '...' : stats.inProgress}</span>
-                                    </div>
-                                    <div className="w-12 h-12 bg-[#5a8cff]/20 rounded-2xl flex items-center justify-center">
-                                        <img src="/combinedshape2793-pcq.svg" className="w-6 h-6" alt="icon" />
-                                    </div>
-                                </div>
-                                <div className="dashbord-thq-frame85-upfromyesterday-elm2 flex items-center gap-2 mt-2">
-                                    <span className="text-gray-400 text-xs font-semibold">Commandes actives</span>
-                                </div>
-                            </div>
-                        </div>
+                                        <div className="[font-family:'Nunito_Sans',Helvetica] font-bold text-[#202224] text-[13.3px] tracking-[0.47px]">
+                                            {isLoading ? '...' : stat.value}
+                                        </div>
 
-                        {/* KPI 3 - Pending */}
-                        <div className="dashbord-thq-frame14756-elm bg-[#fff0f0] rounded-[14px] p-6 shadow-sm border border-gray-100 relative overflow-hidden h-[160px] flex flex-col justify-between">
-                            <div className="dashbord-thq-total-order-elm3 w-full h-full flex flex-col justify-between">
-                                <div className="flex justify-between items-start w-full">
-                                    <div className="flex flex-col gap-1">
-                                        <span className="dashbord-thq-text-elm51 text-gray-600 text-sm font-semibold">En attente</span>
-                                        <span className="dashbord-thq-text-elm52 text-gray-900 text-3xl font-bold">{isLoading ? '...' : stats.pending}</span>
+                                        <div className="flex items-center gap-1">
+                                            <TrendingUpIcon className="w-3 h-3 text-[#00b69b]" />
+                                            <div className="[font-family:'Nunito_Sans',Helvetica] font-semibold text-[7.6px]">
+                                                <span className="text-[#00b69b]">
+                                                    {/* Always positive/neutral for now as we don't have historical diffs */}
+                                                    Up
+                                                </span>
+                                                <span className="text-[#606060]">
+                                                    {" "}
+                                                    {stat.changeText}
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="w-12 h-12 bg-[#ff6d6d]/20 rounded-2xl flex items-center justify-center">
-                                        <img src="/combinedshape2793-0e9h.svg" className="w-6 h-6" alt="icon" />
-                                    </div>
-                                </div>
-                                <div className="dashbord-thq-frame85-upfromyesterday-elm3 flex items-center gap-2 mt-2">
-                                    <span className="text-gray-400 text-xs font-semibold">Attente de traitement</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* KPI 4 - Completed */}
-                        <div className="dashbord-thq-frame14757-elm bg-[#e5f8f5] rounded-[14px] p-6 shadow-sm border border-gray-100 relative overflow-hidden h-[160px] flex flex-col justify-between">
-                            <div className="dashbord-thq-total-order-elm4 w-full h-full flex flex-col justify-between">
-                                <div className="flex justify-between items-start w-full">
-                                    <div className="flex flex-col gap-1">
-                                        <span className="dashbord-thq-text-elm57 text-gray-600 text-sm font-semibold">Terminées</span>
-                                        <span className="dashbord-thq-text-elm58 text-gray-900 text-3xl font-bold">{isLoading ? '...' : stats.completed}</span>
-                                    </div>
-                                    <div className="w-12 h-12 bg-[#00b69b]/20 rounded-2xl flex items-center justify-center">
-                                        <img src="/combinedshape2793-s3x9.svg" className="w-6 h-6" alt="icon" />
-                                    </div>
-                                </div>
-                                <div className="dashbord-thq-frame85-upfromyesterday-elm4 flex items-center gap-2 mt-2">
-                                    <span className="text-gray-400 text-xs font-semibold">Commandes livrées</span>
-                                </div>
-                            </div>
-                        </div>
+                                </CardContent>
+                            </Card>
+                        ))}
                     </div>
 
                     {/* Filter Bar */}
@@ -285,7 +206,7 @@ export const OrderListSection = (): JSX.Element => {
                         <div className="flex items-center gap-4">
                             <div className="flex items-center gap-2 border border-gray-200 rounded-md px-3 py-2 bg-transparent text-gray-600">
                                 <FilterIcon className="w-4 h-4" />
-                                <span className="text-sm font-bold font-nunito">Filtrer par</span>
+                                <span className="text-sm font-bold [font-family:'Nunito_Sans',Helvetica]">Filtrer par</span>
                             </div>
 
                             <Select value={sortOrder} onValueChange={setSortOrder}>
@@ -315,25 +236,24 @@ export const OrderListSection = (): JSX.Element => {
                             </Select>
                         </div>
 
-                        <Button variant="ghost" className="text-red-500 hover:text-red-600 font-bold font-nunito" onClick={resetFilters}>
+                        <Button variant="ghost" className="text-red-500 hover:text-red-600 font-bold [font-family:'Nunito_Sans',Helvetica]" onClick={resetFilters}>
                             <RotateCcwIcon className="w-4 h-4 mr-2" />
-                            Réinitialiser
+                            Réinitialiser Filter
                         </Button>
                     </div>
 
-
                     {/* Main Table */}
-                    <div className="bg-white rounded-[14px] shadow-sm overflow-hidden border border-gray-100 mb-10">
+                    <div className="bg-white rounded-[14px] shadow-sm overflow-hidden border border-gray-100">
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead>
                                     <tr className="bg-gray-50/50 border-b border-gray-100">
-                                        <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider font-nunito opacity-70">N° Commande</th>
-                                        <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider font-nunito opacity-70">Service</th>
-                                        <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider font-nunito opacity-70">{dashboardRole === 'buyer' ? 'Vendeur' : 'Acheteur'}</th>
-                                        <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider font-nunito opacity-70">Date</th>
-                                        <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider font-nunito opacity-70">Montant</th>
-                                        <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider font-nunito opacity-70">Statut</th>
+                                        <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider [font-family:'Nunito_Sans',Helvetica] opacity-70">N° Commande</th>
+                                        <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider [font-family:'Nunito_Sans',Helvetica] opacity-70">Service</th>
+                                        <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider [font-family:'Nunito_Sans',Helvetica] opacity-70">{dashboardRole === 'buyer' ? 'Vendeur' : 'Acheteur'}</th>
+                                        <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider [font-family:'Nunito_Sans',Helvetica] opacity-70">Date</th>
+                                        <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider [font-family:'Nunito_Sans',Helvetica] opacity-70">Montant</th>
+                                        <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider [font-family:'Nunito_Sans',Helvetica] opacity-70">Statut</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100">
@@ -351,13 +271,13 @@ export const OrderListSection = (): JSX.Element => {
                                             const counterparty = dashboardRole === 'buyer' ? order.seller : order.buyer;
                                             return (
                                                 <tr key={order.id} className="hover:bg-gray-50 transition-colors cursor-pointer">
-                                                    <td className="p-6 text-sm font-bold text-gray-900 font-nunito">{order.order_number}</td>
-                                                    <td className="p-6 text-sm font-medium text-gray-900 font-nunito">{order.service?.title || 'Service'}</td>
-                                                    <td className="p-6 text-sm text-gray-500 font-nunito">{counterparty?.display_name || counterparty?.username || '-'}</td>
-                                                    <td className="p-6 text-sm text-gray-500 font-nunito">{new Date(order.created_at).toLocaleDateString('fr-FR')}</td>
-                                                    <td className="p-6 text-sm text-gray-900 font-nunito">€{order.amount.toFixed(2)}</td>
+                                                    <td className="p-6 text-sm font-bold text-gray-900 [font-family:'Nunito_Sans',Helvetica]">{order.order_number}</td>
+                                                    <td className="p-6 text-sm font-medium text-gray-900 [font-family:'Nunito_Sans',Helvetica]">{order.service?.title || 'Service'}</td>
+                                                    <td className="p-6 text-sm text-gray-500 [font-family:'Nunito_Sans',Helvetica]">{counterparty?.display_name || counterparty?.username || '-'}</td>
+                                                    <td className="p-6 text-sm text-gray-500 [font-family:'Nunito_Sans',Helvetica]">{new Date(order.created_at).toLocaleDateString('fr-FR')}</td>
+                                                    <td className="p-6 text-sm text-gray-900 [font-family:'Nunito_Sans',Helvetica]">€{order.amount.toFixed(2)}</td>
                                                     <td className="p-6">
-                                                        <span className={`inline-flex items-center px-4 py-1.5 rounded-lg text-xs font-bold font-nunito ${statusDisplay.color}`}>
+                                                        <span className={`inline-flex items-center px-4 py-1.5 rounded-lg text-xs font-bold [font-family:'Nunito_Sans',Helvetica] ${statusDisplay.color}`}>
                                                             {statusDisplay.label}
                                                         </span>
                                                     </td>
@@ -368,13 +288,12 @@ export const OrderListSection = (): JSX.Element => {
                                 </tbody>
                             </table>
                         </div>
-                        <div className="p-6 border-t border-gray-100 flex justify-between items-center text-sm text-gray-500 font-nunito">
+                        <div className="p-6 border-t border-gray-100 flex justify-between items-center text-sm text-gray-500 [font-family:'Nunito_Sans',Helvetica]">
                             <span>Affichage de {filteredOrders.length} commande{filteredOrders.length > 1 ? 's' : ''}</span>
                         </div>
                     </div>
-
                 </div>
             </div>
-        </div>
-    )
-}
+        </section>
+    );
+};

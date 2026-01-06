@@ -87,6 +87,45 @@
   --primarymain: rgba(104, 54, 221, 1);
   --secondary-5-workdlight: rgba(244, 245, 255, 1);
   --secondary-7-workddark: rgba(0, 231, 169, 1);
+
+  /* TeleportHQ Variables */
+  --dl-layout-size-large: 144px;
+  --dl-layout-size-small: 48px;
+  --dl-layout-space-unit: 16px;
+  --dl-layout-size-medium: 96px;
+  --dl-layout-size-xlarge: 192px;
+  --dl-layout-size-xsmall: 16px;
+  --dl-color-theme-accent1: #FFFFFF;
+  --dl-color-theme-accent2: #F5D1B0;
+  --dl-layout-radius-round: 50%;
+  --dl-layout-size-xxlarge: 288px;
+  --dl-color-theme-primary1: #BF4408;
+  --dl-color-theme-primary2: #E65103;
+  --dl-layout-size-maxwidth: 1400px;
+  --dl-layout-radius-radius2: 2px;
+  --dl-layout-radius-radius4: 4px;
+  --dl-layout-radius-radius8: 8px;
+  --dl-layout-space-halfunit: 8px;
+  --dl-layout-space-sixunits: 96px;
+  --dl-layout-space-twounits: 32px;
+  --dl-color-theme-secondary1: #FFFFFF;
+  --dl-color-theme-secondary2: #FBF1EB;
+  --dl-layout-space-fiveunits: 80px;
+  --dl-layout-space-fourunits: 64px;
+  --dl-layout-space-threeunits: 48px;
+  --dl-color-light_text-primary: rgba(28, 28, 30, 1);
+  --dl-color-theme-neutral-dark: #191818;
+  --dl-layout-radius-cardradius: 8px;
+  --dl-color-light_action-active: rgba(28, 28, 30, 0.5400000214576721);
+  --dl-color-light_text-disabled: rgba(28, 28, 30, 0.4000000059604645);
+  --dl-color-theme-neutral-light: #FBFAF9;
+  --dl-layout-radius-imageradius: 8px;
+  --dl-layout-radius-inputradius: 24px;
+  --dl-color-light_text-secondary: rgba(28, 28, 30, 0.7200000286102295);
+  --dl-layout-radius-buttonradius: 24px;
+  --dl-layout-space-oneandhalfunits: 24px;
+  --dl-color-secondary5-workd-light: rgba(244, 245, 255, 1);
+  --dl-color-light_background-transparent: rgba(255, 255, 255, 0);
 }
 
 :root {
@@ -164,6 +203,7 @@
 }
 
 @keyframes shimmer {
+
   0%,
   90%,
   to {
