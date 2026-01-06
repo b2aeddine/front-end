@@ -100,16 +100,9 @@ export const MessagesContentSection = (): JSX.Element => {
     }));
 
     return (
-        <div className="flex-1 w-full bg-[#F5F5F0] min-h-screen relative">
-            {/* Decorative Background */}
-            <img
-                className="absolute top-0 left-0 w-full h-[1313.24px] object-cover -z-10 pointer-events-none"
-                alt="Main bg color"
-                src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/main-bg-color.svg"
-            />
-
+        <section className="flex flex-col w-full items-start border border-solid border-[#9797974c]">
             {/* Header */}
-            <header className="w-full h-[70px] bg-[#f8f5f0] border-b border-[#97979766] px-8 flex items-center justify-end">
+            <header className="relative w-full h-[70px] bg-[#f8f5f0] border-b border-[#97979766] px-8 flex items-center justify-end">
                 <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
                         <img
@@ -121,8 +114,15 @@ export const MessagesContentSection = (): JSX.Element => {
                 </div>
             </header>
 
-            {/* Content */}
-            <div className="w-full max-w-7xl mx-auto px-8 py-8">
+            {/* Content with decorative background */}
+            <div className="flex flex-col items-start gap-2.5 relative w-full min-h-screen">
+                <img
+                    className="absolute top-0 left-0 w-full h-[1313.24px] object-cover -z-10"
+                    alt="Main bg color"
+                    src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/main-bg-color.svg"
+                />
+
+                <div className="w-full max-w-7xl mx-auto px-8 py-8">
                 <h1 className="text-3xl font-bold text-gray-900 [font-family:'Nunito_Sans',Helvetica] mb-8">
                     Inbox
                 </h1>
@@ -261,7 +261,8 @@ export const MessagesContentSection = (): JSX.Element => {
                         </div>
                     </div>
                 </div>
+                </div>
             </div>
-        </div>
+        </section>
     );
 };

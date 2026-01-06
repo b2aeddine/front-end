@@ -114,16 +114,9 @@ export const MessageDetailContentSection = ({ conversationId }: MessageDetailCon
     const displayName = otherUser?.display_name || otherUser?.username || 'Utilisateur';
 
     return (
-        <div className="flex-1 w-full bg-[#F5F5F0] min-h-screen flex flex-col relative">
-            {/* Decorative Background */}
-            <img
-                className="absolute top-0 left-0 w-full h-[1313.24px] object-cover -z-10 pointer-events-none"
-                alt="Main bg color"
-                src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/main-bg-color.svg"
-            />
-
+        <section className="flex flex-col w-full items-start border border-solid border-[#9797974c] min-h-screen">
             {/* Header */}
-            <header className="w-full h-[70px] bg-[#f8f5f0] border-b border-[#97979766] px-8 flex items-center justify-between">
+            <header className="relative w-full h-[70px] bg-[#f8f5f0] border-b border-[#97979766] px-8 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <Button
                         variant="ghost"
@@ -155,8 +148,16 @@ export const MessageDetailContentSection = ({ conversationId }: MessageDetailCon
                 </div>
             </header>
 
-            {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto px-8 py-6">
+            {/* Content with decorative background */}
+            <div className="flex flex-col flex-1 relative w-full">
+                <img
+                    className="absolute top-0 left-0 w-full h-[1313.24px] object-cover -z-10"
+                    alt="Main bg color"
+                    src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/main-bg-color.svg"
+                />
+
+                {/* Messages Area */}
+                <div className="flex-1 overflow-y-auto px-8 py-6">
                 <div className="max-w-3xl mx-auto space-y-4">
                     {isLoading ? (
                         <div className="text-center text-gray-500 py-8">Chargement des messages...</div>
@@ -250,6 +251,7 @@ export const MessageDetailContentSection = ({ conversationId }: MessageDetailCon
                     </Button>
                 </div>
             </div>
-        </div>
+            </div>
+        </section>
     );
 };
