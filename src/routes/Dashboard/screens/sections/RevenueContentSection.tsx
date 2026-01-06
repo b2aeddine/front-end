@@ -14,7 +14,8 @@ import {
     SelectValue,
 } from "../../../../components/ui/select";
 import { useAuth } from "../../../../lib/auth";
-import { fetchSellerRevenues, getAvailableBalance, fetchRevenueStats } from "../../../../lib/queries/withdrawals";
+import { fetchSellerRevenues, getAvailableBalance } from "../../../../lib/queries/withdrawals";
+import { fetchRevenueStats } from "../../../../lib/queries/dashboard";
 
 interface RevenueRecord {
     id: string;
@@ -71,7 +72,7 @@ export const RevenueContentSection = (): JSX.Element => {
             }
 
             // Fetch balance
-            const { data: balanceData } = await getAvailableBalance(user.id);
+            const { balance: balanceData } = await getAvailableBalance(user.id);
 
             // Fetch revenue stats for percentage change
             const { data: revenueStatsData } = await fetchRevenueStats(user.id);
@@ -86,7 +87,7 @@ export const RevenueContentSection = (): JSX.Element => {
                 pendingRevenue,
                 availableBalance: balanceData || 0,
                 withdrawnTotal,
-                percentageChange: revenueStatsData?.percentageChange || 0,
+                percentageChange: revenueStatsData?.percentChange || 0,
             });
 
             setIsLoading(false);
