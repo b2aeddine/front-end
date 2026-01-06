@@ -58,6 +58,7 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     const [isLoading, setIsLoading] = useState(true);
 
     const isDemoMode = !isSupabaseConfigured();
+    const isDevBypass = import.meta.env.VITE_DEV_BYPASS_AUTH === 'true';
 
     // Fetch user profile and roles from DB
     const fetchUserData = async (userId: string) => {
@@ -210,7 +211,7 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
         profile,
         roles,
         isLoading,
-        isAuthenticated: !!session || isDemoMode, // In demo mode, consider as "authenticated"
+        isAuthenticated: !!session || isDemoMode || isDevBypass, // In demo/dev bypass mode, consider as "authenticated"
         isDemoMode,
         signIn,
         signUp,
