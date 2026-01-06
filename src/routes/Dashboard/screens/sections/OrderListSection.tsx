@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
     FilterIcon,
     RotateCcwIcon,
-    TrendingDownIcon,
     TrendingUpIcon,
 } from "lucide-react";
+import { DashboardHeader } from "../../components/DashboardHeader";
 import { Button } from "../../../../components/ui/button";
 import { Card, CardContent } from "../../../../components/ui/card";
 import {
@@ -43,6 +43,8 @@ interface OrderStats {
     completed: number;
 }
 
+
+
 export const OrderListSection = (): JSX.Element => {
     const { user, profile, roles } = useAuth();
     const [orders, setOrders] = useState<Order[]>([]);
@@ -55,10 +57,6 @@ export const OrderListSection = (): JSX.Element => {
     const primaryRole = roles.find(r => r.status === 'active')?.role;
     const dashboardRole: 'buyer' | 'seller' =
         primaryRole === 'freelance' || primaryRole === 'influencer' ? 'seller' : 'buyer';
-
-    // Display name for header
-    const displayName = profile?.display_name || profile?.username || user?.email?.split('@')[0] || 'Utilisateur';
-    const avatarUrl = profile?.avatar_url || "https://c.animaapp.com/mjs8bxbnJhG6tv/img/man-438081-960-720.png";
 
     useEffect(() => {
         if (!user?.id) return;
@@ -77,8 +75,8 @@ export const OrderListSection = (): JSX.Element => {
             if (statsData) {
                 setStats({
                     total: statsData.total,
-                    inProgress: statsData.in_progress,
-                    pending: statsData.pending + statsData.payment_authorized,
+                    inProgress: statsData.inProgress,
+                    pending: statsData.pending,
                     completed: statsData.completed,
                 });
             }
@@ -131,30 +129,20 @@ export const OrderListSection = (): JSX.Element => {
     ];
 
     return (
-        <section className="flex flex-col w-full items-start border border-solid border-[#9797974c]">
-            {/* Header */}
-            <header className="relative w-full h-[70px] bg-[#f8f5f0] border-b border-[#97979766] px-8 flex items-center justify-end">
-                <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
-                        <img
-                            src={avatarUrl}
-                            alt="Profile"
-                            className="w-full h-full object-cover"
-                        />
-                    </div>
-                </div>
-            </header>
+        <section className="relative flex flex-col w-full min-h-screen items-start bg-[#f8f5f0] isolate overflow-hidden">
+            <DashboardHeader />
+
 
             {/* Content with decorative background */}
-            <div className="flex flex-col items-start gap-2.5 relative w-full min-h-screen">
+            <div className="flex flex-col items-start gap-2.5 relative w-full flex-1">
                 <img
-                    className="absolute top-0 left-0 w-full h-[1313.24px] object-cover -z-10"
+                    className="absolute top-0 left-0 w-full h-[1313px] object-cover md:object-none md:object-top -z-10"
                     alt="Main bg color"
                     src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/main-bg-color.svg"
                 />
 
                 <div className="w-full max-w-7xl mx-auto px-8 py-8 flex flex-col gap-8">
-                    <h1 className="text-3xl font-bold text-gray-900 [font-family:'Nunito_Sans',Helvetica]">
+                    <h1 className="dashboard-title">
                         Commandes
                     </h1>
 

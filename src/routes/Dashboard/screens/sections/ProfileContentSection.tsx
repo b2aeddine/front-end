@@ -1,6 +1,6 @@
-import React from 'react'
-import { Helmet } from "react-helmet";
 import { useAuth } from "../../../../lib/auth";
+
+import { DashboardHeader } from "../../components/DashboardHeader";
 import './ProfileContentSection.css'
 
 export const ProfileContentSection = (): JSX.Element => {
@@ -18,24 +18,12 @@ export const ProfileContentSection = (): JSX.Element => {
 
     // Replicate Revenue Page Header Layout EXACTLY
     return (
-        <section className="flex flex-col w-full items-start border border-solid border-[#9797974c]">
-            {/* Header - EXACT COPY from RevenueContentSection */}
-            <header className="relative w-full h-[70px] bg-[#f8f5f0] border-b border-[#97979766] px-8 flex items-center justify-end">
-                <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
-                        <img
-                            src={avatarUrl}
-                            alt="Profile"
-                            className="w-full h-full object-cover"
-                        />
-                    </div>
-                </div>
-            </header>
+        <section className="relative flex flex-col w-full min-h-screen items-start bg-[#f8f5f0] isolate overflow-hidden">
+            <DashboardHeader />
 
-            {/* Content with decorative background - EXACT COPY from RevenueContentSection */}
-            <div className="flex flex-col items-start gap-2.5 relative w-full min-h-screen">
+            <div className="flex flex-col items-start gap-2.5 relative w-full flex-1">
                 <img
-                    className="absolute top-0 left-0 w-full h-[1313.24px] object-cover -z-10"
+                    className="absolute top-0 left-0 w-full h-[1313px] object-cover md:object-none md:object-top -z-10"
                     alt="Main bg color"
                     src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/main-bg-color.svg"
                 />
@@ -46,7 +34,7 @@ export const ProfileContentSection = (): JSX.Element => {
 
                     {/* ORIGINAL PROFILE CONTENT INJECTED HERE */}
                     <div className="frame14706-thq-frame14706-elm w-full">
-                        <span className="frame14706-thq-text-elm10">Mon Profil</span>
+                        <h1 className="dashboard-title">Mon Profil</h1>
                         <div className="frame14706-thq-body-elm">
                             <div className="frame14706-thq-profilebanner-elm">
                                 <div

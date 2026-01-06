@@ -318,3 +318,22 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
+
+/* Dashboard Title - Aligned with background SVG orange vector */
+/* The orange line in main-bg-color.svg is at ~136px from top */
+/* Title positioned so the line appears below the title text */
+.dashboard-title {
+  font-size: 32px;
+  font-weight: 700;
+  font-family: 'Nunito Sans', Helvetica, sans-serif;
+  color: #202224;
+  line-height: 1.2;
+  margin: 0;
+  /* Position title so orange line from SVG sits below */
+  /* SVG line is at 136px. Content container has py-8 (32px) */
+  /* Previous 64px caused overlap. Reducing to 50px lifts title up by 14px. */
+  /* 50px padding + 32px container = 82px start. Text ends ~122px. Line is at 136px. */
+  padding-top: 50px;
+  padding-bottom: 8px;
+  position: relative;
+}

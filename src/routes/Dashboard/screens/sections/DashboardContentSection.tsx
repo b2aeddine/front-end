@@ -1,12 +1,8 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import {
-  ChevronDownIcon,
-  MapPinIcon,
-  MoreVerticalIcon,
-  SearchIcon,
   TrendingDownIcon,
   TrendingUpIcon,
+  MapPinIcon,
 } from "lucide-react";
 import {
   Avatar,
@@ -16,7 +12,6 @@ import {
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";
-import { Input } from "../../components/ui/input";
 import { useAuth } from "../../../../lib/auth";
 import { fetchMyOrders, Order } from "../../../../lib/queries/orders";
 import { fetchDashboardStats, fetchRevenueStats } from "../../../../lib/queries/dashboard";
@@ -46,6 +41,8 @@ const applicantImages = [
   "https://c.animaapp.com/mjs8bxbnJhG6tv/img/ellipse-8.png",
 ];
 
+import { DashboardHeader } from "../../components/DashboardHeader";
+
 export const DashboardContentSection = (): JSX.Element => {
   const { user, profile, roles } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
@@ -55,7 +52,7 @@ export const DashboardContentSection = (): JSX.Element => {
       value: "0",
       change: "0%",
       changeText: "",
-      trending: "up" as const,
+      trending: "up" as "up" | "down",
       icon: "https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon-2.png",
     },
     {
@@ -63,7 +60,7 @@ export const DashboardContentSection = (): JSX.Element => {
       value: "€0",
       change: "0%",
       changeText: "",
-      trending: "up" as const,
+      trending: "up" as "up" | "down",
       icon: "https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon.png",
     },
     {
@@ -71,7 +68,7 @@ export const DashboardContentSection = (): JSX.Element => {
       value: "0",
       change: "0%",
       changeText: "",
-      trending: "up" as const,
+      trending: "up" as "up" | "down",
       icon: "https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon-1.png",
     },
   ]);
@@ -100,7 +97,7 @@ export const DashboardContentSection = (): JSX.Element => {
       if (dashboardRole === 'seller') {
         const { data: revenueData } = await fetchRevenueStats(user.id);
         if (revenueData) {
-          revenueChange = revenueData.percentageChange;
+          revenueChange = revenueData.percentChange;
         }
       }
 
@@ -112,15 +109,15 @@ export const DashboardContentSection = (): JSX.Element => {
             value: String(stats.activeOrders),
             change: stats.activeOrders > 0 ? "+1" : "0",
             changeText: "cette semaine",
-            trending: "up" as const,
+            trending: "up" as "up" | "down",
             icon: "https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon-2.png",
           },
           {
             title: "Revenues 30j",
-            value: `€${stats.totalRevenue.toFixed(0)}`,
-            change: `${revenueChange >= 0 ? '+' : ''}${revenueChange.toFixed(1)}%`,
+            value: `€${stats.totalRevenue.toFixed(0)} `,
+            change: `${revenueChange >= 0 ? '+' : ''}${revenueChange.toFixed(1)}% `,
             changeText: "vs mois précédent",
-            trending: revenueChange >= 0 ? "up" as const : "down" as const,
+            trending: (revenueChange >= 0 ? "up" : "down") as "up" | "down",
             icon: "https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon.png",
           },
           {
@@ -128,7 +125,7 @@ export const DashboardContentSection = (): JSX.Element => {
             value: String(stats.unreadMessages),
             change: stats.unreadMessages > 0 ? "Nouveau" : "",
             changeText: "",
-            trending: "up" as const,
+            trending: "up" as "up" | "down",
             icon: "https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon-1.png",
           },
         ]);
@@ -146,264 +143,90 @@ export const DashboardContentSection = (): JSX.Element => {
   const latestOrder = orders[0];
 
   return (
-    <section className="flex flex-col w-full items-start border border-solid border-[#9797974c]">
-      <header className="relative w-full h-[70px] bg-[#f8f5f0] border-[0.5px] border-solid border-[#97979766]">
-        <div className="flex w-full max-w-[1095px] items-center justify-between mx-auto px-4 h-full">
-          <div className="relative w-[390.65px]">
-            <div className="relative">
-              <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#202224] opacity-50" />
-              <Input
-                placeholder="Search"
-                className="w-full h-[38px] bg-[#f5f6fa] rounded-[19px] border-[0.6px] border-neutral-300 pl-12 [font-family:'Nunito_Sans',Helvetica] text-sm"
-              />
-            </div>
-          </div>
+    <section className="relative flex flex-col w-full min-h-screen items-start bg-[#f8f5f0] isolate overflow-hidden">
+      <DashboardHeader />
 
-          <div className="inline-flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="relative h-auto p-0">
-              <div className="relative w-[31.05px] h-[30.5px]">
-                <img
-                  className="absolute w-[77.43%] h-[58.98%] top-[16.39%] left-0"
-                  alt="Combined shape"
-                  src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/combined-shape.svg"
-                />
-                <div className="absolute w-[19.36%] h-[19.67%] top-[63.93%] left-[29.03%] bg-[#ff0000] rounded-[2.25px] opacity-30" />
-                <img
-                  className="absolute w-[51.62%] h-[52.46%] top-0 left-[41.94%]"
-                  alt="Oval"
-                  src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/oval.svg"
-                />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-bold text-[#f8f5f0] text-xs [font-family:'Nunito_Sans',Helvetica]">
-                  6
-                </div>
-              </div>
-            </Button>
 
-            <Button variant="ghost" size="icon" className="h-auto p-0">
-              <img
-                className="w-[18.03px] h-[18px]"
-                alt="Oval"
-                src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/oval.svg"
-              />
-            </Button>
-
-            <div className="flex items-center gap-2">
-              <img
-                className="w-[40.07px] h-[27px]"
-                alt="Flag"
-                src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/flag.png"
-              />
-              <span className="[font-family:'Nunito_Sans',Helvetica] font-semibold text-[#646464] text-sm">
-                English
-              </span>
-              <ChevronDownIcon className="w-4 h-4 text-[#646464]" />
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Avatar className="w-11 h-11">
-                <AvatarImage src={avatarUrl} />
-                <AvatarFallback>{displayName.charAt(0).toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col">
-                <div className="[font-family:'Nunito_Sans',Helvetica] font-bold text-neutral-700 text-sm">
-                  {displayName}
-                </div>
-                <div className="[font-family:'Nunito_Sans',Helvetica] font-semibold text-[#565656] text-xs capitalize">
-                  {displayRole}
-                </div>
-              </div>
-              <Button variant="ghost" size="icon" className="h-auto p-0">
-                <MoreVerticalIcon className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <div className="flex flex-col items-start gap-2.5 relative w-full">
+      <div className="flex flex-col items-start gap-2.5 relative w-full flex-1">
         <img
-          className="absolute top-0 left-0 w-full h-[1313.24px] object-cover -z-10"
+          className="absolute top-0 left-0 w-full h-[1313px] object-cover md:object-none md:object-top -z-10"
           alt="Main bg color"
           src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/main-bg-color.svg"
         />
 
-        <div className="w-full px-[25px] pt-24">
-          <h1 className="[font-family:'Nunito_Sans',Helvetica] font-bold text-[#202224] text-[32px] tracking-[-0.11px]">
+        <div className="w-full px-[25px] py-8">
+          <h1 className="dashboard-title">
             Dashboard
           </h1>
         </div>
 
-        <div className="flex flex-col w-full px-[25px] gap-3 mt-[54px]">
-          <div className="flex items-start justify-between w-full gap-4">
-            <div className="flex flex-col w-[708px] items-start gap-[9px]">
-              <div className="flex flex-col items-center gap-4 w-full">
-                <div className="[font-family:'DM_Sans',Helvetica] font-bold text-[25px] tracking-[1.00px]">
-                  <span className="text-[#202224] tracking-[0.25px]">
-                    Salut{" "}
-                  </span>
-                  <span className="text-[#fea38e] tracking-[0.25px]">
-                    {displayName}
-                  </span>
-                  <span className="text-[#202224] tracking-[0.25px]">
-                    , quoi de neuf aujourd&apos;hui ?
-                  </span>
+        <div className="grid grid-cols-1 lg:grid-cols-12 w-full px-4 md:px-[25px] gap-8 mt-[54px] pb-12">
+
+          {/* LEFT COLUMN (8 cols) - Welcome, Notifs, Offers */}
+          <div className="lg:col-span-8 flex flex-col gap-8">
+
+            {/* 1. Welcome & Notification */}
+            <div className="flex flex-col md:flex-row items-start gap-4 w-full">
+              <div className="flex flex-col items-start gap-4 flex-1 w-full">
+                <div className="flex flex-col items-center gap-4 w-full">
+                  <div className="[font-family:'DM_Sans',Helvetica] font-bold text-[25px] tracking-[1.00px] text-left w-full">
+                    <span className="text-[#202224] tracking-[0.25px]">
+                      Salut{" "}
+                    </span>
+                    <span className="text-[#fea38e] tracking-[0.25px]">
+                      {displayName}
+                    </span>
+                    <span className="text-[#202224] tracking-[0.25px]">
+                      , quoi de neuf aujourd&apos;hui ?
+                    </span>
+                  </div>
                 </div>
-              </div>
 
-              <Card className="w-[172px] bg-[#fff0f0] rounded-[3.2px] border-[0.4px] border-solid border-[#dcdcdc] shadow-[0px_1.6px_2.4px_-0.8px_#24242408,0px_4.8px_6.4px_-1.6px_#24242414]">
-                <CardContent className="p-2 gap-[4.8px] flex flex-col">
-                  <div className="flex items-start justify-between gap-1">
-                    <div className="[font-family:'Inter',Helvetica] font-medium text-[#292929] text-[7.2px] leading-[7.2px]">
-                      Notification title
-                    </div>
-                    <div className="[font-family:'Inter',Helvetica] font-normal text-[#7c7c7c] text-[5.6px] leading-[8px]">
-                      10 mins ago
-                    </div>
-                  </div>
-
-                  <div className="relative w-full h-[60.8px] rounded-[3.2px] overflow-hidden border-[0.4px] border-solid border-[#dcdcdc]">
-                    <img
-                      className="w-full h-full object-cover"
-                      alt="Image"
-                      src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/image-3.png"
-                    />
-                  </div>
-
-                  <div className="[font-family:'Inter',Helvetica] font-normal text-neutral-600 text-[5.6px] leading-[8.4px]">
-                    Lorem Ipsum is simply dummy text of the printing and
-                    typesetting industry. Lorem Ipsum has been the
-                  </div>
-
-                  <div className="flex gap-[6.4px] items-start">
-                    <Button
-                      variant="ghost"
-                      className="h-auto p-0 [font-family:'Inter',Helvetica] font-normal text-[#292929] text-[5.6px] leading-[8px]"
-                    >
-                      Dismiss
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      className="h-auto p-0 [font-family:'Inter',Helvetica] font-bold text-[#ab0909] text-[5.6px] leading-[8px]"
-                    >
-                      Accept
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="flex flex-col w-[391px] items-center gap-1">
-              <Card className="w-[213px] bg-[#fea38ec7] rounded-[3.46px] border-[0.43px] border-solid border-[#dcdcdc] shadow-[0px_1.73px_2.6px_-0.87px_#24242408,0px_5.2px_6.93px_-1.73px_#24242414]">
-                <CardContent className="p-[8.66px] flex items-start gap-[5.2px]">
-                  <div className="flex items-center justify-center w-[20.79px] h-[20.79px] rounded-[3.46px]">
-                    <img
-                      className="w-[17.32px] h-[17.32px]"
-                      alt="Icon rocketlaunch"
-                      src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon-rocketlaunch.svg"
-                    />
-                  </div>
-
-                  <div className="flex flex-col items-start gap-[7.85px] flex-1">
-                    <div className="flex items-start justify-between w-full gap-[4.9px]">
-                      <div className="[font-family:'Inter',Helvetica] font-medium text-[#292929] text-[8.8px] leading-[8.8px]">
-                        Etat utlisateur
+                <Card className="w-full md:w-auto bg-[#fff0f0] rounded-[3.2px] border-[0.4px] border-solid border-[#dcdcdc] shadow-[0px_1.6px_2.4px_-0.8px_#24242408,0px_4.8px_6.4px_-1.6px_#24242414]">
+                  <CardContent className="p-2 gap-[4.8px] flex flex-col">
+                    <div className="flex items-start justify-between gap-1">
+                      <div className="[font-family:'Inter',Helvetica] font-medium text-[#292929] text-[7.2px] leading-[7.2px]">
+                        Notification title
                       </div>
-                      <div className="[font-family:'Inter',Helvetica] font-normal text-[#7c7c7c] text-[6.9px] leading-[9.8px]">
+                      <div className="[font-family:'Inter',Helvetica] font-normal text-[#7c7c7c] text-[5.6px] leading-[8px]">
                         10 mins ago
                       </div>
                     </div>
 
-                    <div className="[font-family:'Inter',Helvetica] font-normal text-neutral-600 text-[6.9px] leading-[10.3px]">
-                      par exemple : il vous reste 1 verification a faire ou vous
-                      n&apos;avez encore piblier aucun service
+                    <div className="relative w-full h-[60.8px] rounded-[3.2px] overflow-hidden border-[0.4px] border-solid border-[#dcdcdc]">
+                      <img
+                        className="w-full h-full object-cover"
+                        alt="Image"
+                        src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/image-3.png"
+                      />
                     </div>
 
-                    <div className="flex gap-[7.85px] items-start">
+                    <div className="[font-family:'Inter',Helvetica] font-normal text-neutral-600 text-[5.6px] leading-[8.4px]">
+                      Lorem Ipsum is simply dummy text of the printing and
+                      typesetting industry. Lorem Ipsum has been the
+                    </div>
+
+                    <div className="flex gap-[6.4px] items-start">
                       <Button
                         variant="ghost"
-                        className="h-auto p-0 [font-family:'Inter',Helvetica] font-bold text-[#292929] text-[6.9px] leading-[9.8px]"
+                        className="h-auto p-0 [font-family:'Inter',Helvetica] font-normal text-[#292929] text-[5.6px] leading-[8px]"
+                      >
+                        Dismiss
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        className="h-auto p-0 [font-family:'Inter',Helvetica] font-bold text-[#ab0909] text-[5.6px] leading-[8px]"
                       >
                         Accept
                       </Button>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <div className="flex items-end gap-0">
-                {actionButtons.map((button, index) => (
-                  <Button
-                    key={index}
-                    variant="ghost"
-                    className="flex flex-col w-[78px] items-center h-auto p-0 hover:bg-transparent"
-                  >
-                    <img
-                      className="w-[47px] h-[47px]"
-                      alt="Frame"
-                      src={button.icon}
-                    />
-                    <div className="h-[54px] flex items-center justify-center text-center [font-family:'DM_Sans',Helvetica] font-normal text-[#000000] text-[10px] leading-[15px] whitespace-pre-line">
-                      {button.label}
-                    </div>
-                  </Button>
-                ))}
-              </div>
-
-              <div className="flex items-start gap-2 w-full">
-                {statsCards.map((stat, index) => (
-                  <Card
-                    key={index}
-                    className="flex-1 bg-[#f8f5f0] rounded-[6.64px] border border-solid border-[#97979766] shadow-[2.85px_2.85px_25.61px_#0000000d]"
-                  >
-                    <CardContent className="p-[7px] flex flex-col gap-2.5">
-                      <div className="flex flex-col gap-0.5">
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="opacity-80 [font-family:'Nunito_Sans',Helvetica] font-semibold text-[#202224] text-[10px] whitespace-pre-line">
-                            {stat.title}
-                          </div>
-                          <img
-                            className="w-[28.45px] h-[28.45px]"
-                            alt="Icon"
-                            src={stat.icon}
-                          />
-                        </div>
-
-                        <div className="[font-family:'Nunito_Sans',Helvetica] font-bold text-[#202224] text-[13.3px] tracking-[0.47px]">
-                          {stat.value}
-                        </div>
-
-                        <div className="flex items-center gap-1">
-                          {stat.trending === "up" ? (
-                            <TrendingUpIcon className="w-3 h-3 text-[#00b69b]" />
-                          ) : (
-                            <TrendingDownIcon className="w-3 h-3 text-[#f93c65]" />
-                          )}
-                          <div className="[font-family:'Nunito_Sans',Helvetica] font-semibold text-[7.6px]">
-                            <span
-                              className={
-                                stat.trending === "up"
-                                  ? "text-[#00b69b]"
-                                  : "text-[#f93c65]"
-                              }
-                            >
-                              {stat.change}
-                            </span>
-                            <span className="text-[#606060]">
-                              {" "}
-                              {stat.changeText}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                  </CardContent>
+                </Card>
               </div>
             </div>
-          </div>
 
-          <div className="flex items-start justify-between w-full gap-4">
-            <div className="w-[660px] flex flex-col items-start gap-[30px]">
+            {/* 2. Recent Offers (Moved from bottom left) */}
+            <div className="flex flex-col items-start gap-[30px] w-full mt-4">
               <div className="flex items-end justify-between w-full">
                 <h2 className="[font-family:'DM_Sans',Helvetica] font-bold text-black text-[25px] tracking-[0.25px]">
                   Appel d&apos;offres recentes :
@@ -414,7 +237,7 @@ export const DashboardContentSection = (): JSX.Element => {
                 />
               </div>
 
-              <Card className="w-[293.09px] bg-[#fea38e4c] rounded-lg border-[0.8px] border-solid border-[#fea38e]">
+              <Card className="w-full md:max-w-[400px] bg-[#fea38e4c] rounded-lg border-[0.8px] border-solid border-[#fea38e]">
                 <CardContent className="p-[7px] flex flex-col gap-2.5">
                   <div className="flex flex-col gap-[15px]">
                     <div className="flex items-center justify-between gap-[17px]">
@@ -488,8 +311,123 @@ export const DashboardContentSection = (): JSX.Element => {
                 </CardContent>
               </Card>
             </div>
+          </div>
 
-            <div className="flex flex-col w-[391px] items-start gap-2.5 p-2.5">
+          {/* RIGHT COLUMN (4 cols) - Sidebar Widgets */}
+          <div className="lg:col-span-4 flex flex-col gap-8 w-full">
+
+            {/* 1. Status & Actions */}
+            <div className="flex flex-col w-full items-center lg:items-start gap-4">
+              <Card className="w-full max-w-[391px] bg-[#fea38ec7] rounded-[3.46px] border-[0.43px] border-solid border-[#dcdcdc] shadow-[0px_1.73px_2.6px_-0.87px_#24242408,0px_5.2px_6.93px_-1.73px_#24242414]">
+                <CardContent className="p-[8.66px] flex items-start gap-[5.2px]">
+                  <div className="flex items-center justify-center w-[20.79px] h-[20.79px] rounded-[3.46px]">
+                    <img
+                      className="w-[17.32px] h-[17.32px]"
+                      alt="Icon rocketlaunch"
+                      src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon-rocketlaunch.svg"
+                    />
+                  </div>
+
+                  <div className="flex flex-col items-start gap-[7.85px] flex-1">
+                    <div className="flex items-start justify-between w-full gap-[4.9px]">
+                      <div className="[font-family:'Inter',Helvetica] font-medium text-[#292929] text-[8.8px] leading-[8.8px]">
+                        Etat utlisateur
+                      </div>
+                      <div className="[font-family:'Inter',Helvetica] font-normal text-[#7c7c7c] text-[6.9px] leading-[9.8px]">
+                        10 mins ago
+                      </div>
+                    </div>
+
+                    <div className="[font-family:'Inter',Helvetica] font-normal text-neutral-600 text-[6.9px] leading-[10.3px]">
+                      par exemple : il vous reste 1 verification a faire ou vous
+                      n&apos;avez encore piblier aucun service
+                    </div>
+
+                    <div className="flex gap-[7.85px] items-start">
+                      <Button
+                        variant="ghost"
+                        className="h-auto p-0 [font-family:'Inter',Helvetica] font-bold text-[#292929] text-[6.9px] leading-[9.8px]"
+                      >
+                        Accept
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="grid grid-cols-4 gap-2 w-full max-w-[391px]">
+                {actionButtons.map((button, index) => (
+                  <Button
+                    key={index}
+                    variant="ghost"
+                    className="flex flex-col w-full items-center h-auto p-0 hover:bg-transparent"
+                  >
+                    <img
+                      className="w-[47px] h-[47px]"
+                      alt="Frame"
+                      src={button.icon}
+                    />
+                    <div className="h-[54px] flex items-center justify-center text-center [font-family:'DM_Sans',Helvetica] font-normal text-[#000000] text-[10px] leading-[15px] whitespace-pre-line">
+                      {button.label}
+                    </div>
+                  </Button>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 w-full max-w-[391px]">
+                {statsCards.map((stat, index) => (
+                  <Card
+                    key={index}
+                    className="bg-[#f8f5f0] rounded-[6.64px] border border-solid border-[#97979766] shadow-[2.85px_2.85px_25.61px_#0000000d]"
+                  >
+                    <CardContent className="p-[7px] flex flex-col gap-2.5">
+                      <div className="flex flex-col gap-0.5">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="opacity-80 [font-family:'Nunito_Sans',Helvetica] font-semibold text-[#202224] text-[10px] whitespace-pre-line">
+                            {stat.title}
+                          </div>
+                          <img
+                            className="w-[28.45px] h-[28.45px]"
+                            alt="Icon"
+                            src={stat.icon}
+                          />
+                        </div>
+
+                        <div className="[font-family:'Nunito_Sans',Helvetica] font-bold text-[#202224] text-[13.3px] tracking-[0.47px]">
+                          {stat.value}
+                        </div>
+
+                        <div className="flex items-center gap-1">
+                          {stat.trending === "up" ? (
+                            <TrendingUpIcon className="w-3 h-3 text-[#00b69b]" />
+                          ) : (
+                            <TrendingDownIcon className="w-3 h-3 text-[#f93c65]" />
+                          )}
+                          <div className="[font-family:'Nunito_Sans',Helvetica] font-semibold text-[7.6px]">
+                            <span
+                              className={
+                                stat.trending === "up"
+                                  ? "text-[#00b69b]"
+                                  : "text-[#f93c65]"
+                              }
+                            >
+                              {stat.change}
+                            </span>
+                            <span className="text-[#606060]">
+                              {" "}
+                              {stat.changeText}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            {/* 2. Your Orders (Moved from bottom right) */}
+            <div className="flex flex-col w-full max-w-[391px] items-start gap-2.5">
               <h2 className="[font-family:'DM_Sans',Helvetica] font-bold text-[#202224] text-4xl tracking-[1.44px]">
                 Vos commandes :
               </h2>
@@ -539,6 +477,6 @@ export const DashboardContentSection = (): JSX.Element => {
           </div>
         </div>
       </div>
-    </section>
+    </section >
   );
 };

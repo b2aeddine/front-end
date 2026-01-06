@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
     FilterIcon,
     RotateCcwIcon,
@@ -17,6 +17,7 @@ import {
 import { useAuth } from "../../../../lib/auth";
 import { fetchSellerRevenues, getAvailableBalance } from "../../../../lib/queries/withdrawals";
 import { fetchRevenueStats } from "../../../../lib/queries/dashboard";
+import { DashboardHeader } from "../../components/DashboardHeader";
 
 interface RevenueRecord {
     id: string;
@@ -45,6 +46,7 @@ const getStatusDisplay = (status: string): { label: string; color: string } => {
     };
     return statusMap[status] || { label: status, color: "bg-gray-100 text-gray-600" };
 };
+
 
 export const RevenueContentSection = (): JSX.Element => {
     const { user } = useAuth();
@@ -79,9 +81,9 @@ export const RevenueContentSection = (): JSX.Element => {
             const { data: revenueStatsData } = await fetchRevenueStats(user.id);
 
             // Calculate stats from revenues
-            const totalRevenue = revenuesData?.reduce((sum, r) => sum + (r.seller_amount || 0), 0) || 0;
-            const pendingRevenue = revenuesData?.filter(r => r.status === 'pending').reduce((sum, r) => sum + (r.seller_amount || 0), 0) || 0;
-            const withdrawnTotal = revenuesData?.filter(r => r.status === 'paid').reduce((sum, r) => sum + (r.seller_amount || 0), 0) || 0;
+            const totalRevenue = revenuesData?.reduce((sum: number, r: any) => sum + (r.seller_amount || 0), 0) || 0;
+            const pendingRevenue = revenuesData?.filter((r: any) => r.status === 'pending').reduce((sum: number, r: any) => sum + (r.seller_amount || 0), 0) || 0;
+            const withdrawnTotal = revenuesData?.filter((r: any) => r.status === 'paid').reduce((sum: number, r: any) => sum + (r.seller_amount || 0), 0) || 0;
 
             setStats({
                 totalRevenue,
@@ -143,30 +145,20 @@ export const RevenueContentSection = (): JSX.Element => {
     ];
 
     return (
-        <section className="flex flex-col w-full items-start border border-solid border-[#9797974c]">
-            {/* Header */}
-            <header className="relative w-full h-[70px] bg-[#f8f5f0] border-b border-[#97979766] px-8 flex items-center justify-end">
-                <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
-                        <img
-                            src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/man-438081-960-720.png"
-                            alt="Profile"
-                            className="w-full h-full object-cover"
-                        />
-                    </div>
-                </div>
-            </header>
+        <section className="relative flex flex-col w-full min-h-screen items-start bg-[#f8f5f0] isolate overflow-hidden">
+            <DashboardHeader />
+
 
             {/* Content with decorative background */}
-            <div className="flex flex-col items-start gap-2.5 relative w-full min-h-screen">
+            <div className="flex flex-col items-start gap-2.5 relative w-full flex-1">
                 <img
-                    className="absolute top-0 left-0 w-full h-[1313.24px] object-cover -z-10"
+                    className="absolute top-0 left-0 w-full h-[1313px] object-cover md:object-none md:object-top -z-10"
                     alt="Main bg color"
                     src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/main-bg-color.svg"
                 />
 
                 <div className="w-full max-w-7xl mx-auto px-8 py-8 flex flex-col gap-8">
-                    <h1 className="text-3xl font-bold text-gray-900 [font-family:'Nunito_Sans',Helvetica]">
+                    <h1 className="dashboard-title">
                         Revenue
                     </h1>
 

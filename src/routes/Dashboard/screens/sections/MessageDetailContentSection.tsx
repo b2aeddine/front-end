@@ -11,6 +11,7 @@ import {
     SendIcon,
     MoreVerticalIcon,
 } from "lucide-react";
+
 import { Button } from "../../../../components/ui/button";
 import { Input } from "../../../../components/ui/input";
 import { useAuth } from "../../../../lib/auth";
@@ -22,6 +23,7 @@ import {
     Message,
 } from "../../../../lib/queries/messaging";
 import { supabase } from "../../../../lib/supabaseClient";
+import { DashboardHeader } from "../../components/DashboardHeader";
 
 interface MessageDetailContentSectionProps {
     conversationId: string;
@@ -114,25 +116,36 @@ export const MessageDetailContentSection = ({ conversationId }: MessageDetailCon
     const displayName = otherUser?.display_name || otherUser?.username || 'Utilisateur';
 
     return (
-        <section className="flex flex-col w-full items-start border border-solid border-[#9797974c] min-h-screen">
-            {/* Header */}
-            <header className="relative w-full h-[70px] bg-[#f8f5f0] border-b border-[#97979766] px-8 flex items-center justify-between">
+        <section className="relative flex flex-col w-full min-h-screen items-start bg-[#f8f5f0] isolate overflow-hidden">
+            <DashboardHeader />
+
+            {/* Sub-Header with conversation info */}
+            <header className="relative w-full h-[60px] bg-[#f8f5f0]/50 backdrop-blur-sm border-b border-[#97979733] px-6 flex items-center justify-between z-10">
                 <div className="flex items-center gap-4">
                     <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => navigate('/dashboard/messages')}
-                        className="text-gray-600 hover:text-gray-900"
+                        className="text-gray-600 hover:text-gray-900 md:hidden"
                     >
                         <ArrowLeftIcon className="w-5 h-5" />
                     </Button>
-                    <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border border-white shadow-sm">
+                        <img
+                            src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/man-438081-960-720.png"
+                            alt="Contact"
+                            className="w-full h-full object-cover"
+                        />
+                    </div>
+                    <div className="flex flex-col">
                         <span className="text-lg font-bold text-gray-900 [font-family:'Nunito_Sans',Helvetica]">
                             {displayName}
                         </span>
-                        <span className="px-2 py-1 rounded text-xs font-medium bg-[#00b69b]/20 text-[#00b69b]">
-                            Friends
-                        </span>
+                        <div className="flex items-center gap-2">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-[#00b69b]/20 text-[#00b69b]">
+                                Online
+                            </span>
+                        </div>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -151,106 +164,105 @@ export const MessageDetailContentSection = ({ conversationId }: MessageDetailCon
             {/* Content with decorative background */}
             <div className="flex flex-col flex-1 relative w-full">
                 <img
-                    className="absolute top-0 left-0 w-full h-[1313.24px] object-cover -z-10"
+                    className="absolute top-0 left-0 w-full h-[1313px] object-cover md:object-none md:object-top -z-10"
                     alt="Main bg color"
                     src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/main-bg-color.svg"
                 />
 
                 {/* Messages Area */}
                 <div className="flex-1 overflow-y-auto px-8 py-6">
-                <div className="max-w-3xl mx-auto space-y-4">
-                    {isLoading ? (
-                        <div className="text-center text-gray-500 py-8">Chargement des messages...</div>
-                    ) : messages.length === 0 ? (
-                        <div className="text-center text-gray-500 py-8">
-                            Aucun message. Commencez la conversation !
-                        </div>
-                    ) : (
-                        messages.map((msg) => {
-                            const isOwn = msg.sender_id === user?.id;
+                    <div className="max-w-3xl mx-auto space-y-4">
+                        {isLoading ? (
+                            <div className="text-center text-gray-500 py-8">Chargement des messages...</div>
+                        ) : messages.length === 0 ? (
+                            <div className="text-center text-gray-500 py-8">
+                                Aucun message. Commencez la conversation !
+                            </div>
+                        ) : (
+                            messages.map((msg) => {
+                                const isOwn = msg.sender_id === user?.id;
 
-                            return (
-                                <div
-                                    key={msg.id}
-                                    className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
-                                >
-                                    <div className={`flex items-end gap-2 max-w-[70%] ${isOwn ? 'flex-row-reverse' : ''}`}>
-                                        {/* Avatar */}
-                                        {!isOwn && (
-                                            <div className="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0" />
-                                        )}
+                                return (
+                                    <div
+                                        key={msg.id}
+                                        className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
+                                    >
+                                        <div className={`flex items-end gap-2 max-w-[70%] ${isOwn ? 'flex-row-reverse' : ''}`}>
+                                            {/* Avatar */}
+                                            {!isOwn && (
+                                                <div className="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0" />
+                                            )}
 
-                                        {/* Message Bubble */}
-                                        <div
-                                            className={`rounded-2xl px-4 py-3 ${
-                                                isOwn
+                                            {/* Message Bubble */}
+                                            <div
+                                                className={`rounded-2xl px-4 py-3 ${isOwn
                                                     ? 'bg-[#fea38e] text-white rounded-br-sm'
                                                     : 'bg-white border border-gray-200 text-gray-900 rounded-bl-sm'
-                                            }`}
-                                        >
-                                            <p className="text-sm [font-family:'Inter',Helvetica] leading-relaxed">
-                                                {msg.content}
-                                            </p>
-                                            <div className={`flex items-center gap-2 mt-1 ${isOwn ? 'justify-end' : ''}`}>
-                                                <span className={`text-xs ${isOwn ? 'text-white/70' : 'text-gray-400'}`}>
-                                                    {new Date(msg.created_at).toLocaleTimeString('fr-FR', {
-                                                        hour: '2-digit',
-                                                        minute: '2-digit'
-                                                    })}
-                                                </span>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className={`w-4 h-4 p-0 ${isOwn ? 'text-white/50 hover:text-white/70' : 'text-gray-300 hover:text-gray-500'}`}
-                                                >
-                                                    <MoreVerticalIcon className="w-3 h-3" />
-                                                </Button>
+                                                    }`}
+                                            >
+                                                <p className="text-sm [font-family:'Inter',Helvetica] leading-relaxed">
+                                                    {msg.content}
+                                                </p>
+                                                <div className={`flex items-center gap-2 mt-1 ${isOwn ? 'justify-end' : ''}`}>
+                                                    <span className={`text-xs ${isOwn ? 'text-white/70' : 'text-gray-400'}`}>
+                                                        {new Date(msg.created_at).toLocaleTimeString('fr-FR', {
+                                                            hour: '2-digit',
+                                                            minute: '2-digit'
+                                                        })}
+                                                    </span>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className={`w-4 h-4 p-0 ${isOwn ? 'text-white/50 hover:text-white/70' : 'text-gray-300 hover:text-gray-500'}`}
+                                                    >
+                                                        <MoreVerticalIcon className="w-3 h-3" />
+                                                    </Button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            );
-                        })
-                    )}
-                    <div ref={messagesEndRef} />
-                </div>
-            </div>
-
-            {/* Message Input */}
-            <div className="border-t border-gray-200 bg-white px-8 py-4">
-                <div className="max-w-3xl mx-auto flex items-center gap-3">
-                    <Button variant="ghost" size="icon" className="text-gray-400 hover:text-gray-600">
-                        <MicIcon className="w-5 h-5" />
-                    </Button>
-
-                    <div className="flex-1 relative">
-                        <Input
-                            placeholder="Write message"
-                            value={newMessage}
-                            onChange={(e) => setNewMessage(e.target.value)}
-                            onKeyPress={handleKeyPress}
-                            className="pr-20 bg-gray-50 border-none rounded-lg [font-family:'Inter',Helvetica]"
-                        />
-                        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                            <Button variant="ghost" size="icon" className="w-8 h-8 text-gray-400 hover:text-gray-600">
-                                <PaperclipIcon className="w-4 h-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon" className="w-8 h-8 text-gray-400 hover:text-gray-600">
-                                <ImageIcon className="w-4 h-4" />
-                            </Button>
-                        </div>
+                                );
+                            })
+                        )}
+                        <div ref={messagesEndRef} />
                     </div>
-
-                    <Button
-                        onClick={handleSendMessage}
-                        disabled={!newMessage.trim() || isSending}
-                        className="bg-[#fea38e] hover:bg-[#fea38e]/90 text-white rounded-lg px-6"
-                    >
-                        Send
-                        <SendIcon className="w-4 h-4 ml-2" />
-                    </Button>
                 </div>
-            </div>
+
+                {/* Message Input */}
+                <div className="border-t border-gray-200 bg-white px-8 py-4">
+                    <div className="max-w-3xl mx-auto flex items-center gap-3">
+                        <Button variant="ghost" size="icon" className="text-gray-400 hover:text-gray-600">
+                            <MicIcon className="w-5 h-5" />
+                        </Button>
+
+                        <div className="flex-1 relative">
+                            <Input
+                                placeholder="Write message"
+                                value={newMessage}
+                                onChange={(e) => setNewMessage(e.target.value)}
+                                onKeyPress={handleKeyPress}
+                                className="pr-20 bg-gray-50 border-none rounded-lg [font-family:'Inter',Helvetica]"
+                            />
+                            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                                <Button variant="ghost" size="icon" className="w-8 h-8 text-gray-400 hover:text-gray-600">
+                                    <PaperclipIcon className="w-4 h-4" />
+                                </Button>
+                                <Button variant="ghost" size="icon" className="w-8 h-8 text-gray-400 hover:text-gray-600">
+                                    <ImageIcon className="w-4 h-4" />
+                                </Button>
+                            </div>
+                        </div>
+
+                        <Button
+                            onClick={handleSendMessage}
+                            disabled={!newMessage.trim() || isSending}
+                            className="bg-[#fea38e] hover:bg-[#fea38e]/90 text-white rounded-lg px-6"
+                        >
+                            Send
+                            <SendIcon className="w-4 h-4 ml-2" />
+                        </Button>
+                    </div>
+                </div>
             </div>
         </section>
     );

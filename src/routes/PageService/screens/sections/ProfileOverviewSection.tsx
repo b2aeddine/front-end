@@ -343,127 +343,109 @@ export const ProfileOverviewSection = (): JSX.Element => {
           </div>
         </div>
 
-        <Card className="w-[424px] h-[801px] rounded-[15px] border border-solid border-[#dadbdd9e] shadow-[0px_-2px_5px_#0000001a,0px_-9px_9px_#00000017,0px_-21px_12px_#0000000d,0px_-37px_15px_#00000003,0px_-57px_16px_transparent]">
-          <CardContent className="flex flex-col w-[362px] items-center gap-5 p-7 pt-[26px]">
-            <div className="flex flex-col items-center gap-2 w-full">
-              <div className="inline-flex items-center">
-                <div className={`w-[31px] h-[33px] ${selectedPackage === 'basic' ? 'bg-[#fea38e]' : 'bg-[#d9d9d9]'} rounded-[15.5px/16.5px] cursor-pointer`} onClick={() => setSelectedPackage('basic')} />
-                <div className={`w-14 h-[5px] ${selectedPackage === 'basic' ? 'bg-[#fea38e]' : 'bg-[#d9d9d9]'}`} />
-                <div className={`w-14 h-[5px] ${selectedPackage === 'standard' ? 'bg-[#fea38e]' : 'bg-[#d9d9d9]'}`} />
-                <div className={`w-[31px] h-[33px] ${selectedPackage === 'standard' ? 'bg-[#fea38e]' : 'bg-[#d9d9d9]'} rounded-[15.5px/16.5px] cursor-pointer`} onClick={() => setSelectedPackage('standard')} />
-                <div className={`w-14 h-[5px] ${selectedPackage === 'standard' ? 'bg-[#fea38e]' : 'bg-[#d9d9d9]'}`} />
-                <div className={`w-14 h-[5px] ${selectedPackage === 'premium' ? 'bg-[#fea38e]' : 'bg-[#d9d9d9]'}`} />
-                <div className={`w-[31px] h-[33px] ${selectedPackage === 'premium' ? 'bg-[#fea38e]' : 'bg-[#d9d9d9]'} rounded-[15.5px/16.5px] cursor-pointer`} onClick={() => setSelectedPackage('premium')} />
-              </div>
-
-              <div className="flex items-center gap-[74px] w-full">
-                <span
-                  onClick={() => setSelectedPackage('basic')}
-                  className={`[font-family:'Inter',Helvetica] font-normal text-black text-base text-center tracking-[0] leading-6 whitespace-nowrap w-[68px] cursor-pointer ${selectedPackage === 'basic' ? 'font-bold' : ''}`}
-                >
-                  basic
-                </span>
-                <span
-                  onClick={() => setSelectedPackage('standard')}
-                  className={`[font-family:'Inter',Helvetica] font-normal text-black text-base text-center tracking-[0] leading-6 whitespace-nowrap w-[68px] cursor-pointer ${selectedPackage === 'standard' ? 'font-bold' : ''}`}
-                >
-                  standard
-                </span>
-                <span
-                  onClick={() => setSelectedPackage('premium')}
-                  className={`[font-family:'Inter',Helvetica] font-normal text-black text-base text-center tracking-[0] leading-6 whitespace-nowrap w-[68px] cursor-pointer ${selectedPackage === 'premium' ? 'font-bold' : ''}`}
-                >
-                  premium
-                </span>
-              </div>
+        <Card className="w-[424px] rounded-[15px] border border-solid border-[#dadbdd9e] shadow-[0px_-2px_5px_#0000001a,0px_-9px_9px_#00000017,0px_-21px_12px_#0000000d,0px_-37px_15px_#00000003,0px_-57px_16px_transparent] overflow-hidden">
+          <CardContent className="flex flex-col items-center gap-0 p-0">
+            {/* Tabs - Package Selection */}
+            <div className="flex w-full">
+              {(['basic', 'standard', 'premium'] as const).map((pkg) => {
+                const isActive = selectedPackage === pkg;
+                const labels = { basic: 'Basic', standard: 'Standard', premium: 'Premium' };
+                return (
+                  <button
+                    key={pkg}
+                    onClick={() => setSelectedPackage(pkg)}
+                    className={`flex-1 py-4 px-2 text-center font-semibold text-sm transition-all duration-150 ease-out border-b-[3px] ${isActive
+                        ? 'bg-[#fea38e] text-white border-[#e8927c]'
+                        : 'bg-[#f5f5f5] text-[#6b7280] border-transparent hover:bg-[#ebebeb]'
+                      }`}
+                  >
+                    {labels[pkg]}
+                  </button>
+                );
+              })}
             </div>
 
-            <Separator className="w-full h-[3.07px]" />
+            {/* Selected Offer Content */}
+            <div className="flex flex-col items-center gap-5 p-7 w-full">
+              {(() => {
+                const selectedTier = pricingTiers.find(t => t.name === selectedPackage) || pricingTiers[0];
+                return (
+                  <div className="flex flex-col items-center gap-6 w-full transition-all duration-200 ease-out">
+                    {/* Offer Title */}
+                    <div className="text-center">
+                      <span className="text-sm text-[#6b7280] font-medium">
+                        {selectedTier.title}
+                      </span>
+                    </div>
 
-            <div className="flex flex-col w-[231px] items-start gap-[22px]">
-              {pricingTiers.map((tier, index) => (
-                <div
-                  key={index}
-                  className="flex flex-col items-start gap-[18px] w-full"
-                >
-                  <div className="flex items-center justify-between w-full">
-                    <span
-                      className={`[font-family:'Inter',Helvetica] font-normal ${tier.textColor} text-xs tracking-[0] leading-[normal]`}
-                    >
-                      {tier.title}
-                    </span>
-                    <span className="[font-family:'Inter',Helvetica] font-bold italic text-gray-900 text-lg tracking-[0] leading-[normal]">
-                      {tier.price}
-                    </span>
-                  </div>
+                    {/* Price - Large and Prominent */}
+                    <div className="text-center">
+                      <span className="[font-family:'Inter',Helvetica] font-bold text-[#1f2937] text-4xl tracking-tight">
+                        {selectedTier.price}
+                      </span>
+                    </div>
 
-                  <div className="inline-flex items-center gap-[27px]">
-                    <span
-                      className={`[font-family:'Inter',Helvetica] font-normal ${tier.textColor} text-xs tracking-[0] leading-[normal]`}
-                    >
-                      {tier.duration}
-                    </span>
-                    <span
-                      className={`[font-family:'Inter',Helvetica] font-normal ${tier.textColor} text-xs tracking-[0] leading-[normal]`}
-                    >
-                      {tier.revisions}
-                    </span>
-                    <span
-                      className={`[font-family:'Inter',Helvetica] font-normal ${tier.textColor} text-xs tracking-[0] leading-[normal]`}
-                    >
-                      {tier.concepts}
-                    </span>
-                  </div>
+                    {/* Duration & Revisions */}
+                    <div className="flex items-center justify-center gap-6 text-sm text-[#4b5563]">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-lg">⏱</span>
+                        <span>{selectedTier.duration.replace('⏱ ', '')}</span>
+                      </div>
+                      <div className="w-px h-4 bg-[#d1d5db]" />
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-lg">↺</span>
+                        <span>{selectedTier.revisions.replace('↺ ', '')} révisions</span>
+                      </div>
+                      {selectedTier.concepts && (
+                        <>
+                          <div className="w-px h-4 bg-[#d1d5db]" />
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-lg">✦</span>
+                            <span>{selectedTier.concepts.replace('✦ ', '')}</span>
+                          </div>
+                        </>
+                      )}
+                    </div>
 
-                  <div className="flex items-center justify-between w-full">
-                    <div className="flex flex-col w-[125px] items-start gap-[9px]">
-                      {tier.features.map((feature, featureIndex) => (
-                        <span
-                          key={featureIndex}
-                          className={`[font-family:'Inter',Helvetica] font-normal ${tier.textColor} text-xs tracking-[0] leading-[normal]`}
-                        >
-                          {feature.name}
-                        </span>
+                    {/* Separator */}
+                    <div className="w-full h-px bg-[#e5e7eb]" />
+
+                    {/* Features List */}
+                    <div className="flex flex-col items-start gap-3 w-full">
+                      {selectedTier.features.map((feature, idx) => (
+                        <div key={idx} className="flex items-center gap-3 w-full">
+                          <span className={`text-base ${feature.included ? 'text-green-500' : 'text-[#9ca3af]'}`}>
+                            {feature.included ? '✓' : '—'}
+                          </span>
+                          <span className={`text-sm ${feature.included ? 'text-[#374151]' : 'text-[#9ca3af]'}`}>
+                            {feature.name}
+                          </span>
+                        </div>
                       ))}
                     </div>
 
-                    <div className="flex flex-col w-[11px] items-start gap-[9px]">
-                      {tier.features.map((feature, featureIndex) => (
-                        <span
-                          key={featureIndex}
-                          className={`[font-family:'Inter',Helvetica] font-normal ${
-                            feature.included
-                              ? "text-green-600"
-                              : "text-[#979797]"
-                          } text-xs tracking-[0] leading-[normal]`}
-                        >
-                          {feature.included ? "✓" : "—"}
-                        </span>
-                      ))}
-                    </div>
+                    {/* Separator */}
+                    <div className="w-full h-px bg-[#e5e7eb]" />
+
+                    {/* Response Time */}
+                    <p className="text-sm text-[#6b7280] text-center">
+                      Temps de réponse moyen : <span className="font-medium">3 heures</span>
+                    </p>
+
+                    {/* Order Button */}
+                    <Button
+                      onClick={handleContactClick}
+                      disabled={isOrdering}
+                      className="h-12 w-full bg-[#fea38e] hover:bg-[#e8927c] rounded-lg shadow-md transition-all duration-150 disabled:opacity-50"
+                    >
+                      <span className="[font-family:'Inter',Helvetica] font-semibold text-white text-base">
+                        {isOrdering ? 'Chargement...' : '✉ Commander'}
+                      </span>
+                    </Button>
                   </div>
-                </div>
-              ))}
+                );
+              })()}
             </div>
-
-            <p className="[font-family:'Inter',Helvetica] font-normal text-[#62646a] text-base text-center tracking-[0] leading-6 whitespace-nowrap">
-              Temps de réponse moyen de 3 heures
-            </p>
-
-            <Button
-              onClick={handleContactClick}
-              disabled={isOrdering}
-              className="h-12 w-full bg-[#fea38e] hover:bg-[#fea38e]/90 rounded-lg border border-solid border-transparent shadow-[0px_2px_5px_#0000001a,0px_9px_9px_#00000017,0px_20px_12px_#0000000d,0px_35px_14px_#00000003,0px_55px_15px_transparent] relative disabled:opacity-50"
-            >
-              <img
-                className="absolute top-[calc(50.00%_-_8px)] left-[calc(50.00%_-_70px)] w-4 h-4"
-                alt="Contact"
-                src="https://c.animaapp.com/mjsa8xj74uh4Dq/img/svg-48.svg"
-              />
-              <span className="[font-family:'Inter',Helvetica] font-semibold text-white text-[15.9px] text-center tracking-[0] leading-[26px] whitespace-nowrap">
-                {isOrdering ? 'Chargement...' : 'Commander'}
-              </span>
-            </Button>
           </CardContent>
         </Card>
       </div>
