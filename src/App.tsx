@@ -11,7 +11,9 @@ import { MessageDetailPage } from "./routes/Dashboard/screens/MessageDetailPage"
 import { PagePublic } from "./routes/PagePublic/PagePublic";
 import { PageService } from "./routes/PageService/PageService";
 import { ProfilePage } from "./routes/Dashboard/screens/ProfilePage";
-
+import { ServicesPage } from "./routes/Dashboard/screens/ServicesPage";
+import { AffiliationPage } from "./routes/Dashboard/screens/AffiliationPage";
+import { AppelsOffresPage } from "./routes/Dashboard/screens/AppelsOffresPage";
 
 export const App = (): JSX.Element => {
   return (
@@ -57,6 +59,21 @@ export const App = (): JSX.Element => {
             <Route path="/dashboard/profile" element={
               <ProtectedRoute>
                 <ProfilePage />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/services" element={
+              <ProtectedRoute>
+                <ServicesPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/affiliation" element={
+              <ProtectedRoute>
+                <AffiliationPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/appels-offres" element={
+              <ProtectedRoute>
+                <AppelsOffresPage />
               </ProtectedRoute>
             } />
 
