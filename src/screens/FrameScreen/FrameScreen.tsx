@@ -1,8 +1,13 @@
 import React from "react";
 import { FooterSection } from "./sections/FooterSection";
 import { HeroSection } from "./sections/HeroSection";
+import { HeroContentSection } from "./sections/HeroContentSection";
+import { HowWeWorkSection1 } from "./sections/HowWeWorkSection1";
+import { HowWeWorkSection2 } from "./sections/HowWeWorkSection2";
 import { HowItWorksSection } from "./sections/HowItWorksSection";
 import { MainContentSection } from "./sections/MainContentSection";
+import { PartnersSection } from "./sections/PartnersSection";
+import { ReviewSection } from "./sections/ReviewSection";
 
 export const FrameScreen = (): JSX.Element => {
   return (
@@ -15,17 +20,13 @@ export const FrameScreen = (): JSX.Element => {
           <HeroSection />
         </div>
 
-        <img
-          className="relative w-full max-w-[1789.89px] flex-[0_0_auto] translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:200ms]"
-          alt="Hero section"
-          src="https://c.animaapp.com/mjqxqi8lTyFq6W/img/hero-section.png"
-        />
+        <div className="w-full translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:200ms]">
+          <HeroContentSection />
+        </div>
 
-        <img
-          className="relative w-full max-w-[1512px] flex-[0_0_auto] translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:400ms]"
-          alt="Partners section"
-          src="https://c.animaapp.com/mjqxqi8lTyFq6W/img/partners-section.png"
-        />
+        <div className="relative w-full max-w-[1512px] flex-[0_0_auto] translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:400ms]">
+          <PartnersSection />
+        </div>
 
         <div className="w-full translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:600ms]">
           <MainContentSection />
@@ -49,27 +50,21 @@ export const FrameScreen = (): JSX.Element => {
           />
         </section>
 
-        <img
-          className="relative flex-[0_0_auto] w-full translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:1000ms]"
-          alt="How we work section"
-          src="https://c.animaapp.com/mjqxqi8lTyFq6W/img/how-we-work-section---1.png"
-        />
+        <div className="relative flex-[0_0_auto] w-full translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:1000ms]">
+          <HowWeWorkSection1 />
+        </div>
 
-        <img
-          className="relative flex-[0_0_auto] w-full translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:1200ms]"
-          alt="How we work section"
-          src="https://c.animaapp.com/mjqxqi8lTyFq6W/img/how-we-work-section---2.png"
-        />
+        <div className="relative flex-[0_0_auto] w-full translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:1200ms]">
+          <HowWeWorkSection2 />
+        </div>
 
         <div className="w-full translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:1400ms]">
           <HowItWorksSection />
         </div>
 
-        <img
-          className="relative self-stretch w-full h-auto translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:1600ms]"
-          alt="Review section"
-          src="https://c.animaapp.com/mjqxqi8lTyFq6W/img/review-section.png"
-        />
+        <div className="relative self-stretch w-full h-auto translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:1600ms]">
+          <ReviewSection />
+        </div>
 
         <div className="w-full translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:1800ms]">
           <FooterSection />
