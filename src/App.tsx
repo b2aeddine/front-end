@@ -36,14 +36,9 @@ export const App = (): JSX.Element => {
                 <Dashboard />
               </ProtectedRoute>
             } />
-            <Route path="/dashboard/orders" element={
+            <Route path="/dashboard/services" element={
               <ProtectedRoute>
-                <OrdersPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/dashboard/revenues" element={
-              <ProtectedRoute>
-                <RevenuePage />
+                <ServicesPage />
               </ProtectedRoute>
             } />
             <Route path="/dashboard/messages" element={
@@ -56,14 +51,21 @@ export const App = (): JSX.Element => {
                 <MessageDetailPage />
               </ProtectedRoute>
             } />
+            <Route path="/dashboard/orders" element={
+              <ProtectedRoute>
+                <OrdersPage />
+              </ProtectedRoute>
+            } />
+
+            {/* Existing routes kept for compatibility if needed, or potentially reachable via other means */}
+            <Route path="/dashboard/revenues" element={
+              <ProtectedRoute>
+                <RevenuePage />
+              </ProtectedRoute>
+            } />
             <Route path="/dashboard/profile" element={
               <ProtectedRoute>
                 <ProfilePage />
-              </ProtectedRoute>
-            } />
-            <Route path="/dashboard/services" element={
-              <ProtectedRoute>
-                <ServicesPage />
               </ProtectedRoute>
             } />
             <Route path="/dashboard/affiliation" element={
