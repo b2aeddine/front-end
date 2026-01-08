@@ -17,6 +17,7 @@ import { Input } from "../../../../components/ui/input";
 import { useAuth } from "../../../../lib/auth";
 import { fetchConversations, getUnreadCount, Conversation } from "../../../../lib/queries/messaging";
 import { DashboardHeader } from "../../components/DashboardHeader";
+import { PageHeader } from "../../../../components/ui/PageHeader";
 
 // Labels for sidebar
 const emailLabels = [
@@ -112,14 +113,16 @@ export const MessagesContentSection = (): JSX.Element => {
                     src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/main-bg-color.svg"
                 />
 
-                <div className="w-full max-w-7xl mx-auto px-8 py-8">
-                    <h1 className="dashboard-title mb-8">
-                        Inbox
-                    </h1>
+                {/* PageHeader */}
+                <PageHeader
+                    title="Messages"
+                    contextMessage="Consultez vos conversations avec vos clients et vendeurs"
+                />
 
-                    <div className="flex gap-6">
+                <div className="w-full max-w-7xl mx-auto px-4 md:px-8 pb-12">
+                    <div className="flex flex-col lg:flex-row gap-6">
                         {/* Sidebar */}
-                        <div className="w-[280px] bg-white rounded-xl shadow-sm border border-gray-100 p-4 h-fit">
+                        <div className="w-full lg:w-[280px] lg:flex-shrink-0 bg-white rounded-xl shadow-sm border border-gray-100 p-4 h-fit">
                             {/* Compose Button */}
                             <Button className="w-full bg-[#fea38e] hover:bg-[#fea38e]/90 text-white rounded-lg mb-6 [font-family:'Nunito_Sans',Helvetica] font-semibold">
                                 <PlusIcon className="w-4 h-4 mr-2" />

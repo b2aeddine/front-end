@@ -21,11 +21,11 @@ const supportLinks = [
 
 export const FooterSection = (): JSX.Element => {
   return (
-    <footer className="w-full bg-[#f8f5f0] py-[120px] px-[99px]">
+    <footer className="w-full bg-[#f8f5f0] py-16 md:py-[120px] px-4 md:px-8 lg:px-[99px]">
       <div className="max-w-[1440px] mx-auto">
-        <div className="border-t border-neutral-400 mb-[120px]" />
+        <div className="border-t border-neutral-400 mb-12 md:mb-[120px]" />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-[100px]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 md:gap-12 mb-12 md:mb-[100px]">
           <div className="flex flex-col gap-6 lg:col-span-1">
             <div className="flex items-center gap-2">
               <img

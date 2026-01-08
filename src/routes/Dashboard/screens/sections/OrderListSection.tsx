@@ -5,6 +5,8 @@ import {
     TrendingUpIcon,
 } from "lucide-react";
 import { DashboardHeader } from "../../components/DashboardHeader";
+import { PageHeader } from "../../../../components/ui/PageHeader";
+import { EmptyState } from "../../../../components/ui/EmptyState";
 import { Button } from "../../../../components/ui/button";
 import { Card, CardContent } from "../../../../components/ui/card";
 import {
@@ -141,11 +143,14 @@ export const OrderListSection = (): JSX.Element => {
                     src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/main-bg-color.svg"
                 />
 
-                <div className="w-full max-w-7xl mx-auto px-8 py-8 flex flex-col gap-8">
-                    <h1 className="dashboard-title">
-                        Commandes
-                    </h1>
+                {/* PageHeader with context */}
+                <PageHeader
+                    title="Commandes"
+                    contextMessage="Suivez vos commandes en cours et consultez l'historique"
+                />
 
+                {/* Main content area */}
+                <div className="w-full max-w-7xl mx-auto px-4 md:px-8 pb-12 flex flex-col gap-8">
                     {/* KPIs Section */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
                         {statsCards.map((stat, index) => (

@@ -22,6 +22,10 @@ export type UserState =
     | 'active_user'             // regular active user
     | 'affiliate_active';       // has affiliate role active
 
+// Priority Mode: determines the visual hierarchy and primary focus
+// Detected from first significant action or role
+export type PriorityMode = 'earn' | 'promote' | 'find_talent' | 'onboarding';
+
 export interface DashboardStats {
     activeOrders: number;
     completedOrders: number;
@@ -33,6 +37,20 @@ export interface DashboardStats {
     activeServices: number;
 }
 
+// Master Card content - always one phrase, one action
+export interface MasterCardContent {
+    headline: string;
+    actionLabel: string;
+    actionPath: string;
+}
+
+// Expected Result content - motivation zone
+export interface ExpectedResultContent {
+    currentValue: string;
+    potential: string;
+    encouragement: string;
+}
+
 export interface UserStateResult {
     primaryState: UserState;
     secondaryStates: UserState[];
@@ -42,6 +60,11 @@ export interface UserStateResult {
     actionPath: string;
     primaryCTA: number;         // Index of CTA button to highlight
     canAccessOffers: boolean;   // Whether user can see appels d'offres
+    // NEW: Master Flow additions
+    priorityMode: PriorityMode;
+    masterCard: MasterCardContent;
+    expectedResult: ExpectedResultContent;
+    isInfluencer: boolean;      // Has more options than agent
 }
 
 // ============================================================================
@@ -204,6 +227,37 @@ function computeUserState(
             r.status === 'active'
         ));
 
+    // ==========================================================================
+    // Compute Priority Mode (Master Flow)
+    // ==========================================================================
+
+    const isInfluencer = primaryRole === 'influencer';
+
+    // Determine priority mode based on role and state
+    let priorityMode: PriorityMode = 'onboarding';
+
+    if (!profile?.onboarding_completed) {
+        priorityMode = 'onboarding';
+    } else if (primaryRole === 'agent') {
+        priorityMode = 'promote';
+    } else if (primaryRole === 'merchant') {
+        priorityMode = 'find_talent';
+    } else if (primaryRole === 'freelance' || primaryRole === 'influencer') {
+        priorityMode = 'earn';
+    }
+
+    // ==========================================================================
+    // Compute Master Card Content (one headline, one action)
+    // ==========================================================================
+
+    const masterCard: MasterCardContent = computeMasterCard(priorityMode, primaryState, stats);
+
+    // ==========================================================================
+    // Compute Expected Result Content (motivation zone)
+    // ==========================================================================
+
+    const expectedResult: ExpectedResultContent = computeExpectedResult(priorityMode, stats);
+
     return {
         primaryState,
         secondaryStates,
@@ -213,6 +267,131 @@ function computeUserState(
         actionPath: config.actionPath,
         primaryCTA: config.primaryCTA,
         canAccessOffers,
+        // Master Flow additions
+        priorityMode,
+        masterCard,
+        expectedResult,
+        isInfluencer,
+    };
+}
+
+// ============================================================================
+// Master Card Content Computation
+// ============================================================================
+
+function computeMasterCard(
+    mode: PriorityMode,
+    state: UserState,
+    stats: DashboardStats | null
+): MasterCardContent {
+    // Onboarding mode (highest priority)
+    if (mode === 'onboarding' || state === 'profile_incomplete') {
+        return {
+            headline: "Bienvenue ! Configurez votre profil pour commencer",
+            actionLabel: "Configurer mon profil",
+            actionPath: "/dashboard/profile",
+        };
+    }
+
+    // Earn mode
+    if (mode === 'earn') {
+        if (state === 'no_service_created' || (stats?.activeServices ?? 0) === 0) {
+            return {
+                headline: "Publiez votre premier service pour commencer à gagner",
+                actionLabel: "Créer un service",
+                actionPath: "/dashboard/services",
+            };
+        }
+        if ((stats?.activeOrders ?? 0) > 0) {
+            return {
+                headline: `Vous avez ${stats?.activeOrders} commande${(stats?.activeOrders ?? 0) > 1 ? 's' : ''} en cours`,
+                actionLabel: "Voir les commandes",
+                actionPath: "/dashboard/orders",
+            };
+        }
+        return {
+            headline: "Votre service est actif ! Attendez vos premières commandes",
+            actionLabel: "Voir mes services",
+            actionPath: "/dashboard/services",
+        };
+    }
+
+    // Promote mode
+    if (mode === 'promote') {
+        return {
+            headline: "Partagez des offres et gagnez des commissions",
+            actionLabel: "Explorer les services",
+            actionPath: "/dashboard/affiliation",
+        };
+    }
+
+    // Find talent mode
+    if (mode === 'find_talent') {
+        return {
+            headline: "Trouvez le prestataire idéal pour votre projet",
+            actionLabel: "Poster un appel d'offres",
+            actionPath: "/dashboard/appels-offres",
+        };
+    }
+
+    // Default fallback
+    return {
+        headline: "Continuez votre activité sur CollabMarket",
+        actionLabel: "Voir le tableau de bord",
+        actionPath: "/dashboard",
+    };
+}
+
+// ============================================================================
+// Expected Result Content Computation
+// ============================================================================
+
+function computeExpectedResult(
+    mode: PriorityMode,
+    stats: DashboardStats | null
+): ExpectedResultContent {
+    const totalRevenue = stats?.totalRevenue ?? 0;
+    const activeServices = stats?.activeServices ?? 0;
+
+    if (mode === 'earn') {
+        if (totalRevenue === 0) {
+            return {
+                currentValue: "0 € gagnés ce mois",
+                potential: "potentiel : élevé",
+                encouragement: activeServices === 0
+                    ? "Créez votre premier service pour débloquer vos gains"
+                    : "Vos premiers clients arrivent bientôt",
+            };
+        }
+        return {
+            currentValue: `${totalRevenue.toFixed(0)} € ce mois`,
+            potential: "en croissance",
+            encouragement: "Continuez sur cette lancée !",
+        };
+    }
+
+    if (mode === 'promote') {
+        const pendingRevenue = stats?.pendingRevenue ?? 0;
+        return {
+            currentValue: pendingRevenue > 0 ? `${pendingRevenue.toFixed(0)} € en attente` : "Aucune commission",
+            potential: "illimité",
+            encouragement: "Commencez avec une offre populaire",
+        };
+    }
+
+    if (mode === 'find_talent') {
+        return {
+            currentValue: "Trouvez des talents",
+            potential: "rapide",
+            encouragement: "Les meilleurs prestataires vous attendent",
+        };
+    }
+
+    // Onboarding or default
+    return {
+        currentValue: "Nouveau compte",
+        potential: "tout est possible",
+        encouragement: "Configurez votre profil pour commencer",
     };
 }
 

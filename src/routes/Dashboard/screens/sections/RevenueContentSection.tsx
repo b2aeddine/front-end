@@ -18,6 +18,7 @@ import { useAuth } from "../../../../lib/auth";
 import { fetchSellerRevenues, getAvailableBalance } from "../../../../lib/queries/withdrawals";
 import { fetchRevenueStats } from "../../../../lib/queries/dashboard";
 import { DashboardHeader } from "../../components/DashboardHeader";
+import { PageHeader } from "../../../../components/ui/PageHeader";
 
 interface RevenueRecord {
     id: string;
@@ -157,11 +158,17 @@ export const RevenueContentSection = (): JSX.Element => {
                     src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/main-bg-color.svg"
                 />
 
-                <div className="w-full max-w-7xl mx-auto px-8 py-8 flex flex-col gap-8">
-                    <h1 className="dashboard-title">
-                        Revenue
-                    </h1>
+                {/* PageHeader */}
+                <PageHeader
+                    title="Revenus"
+                    contextMessage="Consultez vos revenus et demandez des retraits"
+                    primaryAction={{
+                        label: "Demander retrait",
+                        path: "/dashboard/revenue/withdraw",
+                    }}
+                />
 
+                <div className="w-full max-w-7xl mx-auto px-4 md:px-8 pb-12 flex flex-col gap-8">
                     {/* KPIs Section */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
                         {statsCards.map((stat, index) => (

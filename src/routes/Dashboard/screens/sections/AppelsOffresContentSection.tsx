@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { MapPinIcon } from "lucide-react";
 import {
     Avatar,
@@ -8,6 +9,8 @@ import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";
 import { DashboardHeader } from "../../components/DashboardHeader";
+import { PageHeader } from "../../../../components/ui/PageHeader";
+import { AppelOffresModal } from "../../../../components/modals";
 
 const applicantImages = [
     "https://c.animaapp.com/mjs8bxbnJhG6tv/img/ellipse-6.png",
@@ -53,24 +56,34 @@ const offersData = [
 ];
 
 export const AppelsOffresContentSection = (): JSX.Element => {
+    const [isAppelOffresModalOpen, setIsAppelOffresModalOpen] = useState(false);
+
     return (
-        <section className="relative flex flex-col w-full min-h-screen items-start bg-[#f8f5f0] isolate overflow-hidden">
-            <DashboardHeader />
+        <>
+            <section className="relative flex flex-col w-full min-h-screen items-start bg-[#f8f5f0] isolate overflow-hidden">
+                <DashboardHeader />
 
-            <div className="flex flex-col items-start gap-2.5 relative w-full flex-1">
-                <img
-                    className="absolute top-0 left-0 w-full h-[1313px] object-cover md:object-none md:object-top -z-10"
-                    alt="Main bg color"
-                    src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/main-bg-color.svg"
-                />
+                <div className="flex flex-col items-start gap-2.5 relative w-full flex-1">
+                    <img
+                        className="absolute top-0 left-0 w-full h-[1313px] object-cover md:object-none md:object-top -z-10"
+                        alt="Main bg color"
+                        src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/main-bg-color.svg"
+                    />
 
-                {/* Main Content Area */}
-                <div className="w-full max-w-7xl mx-auto px-8 py-8 flex flex-col gap-8">
-                    <div className="w-full">
-                        <h1 className="dashboard-title">Appels d'Offres</h1>
+                    {/* PageHeader */}
+                    <PageHeader
+                        title="Appels d'Offres"
+                        contextMessage="Répondez aux appels d'offres et décrochez de nouveaux contrats"
+                        primaryAction={{
+                            label: "Poster un appel",
+                            onClick: () => setIsAppelOffresModalOpen(true),
+                        }}
+                    />
 
-                        {/* Offers Section - Copied from DashboardContentSection */}
-                        <div className="flex flex-col items-start gap-[30px] w-full mt-8">
+                    {/* Main Content Area */}
+                    <div className="w-full max-w-7xl mx-auto px-4 md:px-8 pb-12 flex flex-col gap-8">
+                        {/* Offers Section */}
+                        <div className="flex flex-col items-start gap-[30px] w-full">
                             <div className="flex items-end justify-between w-full">
                                 <h2 className="[font-family:'DM_Sans',Helvetica] font-bold text-black text-[25px] tracking-[0.25px]">
                                     Appel d&apos;offres recentes :
@@ -149,11 +162,11 @@ export const AppelsOffresContentSection = (): JSX.Element => {
                                                 <div className="flex items-center gap-[13px] w-full">
                                                     <Button
                                                         variant="outline"
-                                                        className="flex-1 h-9 rounded-[10px] border-[1.5px] border-solid border-[#fea38e] bg-transparent [font-family:'DM_Sans',Helvetica] font-extrabold italic text-[#303030] text-sm"
+                                                        className="flex-1 h-9 rounded-[10px] border-[1.5px] border-solid border-[#fea38e] bg-transparent [font-family:'DM_Sans',Helvetica] font-bold text-[#303030] text-sm"
                                                     >
                                                         Voir les détails
                                                     </Button>
-                                                    <Button className="flex-1 h-9 rounded-[10px] bg-[#fea38e] hover:bg-[#fea38e]/90 [font-family:'DM_Sans',Helvetica] font-extrabold italic text-[#f8f5f0] text-sm">
+                                                    <Button className="flex-1 h-9 rounded-[10px] bg-[#fea38e] hover:bg-[#fea38e]/90 [font-family:'DM_Sans',Helvetica] font-bold text-[#f8f5f0] text-sm">
                                                         Postuler
                                                     </Button>
                                                 </div>
@@ -165,7 +178,16 @@ export const AppelsOffresContentSection = (): JSX.Element => {
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+
+            <AppelOffresModal
+                isOpen={isAppelOffresModalOpen}
+                onClose={() => setIsAppelOffresModalOpen(false)}
+                onComplete={(data) => {
+                    console.log('Appel offres created:', data);
+                    setIsAppelOffresModalOpen(false);
+                }}
+            />
+        </>
     );
 };

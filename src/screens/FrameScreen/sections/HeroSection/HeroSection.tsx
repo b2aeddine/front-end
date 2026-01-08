@@ -39,7 +39,7 @@ export const HeroSection = (): JSX.Element => {
             </div>
           </div>
 
-          <div className="inline-flex items-start gap-8 relative flex-shrink-0">
+          <div className="hidden md:inline-flex items-start gap-8 relative flex-shrink-0">
             {navItems.map((item, index) => (
               <button
                 key={index}

@@ -337,3 +337,556 @@
   padding-bottom: 8px;
   position: relative;
 }
+
+/* ========================================
+   COLLABMARKET UX/UI STANDARDIZATION
+   Design System Utility Classes
+   ======================================== */
+
+/* ----------------------------------------
+   LAYOUT UTILITIES
+   ---------------------------------------- */
+.dashboard-container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.dashboard-section {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+
+  .dashboard-container,
+  .dashboard-section {
+    padding: 1rem;
+  }
+}
+
+.content-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.content-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.content-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.content-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .content-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .content-grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+
+  .content-grid-2,
+  .content-grid-3,
+  .content-grid-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ----------------------------------------
+   TYPOGRAPHY STANDARDIZATION
+   ---------------------------------------- */
+.heading-xl {
+  font-family: 'Nunito Sans', Helvetica, sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: #202224;
+  line-height: 1.2;
+}
+
+.heading-lg {
+  font-family: 'DM Sans', Helvetica, sans-serif;
+  font-size: 25px;
+  font-weight: 700;
+  color: #202224;
+  letter-spacing: 0.25px;
+}
+
+.heading-md {
+  font-family: 'DM Sans', Helvetica, sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f392c;
+}
+
+.heading-sm {
+  font-family: 'Nunito Sans', Helvetica, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #202224;
+}
+
+.body-text {
+  font-family: 'Nunito Sans', Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #606060;
+  line-height: 1.5;
+}
+
+.body-text-sm {
+  font-family: 'Nunito Sans', Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #606060;
+  line-height: 1.5;
+}
+
+.label-text {
+  font-family: 'Nunito Sans', Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #9a9a9a;
+}
+
+.text-primary {
+  color: #202224;
+}
+
+.text-secondary {
+  color: #606060;
+}
+
+.text-muted {
+  color: #9a9a9a;
+}
+
+.text-accent {
+  color: #fea38e;
+}
+
+/* ----------------------------------------
+   CARD STANDARDIZATION
+   ---------------------------------------- */
+.card-standard {
+  background: #f8f5f0;
+  border: 1px solid rgba(151, 151, 151, 0.4);
+  border-radius: 8px;
+  box-shadow: 3px 3px 26px rgba(0, 0, 0, 0.05);
+}
+
+.card-standard-content {
+  padding: 1rem;
+}
+
+.card-gradient {
+  background: linear-gradient(180deg, rgba(254, 163, 142, 0.7) 0%, rgba(248, 245, 240, 1) 100%);
+  border-radius: 15px;
+  border: none;
+  box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.1), 5px 9px 10px rgba(0, 0, 0, 0.09);
+}
+
+.card-gradient-content {
+  padding: 1rem;
+}
+
+.card-highlight {
+  background: rgba(254, 163, 142, 0.3);
+  border: 0.8px solid #fea38e;
+  border-radius: 8px;
+}
+
+.card-highlight-content {
+  padding: 0.5rem;
+}
+
+.card-white {
+  background: #ffffff;
+  border: 1px solid rgba(229, 231, 235, 1);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.card-white-content {
+  padding: 1rem;
+}
+
+/* ----------------------------------------
+   BUTTON STANDARDIZATION
+   ---------------------------------------- */
+.btn-primary {
+  background: #fea38e;
+  color: #f8f5f0;
+  border: none;
+  border-radius: 10px;
+  height: 36px;
+  padding: 0 16px;
+  font-family: 'DM Sans', Helvetica, sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-primary:hover {
+  background: #fe8e76;
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1.5px solid #fea38e;
+  color: #303030;
+  border-radius: 10px;
+  height: 36px;
+  padding: 0 16px;
+  font-family: 'DM Sans', Helvetica, sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-secondary:hover {
+  background: rgba(254, 163, 142, 0.1);
+}
+
+.btn-ghost {
+  background: transparent;
+  border: none;
+  color: #606060;
+  height: 36px;
+  padding: 0 12px;
+  font-family: 'Nunito Sans', Helvetica, sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-ghost:hover {
+  color: #202224;
+}
+
+.btn-sm {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 12px;
+}
+
+.btn-lg {
+  height: 44px;
+  padding: 0 24px;
+  font-size: 16px;
+}
+
+/* ----------------------------------------
+   TABLE STANDARDIZATION
+   ---------------------------------------- */
+.table-container {
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  border: 1px solid rgba(243, 244, 246, 1);
+}
+
+.table-standard {
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+}
+
+.table-header {
+  font-family: 'Nunito Sans', Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(156, 163, 175, 0.7);
+  padding: 1.5rem;
+  background: rgba(249, 250, 251, 0.5);
+  border-bottom: 1px solid rgba(243, 244, 246, 1);
+}
+
+.table-cell {
+  font-family: 'Nunito Sans', Helvetica, sans-serif;
+  font-size: 14px;
+  padding: 1.5rem;
+  color: #374151;
+  border-bottom: 1px solid rgba(243, 244, 246, 1);
+}
+
+.table-cell-bold {
+  font-weight: 700;
+  color: #111827;
+}
+
+.table-row:hover {
+  background: rgba(249, 250, 251, 1);
+}
+
+.table-footer {
+  padding: 1.5rem;
+  border-top: 1px solid rgba(243, 244, 246, 1);
+  font-family: 'Nunito Sans', Helvetica, sans-serif;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* ----------------------------------------
+   STATUS BADGE STANDARDIZATION
+   ---------------------------------------- */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 16px;
+  border-radius: 8px;
+  font-family: 'Nunito Sans', Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.status-success {
+  background: #d7f7ef;
+  color: #00b69b;
+}
+
+.status-warning {
+  background: #fff4e5;
+  color: #ff9f43;
+}
+
+.status-info {
+  background: #eef3ff;
+  color: #5a8cff;
+}
+
+.status-error {
+  background: #feeceb;
+  color: #ea5455;
+}
+
+.status-purple {
+  background: #e7d6fa;
+  color: #936dd3;
+}
+
+.status-neutral {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+/* ----------------------------------------
+   FILTER BAR STANDARDIZATION
+   ---------------------------------------- */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: #ffffff;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(243, 244, 246, 1);
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.filter-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  color: #4b5563;
+  font-family: 'Nunito Sans', Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* ----------------------------------------
+   SIDEBAR STANDARDIZATION
+   ---------------------------------------- */
+.sidebar-container {
+  width: 280px;
+  flex-shrink: 0;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(243, 244, 246, 1);
+  padding: 1rem;
+  height: fit-content;
+}
+
+@media (max-width: 1024px) {
+  .sidebar-container {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.sidebar-section {
+  margin-bottom: 1.5rem;
+}
+
+.sidebar-title {
+  font-family: 'Nunito Sans', Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.75rem;
+}
+
+/* ----------------------------------------
+   FORM ELEMENTS STANDARDIZATION
+   ---------------------------------------- */
+.input-standard {
+  width: 100%;
+  height: 38px;
+  padding: 0 1rem;
+  background: #f5f6fa;
+  border: 0.6px solid #d1d5db;
+  border-radius: 19px;
+  font-family: 'Nunito Sans', Helvetica, sans-serif;
+  font-size: 14px;
+  color: #202224;
+  transition: border-color 0.2s ease;
+}
+
+.input-standard:focus {
+  outline: none;
+  border-color: #fea38e;
+}
+
+.input-standard::placeholder {
+  color: #9ca3af;
+}
+
+.select-standard {
+  background: #f9fafb;
+  border: none;
+  border-radius: 9999px;
+  padding: 0 1rem;
+  height: 36px;
+  font-family: 'Nunito Sans', Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* ----------------------------------------
+   RESPONSIVE UTILITIES
+   ---------------------------------------- */
+@media (max-width: 1024px) {
+  .hide-tablet {
+    display: none !important;
+  }
+
+  .show-tablet {
+    display: block !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+
+  .show-mobile {
+    display: block !important;
+  }
+
+  .flex-col-mobile {
+    flex-direction: column !important;
+  }
+
+  .w-full-mobile {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .text-center-mobile {
+    text-align: center !important;
+  }
+}
+
+/* ----------------------------------------
+   SPACING UTILITIES
+   ---------------------------------------- */
+.gap-sm {
+  gap: 0.5rem;
+}
+
+.gap-md {
+  gap: 1rem;
+}
+
+.gap-lg {
+  gap: 1.5rem;
+}
+
+.gap-xl {
+  gap: 2rem;
+}
+
+.mt-section {
+  margin-top: 2rem;
+}
+
+.mb-section {
+  margin-bottom: 2rem;
+}
+
+/* ----------------------------------------
+   ANIMATIONS
+   ---------------------------------------- */
+.transition-standard {
+  transition: all 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
