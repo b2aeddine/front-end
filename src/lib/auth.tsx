@@ -7,7 +7,7 @@ import { supabase, isSupabaseConfigured } from './supabaseClient';
 // Types
 // ============================================================================
 
-interface UserProfile {
+export interface UserProfile {
     id: string;
     username: string | null;
     display_name: string | null;
@@ -16,7 +16,7 @@ interface UserProfile {
     onboarding_completed: boolean;
 }
 
-interface UserRole {
+export interface UserRole {
     role: 'influencer' | 'freelance' | 'merchant' | 'agent';
     status: 'active' | 'pending' | 'suspended';
 }

@@ -49,10 +49,6 @@ export const NavigationMenuSection = (): JSX.Element => {
 
   const renderMenuItem = (item: MenuItem, index: number) => {
     const active = isActive(item.path);
-    // Design shows simple text, bold for active/headings potentially, but mostly clean.
-    // Active state in design image isn't explicitly shown as a bar, but let's keep it subtle or remove the bar if we want provided "clean" look.
-    // The provided image shows "Dashboard", "Products" etc.
-    // Let's use a cleaner style: Text color change or bold.
     return (
       <div className="relative w-full px-4 mb-1">
         <Button
@@ -75,15 +71,32 @@ export const NavigationMenuSection = (): JSX.Element => {
 
   return (
     <nav className="flex flex-col w-60 min-h-screen bg-[#f8f5f0] py-8 border-r border-transparent">
+      {/* Logo */}
+      <div className="px-6 mb-8">
+        <span className="[font-family:'DM_Sans',Helvetica] font-bold text-[#202224] text-xl tracking-wide">
+          DashStack
+        </span>
+      </div>
+
       {/* Main Menu */}
       <div className="flex flex-col gap-2 w-full mb-6">
         {mainMenuItems.map((item, index) => renderMenuItem(item, index))}
       </div>
 
+      {/* PAGES Section Divider */}
+      <div className="px-6 mb-4 mt-4">
+        <span className="[font-family:'Nunito_Sans',Helvetica] font-semibold text-[#9a9a9a] text-xs tracking-[1px] uppercase">
+          PAGES
+        </span>
+      </div>
 
+      {/* Secondary Pages - placeholder for additional pages like in mockup */}
+      <div className="flex flex-col gap-2 w-full mb-6">
+        {/* These are visual placeholders matching the mockup structure */}
+      </div>
 
       {/* Bottom Menu */}
-      <div className="flex flex-col gap-2 w-full mt-8">
+      <div className="flex flex-col gap-2 w-full mt-auto">
         {bottomMenuItems.map((item, index) => renderMenuItem(item, index))}
       </div>
     </nav>
