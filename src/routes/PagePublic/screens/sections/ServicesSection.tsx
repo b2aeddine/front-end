@@ -1,4 +1,6 @@
+import { TrendingUpIcon, ArrowRightIcon } from "lucide-react";
 import { Badge } from "../../components/ui/badge";
+import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";
 
 const projectData = {
@@ -11,6 +13,7 @@ const projectData = {
   duration: "1 à 7 jours",
   mainImage: "https://c.animaapp.com/mjs9uq4eaVmanC/img/lr-05270-jpg.png",
   imageCount: 5,
+  result: "+35% engagement sur les réseaux",
 };
 
 const thumbnails = [
@@ -18,11 +21,13 @@ const thumbnails = [
     image:
       "https://c.animaapp.com/mjs9uq4eaVmanC/img/derrick-hillman-for-hawes---curtis.png",
     borderClass: "border-2 border-[#0c0c0d]",
+    result: "+28% vues",
   },
   {
     image:
       "https://c.animaapp.com/mjs9uq4eaVmanC/img/travel-photoshoot-around-tower-bridge.png",
     borderClass: "border border-[#dadbdd]",
+    result: "+42% conversions",
   },
   {
     image: null,
@@ -32,6 +37,11 @@ const thumbnails = [
 ];
 
 export const ServicesSection = (): JSX.Element => {
+  const handleSimilarResult = (projectTitle?: string) => {
+    // Préparation future checkout/contact modal
+    console.log("Similar result intent:", { projectTitle, intent: "similar_result" });
+  };
+
   return (
     <section className="flex flex-col w-full items-center gap-2">
       <header className="flex flex-col w-[121.73px] items-center">
@@ -46,12 +56,12 @@ export const ServicesSection = (): JSX.Element => {
         />
       </header>
 
-      <div className="flex items-center gap-4 w-full">
+      <div className="flex items-start gap-4 w-full">
         <Card className="flex-1 rounded-[14px] shadow-[2px_7px_15px_#0000001a,9px_26px_28px_#00000017,21px_60px_38px_#0000000d,37px_106px_45px_#00000003,57px_166px_49px_transparent] bg-[linear-gradient(215deg,rgba(254,163,142,1)_0%,rgba(248,245,240,1)_100%)] border-[#dadbdd]">
           <CardContent className="p-0">
             <div className="w-full h-[450.28px] rounded-2xl border border-solid border-[#dadbdd]">
               <div className="flex items-start gap-[38px] pt-[33px] px-[25px]">
-                <div className="flex flex-col w-[514px] items-start gap-[130px]">
+                <div className="flex flex-col w-[514px] items-start gap-6">
                   <div className="flex flex-col items-start gap-[19px] w-full">
                     <p className="flex items-center justify-center self-stretch h-6 mt-[-1.00px] [font-family:'Inter',Helvetica] font-normal text-[#74767e] text-base tracking-[0] leading-6 whitespace-nowrap">
                       {projectData.date}
@@ -76,6 +86,14 @@ export const ServicesSection = (): JSX.Element => {
                         {projectData.tag}
                       </span>
                     </Badge>
+                  </div>
+
+                  {/* Résultat obtenu - NOUVEAU */}
+                  <div className="flex items-center gap-2 px-3 py-2 bg-green-50 rounded-lg">
+                    <TrendingUpIcon className="w-5 h-5 text-green-600" />
+                    <span className="font-bold text-green-700 text-sm">
+                      Résultat : {projectData.result}
+                    </span>
                   </div>
 
                   <div className="inline-flex items-center gap-4">
@@ -107,6 +125,16 @@ export const ServicesSection = (): JSX.Element => {
                       </div>
                     </div>
                   </div>
+
+                  {/* CTA léger - NOUVEAU */}
+                  <Button
+                    onClick={() => handleSimilarResult(projectData.title)}
+                    variant="ghost"
+                    className="text-[#fea38e] hover:text-[#e8937f] hover:bg-[#fea38e]/10 p-0 h-auto font-semibold flex items-center gap-1"
+                  >
+                    Je veux un résultat similaire
+                    <ArrowRightIcon className="w-4 h-4" />
+                  </Button>
                 </div>
 
                 <div
@@ -132,12 +160,13 @@ export const ServicesSection = (): JSX.Element => {
           </CardContent>
         </Card>
 
+        {/* Thumbnails sur le côté droit */}
         <div className="flex flex-col w-[189px] items-start gap-3">
           {thumbnails.map((thumbnail, index) => (
-            <div key={index} className="w-full h-[142.09px]">
+            <div key={index} className="w-full h-[142.09px] relative group">
               {thumbnail.showCount ? (
                 <div
-                  className={`w-[189px] h-[142px] flex flex-col items-center justify-center rounded-md overflow-hidden ${thumbnail.borderClass}`}
+                  className={`w-[189px] h-[142px] flex flex-col items-center justify-center rounded-md overflow-hidden ${thumbnail.borderClass} hover:border-[#fea38e] transition-colors cursor-pointer`}
                 >
                   <span className="h-[18px] w-[31.45px] font-bold text-[#222325] text-base text-center leading-[26px] flex items-center justify-center [font-family:'Inter',Helvetica] tracking-[0] whitespace-nowrap">
                     +23
@@ -149,12 +178,21 @@ export const ServicesSection = (): JSX.Element => {
                 </div>
               ) : (
                 <div
-                  className={`w-[189px] h-[142px] flex justify-center rounded-md overflow-hidden ${thumbnail.borderClass}`}
+                  className={`w-[189px] h-[142px] flex justify-center rounded-md overflow-hidden ${thumbnail.borderClass} hover:border-[#fea38e] transition-colors cursor-pointer relative`}
                 >
                   <div
                     className={`${index === 0 ? "mt-1 w-[181px] h-[134.09px]" : "mt-px w-[187px] h-[140.09px]"} bg-cover bg-[50%_50%]`}
                     style={{ backgroundImage: `url(${thumbnail.image})` }}
                   />
+                  {/* Résultat sur hover */}
+                  {thumbnail.result && (
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-1 text-white text-xs">
+                        <TrendingUpIcon className="w-3 h-3" />
+                        <span>{thumbnail.result}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

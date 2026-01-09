@@ -1,6 +1,7 @@
-import { GlobeIcon, MapPinIcon } from "lucide-react";
+import { GlobeIcon, MapPinIcon, MessageCircleIcon, ArrowDownIcon } from "lucide-react";
 import { Avatar, AvatarImage } from "../../components/ui/avatar";
 import { Badge } from "../../components/ui/badge";
+import { Button } from "../../components/ui/button";
 import { Separator } from "../../components/ui/separator";
 
 const socialMediaIcons = [
@@ -124,10 +125,40 @@ export const ProfileOverviewSection = (): JSX.Element => {
                 </div>
               </div>
 
-              <p className="[font-family:'Inter',Helvetica] font-normal text-[#222325] text-base tracking-[0] leading-6 mt-2">
+              {/* Phrase d'accroche orientée résultat */}
+              <p className="[font-family:'Inter',Helvetica] font-semibold text-[#fea38e] text-lg tracking-[0] leading-7 mt-2">
+                Des vidéos marketing qui transforment votre audience en clients.
+              </p>
+
+              <p className="[font-family:'Inter',Helvetica] font-normal text-[#222325] text-base tracking-[0] leading-6 mt-1">
                 Vidéos de marketing digital professionnelles de haute qualité,
                 engageantes
               </p>
+
+              {/* CTAs principaux */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mt-6">
+                <Button
+                  onClick={() => {
+                    // Préparation future checkout/contact modal
+                    console.log("Contact intent:", { creatorId: "karunarathne", intent: "hero_primary" });
+                  }}
+                  className="bg-[#fea38e] hover:bg-[#e8937f] text-white px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-bold rounded-full transition-all hover:shadow-lg flex items-center gap-2"
+                >
+                  <MessageCircleIcon className="w-5 h-5" />
+                  Contacter ce créateur
+                </Button>
+
+                <Button
+                  onClick={() => {
+                    document.getElementById("services")?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                  variant="outline"
+                  className="border-[#fea38e] text-[#fea38e] px-6 py-3 md:py-4 rounded-full hover:bg-[#fea38e]/10 transition-all flex items-center gap-2"
+                >
+                  Voir les services
+                  <ArrowDownIcon className="w-4 h-4" />
+                </Button>
+              </div>
 
               <Separator className="my-6" />
 

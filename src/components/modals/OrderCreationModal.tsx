@@ -1,9 +1,8 @@
 /**
- * Order Creation Modal - 5-step order flow
- * Converted from frame14734.js
+ * Order Creation Modal - Adoption-First Design (Polished)
+ * 5 steps: Package → Info → Payment → Brief → Success
  */
 import React, { useState } from 'react';
-import './OrderCreationModal.css';
 
 interface OrderCreationModalProps {
     isOpen: boolean;
@@ -19,429 +18,348 @@ interface OrderCreationModalProps {
 interface OrderData {
     packageIndex: number;
     extras: string[];
-    note: string;
-    country: string;
     usageRights: 'personal' | 'commercial' | 'resale';
     billingName: string;
     email: string;
+    country: string;
     brief: string;
 }
 
-type Step = 'package' | 'billing' | 'payment' | 'brief' | 'confirmation';
+type Step = 'package' | 'info' | 'payment' | 'brief' | 'success';
+
+const EXTRAS = [
+    { id: 'express', name: 'Livraison express (24h)', price: 40, emoji: '⚡' },
+    { id: 'sources', name: 'Fichiers sources', price: 25, emoji: '📁' },
+    { id: 'revisions', name: 'Révisions illimitées', price: 30, emoji: '🔄' },
+];
+
+const PACKAGES = [
+    { name: 'Basic', price: 89, deliverables: '1 livrable', days: 2, badge: 'Populaire' },
+    { name: 'Standard', price: 149, deliverables: '2 livrables', days: 3, badge: null },
+    { name: 'Premium', price: 299, deliverables: '4 livrables', days: 5, badge: null },
+];
+
+const COUNTRIES = ['France', 'Belgique', 'Suisse', 'Canada', 'Autre'];
 
 export const OrderCreationModal: React.FC<OrderCreationModalProps> = ({
     isOpen,
     onClose,
     onComplete,
-    service,
 }) => {
     const [step, setStep] = useState<Step>('package');
     const [selectedPackage, setSelectedPackage] = useState(0);
     const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
     const [formData, setFormData] = useState<Partial<OrderData>>({
         usageRights: 'personal',
+        country: 'France',
     });
 
     if (!isOpen) return null;
 
-    const handleContinue = () => {
-        switch (step) {
-            case 'package':
-                setStep('billing');
-                break;
-            case 'billing':
-                setStep('payment');
-                break;
-            case 'payment':
-                setStep('brief');
-                break;
-            case 'brief':
-                setStep('confirmation');
-                break;
-            case 'confirmation':
-                onComplete?.({
-                    ...formData,
-                    packageIndex: selectedPackage,
-                    extras: selectedExtras,
-                } as OrderData);
-                onClose();
-                break;
-        }
-    };
-
-    const handleBack = () => {
-        switch (step) {
-            case 'billing':
-                setStep('package');
-                break;
-            case 'payment':
-                setStep('billing');
-                break;
-            case 'brief':
-                setStep('payment');
-                break;
-            case 'confirmation':
-                setStep('brief');
-                break;
-        }
-    };
-
-    const toggleExtra = (extra: string) => {
-        setSelectedExtras((prev) =>
-            prev.includes(extra) ? prev.filter((e) => e !== extra) : [...prev, extra]
+    const toggleExtra = (id: string) => {
+        setSelectedExtras(prev =>
+            prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]
         );
     };
 
+    const calculateTotal = () => {
+        const packagePrice = PACKAGES[selectedPackage].price;
+        const extrasPrice = EXTRAS
+            .filter(e => selectedExtras.includes(e.id))
+            .reduce((sum, e) => sum + e.price, 0);
+        const subtotal = packagePrice + extrasPrice;
+        const fees = Math.round(subtotal * 0.05);
+        return { subtotal, fees, total: subtotal + fees };
+    };
+
+    const handlePay = () => {
+        setStep('brief');
+    };
+
+    const handleSubmitBrief = () => {
+        onComplete?.({
+            ...formData,
+            packageIndex: selectedPackage,
+            extras: selectedExtras,
+        } as OrderData);
+        setStep('success');
+    };
+
+    const prices = calculateTotal();
+
     return (
-        <div className="frame14734-container1" onClick={(e) => e.target === e.currentTarget && onClose()}>
-            <div className="frame14734-thq-frame14734-elm">
-                {/* Step 1: Package Selection */}
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            onClick={(e) => e.target === e.currentTarget && step !== 'success' && onClose()}
+        >
+            <div className="bg-[#f8f5f0] rounded-2xl w-full max-w-2xl mx-4 shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+
+                {/* ========== STEP 1: PACKAGE ========== */}
                 {step === 'package' && (
-                    <div className="frame14734-thq-frame-elm10">
-                        <img src="/vector1301-5pre.svg" alt="" className="frame14734-thq-vector-elm10" />
-                        <div className="frame14734-thq-frame14177-elm">
-                            <div className="frame14734-thq-frame14176-elm">
-                                <div className="frame14734-thq-frame14158-elm">
-                                    <div className="frame14734-thq-frame14157-elm">
-                                        <span className="frame14734-thq-text-elm100">Choisir l'offre</span>
-                                        <span className="frame14734-thq-text-elm101">
-                                            Étape 1/5 · Configure ton achat (package + extras)
+                    <div className="p-8">
+                        <div className="text-center mb-8">
+                            <h2 className="text-2xl font-bold text-[#222325] mb-2">
+                                Choisir ton offre
+                            </h2>
+                            <p className="text-[#74767e]">
+                                Choisis ton offre, paie en toute sécurité, démarre le projet.
+                            </p>
+                        </div>
+
+                        {/* Packages */}
+                        <div className="grid grid-cols-3 gap-3 mb-6">
+                            {PACKAGES.map((pkg, index) => (
+                                <button
+                                    key={pkg.name}
+                                    onClick={() => setSelectedPackage(index)}
+                                    className={`p-4 rounded-xl border-2 text-center transition-all ${selectedPackage === index
+                                            ? 'border-[#fea38e] bg-[#fea38e]/10'
+                                            : 'border-gray-200 bg-white hover:border-gray-300'
+                                        }`}
+                                >
+                                    {pkg.badge && (
+                                        <span className="inline-block bg-[#fea38e] text-white text-xs px-2 py-1 rounded-full mb-2">
+                                            {pkg.badge}
                                         </span>
-                                    </div>
-                                    <img src="/frame145801381-xhn.svg" alt="" className="frame14734-thq-frame14580-elm" />
-                                </div>
-                                <img src="/vector1301-8xhh.svg" alt="" className="frame14734-thq-vector-elm11" />
-                                <span className="frame14734-thq-text-elm102">Packages</span>
-                                <div className="frame14734-thq-frame14175-elm">
-                                    <div
-                                        className={`frame14734-thq-group-elm10 ${selectedPackage === 0 ? 'selected' : ''}`}
-                                        onClick={() => setSelectedPackage(0)}
+                                    )}
+                                    <div className="font-bold text-[#222325]">{pkg.name}</div>
+                                    <div className="text-2xl font-bold text-[#fea38e] my-2">€{pkg.price}</div>
+                                    <div className="text-sm text-[#74767e]">{pkg.deliverables}</div>
+                                    <div className="text-xs text-[#74767e]">{pkg.days} jours</div>
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Extras */}
+                        <div className="mb-6">
+                            <h3 className="font-semibold text-[#222325] mb-3">Extras</h3>
+                            <div className="space-y-2">
+                                {EXTRAS.map((extra) => (
+                                    <button
+                                        key={extra.id}
+                                        onClick={() => toggleExtra(extra.id)}
+                                        className={`w-full p-3 rounded-xl border-2 flex items-center justify-between transition-all ${selectedExtras.includes(extra.id)
+                                                ? 'border-[#fea38e] bg-[#fea38e]/10'
+                                                : 'border-gray-200 bg-white'
+                                            }`}
                                     >
-                                        <div className="frame14734-thq-frame14162-elm">
-                                            <div className="frame14734-thq-frame14161-elm">
-                                                <span className="frame14734-thq-text-elm103">Basic</span>
-                                                <span className="frame14734-thq-text-elm104">1 livrable · 2 jours</span>
-                                                <span className="frame14734-thq-text-elm105">€ 89</span>
-                                                <div className="frame14734-thq-frame14160-elm">
-                                                    <span className="frame14734-thq-text-elm106">Populaire</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div
-                                        className={`frame14734-thq-group-elm11 ${selectedPackage === 1 ? 'selected' : ''}`}
-                                        onClick={() => setSelectedPackage(1)}
-                                    >
-                                        <div className="frame14734-thq-frame14165-elm">
-                                            <div className="frame14734-thq-frame14164-elm">
-                                                <div className="frame14734-thq-frame14163-elm">
-                                                    <span className="frame14734-thq-text-elm107">Standard</span>
-                                                </div>
-                                                <span className="frame14734-thq-text-elm108">2 livrables · 3 jours</span>
-                                                <span className="frame14734-thq-text-elm109">€ 149</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div
-                                        className={`frame14734-thq-group-elm12 ${selectedPackage === 2 ? 'selected' : ''}`}
-                                        onClick={() => setSelectedPackage(2)}
-                                    >
-                                        <div className="frame14734-thq-frame14167-elm">
-                                            <div className="frame14734-thq-frame14166-elm">
-                                                <span className="frame14734-thq-text-elm110">Premium</span>
-                                                <span className="frame14734-thq-text-elm111">4 livrables · 5 jours</span>
-                                                <span className="frame14734-thq-text-elm112">€ 299</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <span className="frame14734-thq-text-elm113">Extras</span>
-                                <div className="frame14734-thq-group-elm13">
-                                    <div className="frame14734-thq-frame14169-elm">
-                                        <div className="frame14734-thq-frame14168-elm">
-                                            <div
-                                                className="frame14734-thq-frame-elm11"
-                                                onClick={() => toggleExtra('express')}
-                                                style={{ opacity: selectedExtras.includes('express') ? 1 : 0.7 }}
-                                            >
-                                                <img src="/vector1301-gsg.svg" alt="" className="frame14734-thq-vector-elm12" />
-                                                <span className="frame14734-thq-text-elm114">Express (24h)</span>
-                                                <span className="frame14734-thq-text-elm115">+€ 40</span>
-                                            </div>
-                                            <div
-                                                className="frame14734-thq-frame-elm12"
-                                                onClick={() => toggleExtra('sources')}
-                                                style={{ opacity: selectedExtras.includes('sources') ? 1 : 0.7 }}
-                                            >
-                                                <img src="/vector1301-opz7.svg" alt="" className="frame14734-thq-vector-elm13" />
-                                                <span className="frame14734-thq-text-elm116">Fichiers sources</span>
-                                                <span className="frame14734-thq-text-elm117">+€ 25</span>
-                                            </div>
-                                            <div
-                                                className="frame14734-thq-frame-elm13"
-                                                onClick={() => toggleExtra('revisions')}
-                                                style={{ opacity: selectedExtras.includes('revisions') ? 1 : 0.7 }}
-                                            >
-                                                <img src="/vector1301-gwvs.svg" alt="" className="frame14734-thq-vector-elm14" />
-                                                <span className="frame14734-thq-text-elm118">Révisions supplémentaires (x2)</span>
-                                                <span className="frame14734-thq-text-elm119">+€ 30</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="frame14734-thq-frame14321-elm">
-                                    <span className="frame14734-thq-text-elm120">Note rapide (optionnel)</span>
-                                    <div className="frame14734-thq-frame14173-elm">
-                                        <input
-                                            type="text"
-                                            placeholder="Ex: style moderne, ton sérieux…"
-                                            style={{ background: 'transparent', border: 'none', width: '100%', outline: 'none', color: 'inherit' }}
-                                            value={formData.note || ''}
-                                            onChange={(e) => setFormData({ ...formData, note: e.target.value })}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="frame14734-thq-frame14172-elm">
-                                    <div className="frame14734-thq-frame14150-elm1" onClick={onClose}>
-                                        <span className="frame14734-thq-text-elm122">Retour</span>
-                                    </div>
-                                    <div className="frame14734-thq-frame14148-elm" onClick={handleContinue}>
-                                        <span className="frame14734-thq-text-elm123">Continuer</span>
-                                    </div>
-                                </div>
+                                        <span className="flex items-center gap-2">
+                                            <span>{extra.emoji}</span>
+                                            <span>{extra.name}</span>
+                                        </span>
+                                        <span className="font-bold text-[#fea38e]">+€{extra.price}</span>
+                                    </button>
+                                ))}
                             </div>
+                        </div>
+
+                        <div className="flex justify-between items-center pt-6 border-t border-gray-200">
+                            <button onClick={onClose} className="text-[#74767e]">Annuler</button>
+                            <button
+                                onClick={() => setStep('info')}
+                                className="px-8 py-3 bg-[#fea38e] hover:bg-[#e8937f] text-white font-bold rounded-full"
+                            >
+                                Continuer →
+                            </button>
                         </div>
                     </div>
                 )}
 
-                {/* Step 2: Billing Info */}
-                {step === 'billing' && (
-                    <div className="frame14734-thq-frame-elm14">
-                        <img src="/vector1301-uh7g.svg" alt="" className="frame14734-thq-vector-elm15" />
-                        <div className="frame14734-thq-frame14194-elm">
-                            <div className="frame14734-thq-frame14193-elm">
-                                <div className="frame14734-thq-frame14191-elm">
-                                    <div className="frame14734-thq-frame14190-elm">
-                                        <span className="frame14734-thq-text-elm124">
-                                            Infos digitales &amp; droits d'usage
-                                        </span>
-                                        <span className="frame14734-thq-text-elm125">
-                                            Étape 2/5 · Infos réutilisables + NDA (si applicable)
-                                        </span>
-                                    </div>
-                                </div>
-                                <span className="frame14734-thq-text-elm126">Pays</span>
-                                <div className="frame14734-thq-frame14178-elm">
-                                    <span className="frame14734-thq-text-elm127">France</span>
-                                </div>
-                                <span className="frame14734-thq-text-elm128">Droits d'usage</span>
-                                <div className="frame14734-thq-group-elm14">
-                                    <div
-                                        className="frame14734-thq-frame14179-elm"
-                                        onClick={() => setFormData({ ...formData, usageRights: 'personal' })}
-                                        style={{ opacity: formData.usageRights === 'personal' ? 1 : 0.6 }}
-                                    >
-                                        <span className="frame14734-thq-text-elm129">Personnel</span>
-                                    </div>
-                                    <div
-                                        className="frame14734-thq-frame14180-elm"
-                                        onClick={() => setFormData({ ...formData, usageRights: 'commercial' })}
-                                        style={{ opacity: formData.usageRights === 'commercial' ? 1 : 0.6 }}
-                                    >
-                                        <span className="frame14734-thq-text-elm130">Commercial</span>
-                                    </div>
-                                    <div
-                                        className="frame14734-thq-frame14181-elm"
-                                        onClick={() => setFormData({ ...formData, usageRights: 'resale' })}
-                                        style={{ opacity: formData.usageRights === 'resale' ? 1 : 0.6 }}
-                                    >
-                                        <span className="frame14734-thq-text-elm131">Revente</span>
-                                    </div>
-                                </div>
-                                <span className="frame14734-thq-text-elm132">Nom de facturation</span>
-                                <div className="frame14734-thq-frame14182-elm">
-                                    <input
-                                        type="text"
-                                        placeholder="Société / Nom complet"
-                                        style={{ background: 'transparent', border: 'none', width: '100%', outline: 'none', color: 'inherit' }}
-                                        value={formData.billingName || ''}
-                                        onChange={(e) => setFormData({ ...formData, billingName: e.target.value })}
-                                    />
-                                </div>
-                                <span className="frame14734-thq-text-elm134">Email de contact</span>
-                                <div className="frame14734-thq-frame14183-elm">
-                                    <input
-                                        type="email"
-                                        placeholder="exemple@mail.com"
-                                        style={{ background: 'transparent', border: 'none', width: '100%', outline: 'none', color: 'inherit' }}
-                                        value={formData.email || ''}
-                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    />
-                                </div>
-                                <div className="frame14734-thq-frame14192-elm">
-                                    <div className="frame14734-thq-frame14147-elm1" onClick={handleBack}>
-                                        <span className="frame14734-thq-text-elm139">Retour</span>
-                                    </div>
-                                    <div className="frame14734-thq-frame14150-elm2" onClick={handleContinue}>
-                                        <span className="frame14734-thq-text-elm140">Continuer</span>
-                                    </div>
+                {/* ========== STEP 2: INFO ========== */}
+                {step === 'info' && (
+                    <div className="p-8">
+                        <div className="text-center mb-8">
+                            <h2 className="text-2xl font-bold text-[#222325] mb-2">
+                                Informations
+                            </h2>
+                            <p className="text-[#74767e]">
+                                Pour la facturation et les droits d'usage.
+                            </p>
+                        </div>
+
+                        <div className="space-y-4 mb-6">
+                            {/* Country */}
+                            <div>
+                                <label className="block text-sm font-semibold text-[#222325] mb-2">Pays</label>
+                                <select
+                                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl"
+                                    value={formData.country}
+                                    onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                                >
+                                    {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
+                                </select>
+                            </div>
+
+                            {/* Usage Rights */}
+                            <div>
+                                <label className="block text-sm font-semibold text-[#222325] mb-2">Droits d'usage</label>
+                                <div className="grid grid-cols-3 gap-2">
+                                    {(['personal', 'commercial', 'resale'] as const).map((right) => (
+                                        <button
+                                            key={right}
+                                            onClick={() => setFormData({ ...formData, usageRights: right })}
+                                            className={`py-2 px-3 rounded-xl border-2 text-sm ${formData.usageRights === right
+                                                    ? 'border-[#fea38e] bg-[#fea38e]/10 text-[#fea38e]'
+                                                    : 'border-gray-200 bg-white'
+                                                }`}
+                                        >
+                                            {right === 'personal' ? 'Personnel' : right === 'commercial' ? 'Commercial' : 'Revente'}
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
+
+                            {/* Billing Name */}
+                            <div>
+                                <label className="block text-sm font-semibold text-[#222325] mb-2">Nom de facturation</label>
+                                <input
+                                    type="text"
+                                    placeholder="Société ou nom complet"
+                                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl"
+                                    value={formData.billingName || ''}
+                                    onChange={(e) => setFormData({ ...formData, billingName: e.target.value })}
+                                />
+                            </div>
+
+                            {/* Email */}
+                            <div>
+                                <label className="block text-sm font-semibold text-[#222325] mb-2">Email</label>
+                                <input
+                                    type="email"
+                                    placeholder="contact@email.com"
+                                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl"
+                                    value={formData.email || ''}
+                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex justify-between items-center pt-6 border-t border-gray-200">
+                            <button onClick={() => setStep('package')} className="text-[#74767e]">← Retour</button>
+                            <button
+                                onClick={() => setStep('payment')}
+                                disabled={!formData.billingName || !formData.email}
+                                className="px-8 py-3 bg-[#fea38e] hover:bg-[#e8937f] text-white font-bold rounded-full disabled:opacity-50"
+                            >
+                                Continuer →
+                            </button>
                         </div>
                     </div>
                 )}
 
-                {/* Step 3: Payment */}
+                {/* ========== STEP 3: PAYMENT ========== */}
                 {step === 'payment' && (
-                    <div className="frame14734-thq-frame-elm15">
-                        <img src="/vector1301-c8uca.svg" alt="" className="frame14734-thq-vector-elm17" />
-                        <div className="frame14734-thq-frame14218-elm">
-                            <div className="frame14734-thq-frame14196-elm">
-                                <div className="frame14734-thq-frame14195-elm">
-                                    <span className="frame14734-thq-text-elm141">Récap &amp; paiement</span>
-                                    <span className="frame14734-thq-text-elm142">
-                                        Étape 3/5 · Paiement rapide + conditions
-                                    </span>
-                                </div>
+                    <div className="p-8">
+                        <div className="text-center mb-8">
+                            <h2 className="text-2xl font-bold text-[#222325] mb-2">
+                                Récapitulatif & Paiement
+                            </h2>
+                        </div>
+
+                        {/* Summary */}
+                        <div className="bg-white rounded-xl p-6 mb-6 border border-gray-200">
+                            <div className="flex justify-between mb-2">
+                                <span>Package {PACKAGES[selectedPackage].name}</span>
+                                <span>€{PACKAGES[selectedPackage].price}</span>
                             </div>
-                            <div className="frame14734-thq-frame14217-elm">
-                                <div className="frame14734-thq-group-elm16">
-                                    <div className="frame14734-thq-frame14201-elm">
-                                        <div className="frame14734-thq-frame14200-elm">
-                                            <div className="frame14734-thq-frame14198-elm">
-                                                <span className="frame14734-thq-text-elm143">Commande</span>
-                                                <span className="frame14734-thq-text-elm144">
-                                                    Package {selectedPackage === 0 ? 'Basic' : selectedPackage === 1 ? 'Standard' : 'Premium'}
-                                                    {selectedExtras.length > 0 && ` + ${selectedExtras.join(', ')}`}
-                                                </span>
-                                            </div>
-                                        </div>
+                            {selectedExtras.map(id => {
+                                const extra = EXTRAS.find(e => e.id === id)!;
+                                return (
+                                    <div key={id} className="flex justify-between mb-2 text-sm text-[#74767e]">
+                                        <span>{extra.name}</span>
+                                        <span>€{extra.price}</span>
                                     </div>
+                                );
+                            })}
+                            <div className="border-t border-gray-200 pt-3 mt-3">
+                                <div className="flex justify-between text-sm mb-1">
+                                    <span>Sous-total</span>
+                                    <span>€{prices.subtotal}</span>
                                 </div>
-                                <div className="frame14734-thq-group-elm17">
-                                    <div className="frame14734-thq-frame14210-elm">
-                                        <div className="frame14734-thq-frame14209-elm">
-                                            <div className="frame14734-thq-frame14205-elm">
-                                                <span className="frame14734-thq-text-elm152">Paiement</span>
-                                                <div className="frame14734-thq-frame14202-elm">
-                                                    <span className="frame14734-thq-text-elm153">Sous-total</span>
-                                                    <span className="frame14734-thq-text-elm154">€ 149</span>
-                                                </div>
-                                                <div className="frame14734-thq-frame14203-elm">
-                                                    <span className="frame14734-thq-text-elm155">Frais plateforme</span>
-                                                    <span className="frame14734-thq-text-elm156">€ 7</span>
-                                                </div>
-                                                <div className="frame14734-thq-frame14204-elm">
-                                                    <span className="frame14734-thq-text-elm157">TVA</span>
-                                                    <span className="frame14734-thq-text-elm158">€ 0</span>
-                                                </div>
-                                            </div>
-                                            <div className="frame14734-thq-frame14206-elm">
-                                                <span className="frame14734-thq-text-elm159">Total</span>
-                                                <span className="frame14734-thq-text-elm160">€ 156</span>
-                                            </div>
-                                            <div className="frame14734-thq-frame14208-elm">
-                                                <span className="frame14734-thq-text-elm161">Méthode</span>
-                                                <div className="frame14734-thq-frame14149-elm1" onClick={handleContinue}>
-                                                    <span className="frame14734-thq-text-elm162">Payez et continuer</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div className="flex justify-between text-sm mb-1 text-[#74767e]">
+                                    <span>Frais plateforme (5%)</span>
+                                    <span>€{prices.fees}</span>
+                                </div>
+                                <div className="flex justify-between font-bold text-lg mt-2">
+                                    <span>Total</span>
+                                    <span className="text-[#fea38e]">€{prices.total}</span>
                                 </div>
                             </div>
-                            <div className="frame14734-thq-frame14216-elm">
-                                <div className="frame14734-thq-frame14215-elm" onClick={handleBack}>
-                                    <span className="frame14734-thq-text-elm165">Retour</span>
-                                </div>
-                            </div>
+                        </div>
+
+                        <div className="flex justify-between items-center pt-6 border-t border-gray-200">
+                            <button onClick={() => setStep('info')} className="text-[#74767e]">← Retour</button>
+                            <button
+                                onClick={handlePay}
+                                className="px-8 py-3 bg-[#1f392c] hover:bg-[#2d4f3f] text-white font-bold rounded-full"
+                            >
+                                💳 Payer €{prices.total}
+                            </button>
                         </div>
                     </div>
                 )}
 
-                {/* Step 4: Brief */}
+                {/* ========== STEP 4: BRIEF ========== */}
                 {step === 'brief' && (
-                    <div className="frame14734-thq-frame-elm17">
-                        <img src="/vector1301-yr6c.svg" alt="" className="frame14734-thq-vector-elm26" />
-                        <div className="frame14734-thq-frame14254-elm">
-                            <div className="frame14734-thq-frame14253-elm">
-                                <div className="frame14734-thq-frame14230-elm">
-                                    <div className="frame14734-thq-frame14229-elm">
-                                        <span className="frame14734-thq-text-elm177">Brief / Requirements</span>
-                                        <span className="frame14734-thq-text-elm178">
-                                            Étape 4/5 · Donne les infos pour démarrer
-                                        </span>
-                                    </div>
-                                </div>
-                                <div className="frame14734-thq-frame14249-elm">
-                                    <div className="frame14734-thq-frame14239-elm">
-                                        <span className="frame14734-thq-text-elm179">Résumé du besoin (obligatoire)</span>
-                                        <div className="frame14734-thq-frame14231-elm">
-                                            <textarea
-                                                placeholder="Décris clairement l'objectif, le contexte, le style…"
-                                                style={{
-                                                    background: 'transparent',
-                                                    border: 'none',
-                                                    width: '100%',
-                                                    outline: 'none',
-                                                    resize: 'none',
-                                                    minHeight: '100px',
-                                                    color: 'inherit'
-                                                }}
-                                                value={formData.brief || ''}
-                                                onChange={(e) => setFormData({ ...formData, brief: e.target.value })}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="frame14734-thq-frame14252-elm">
-                                    <div className="frame14734-thq-frame14154-elm1" onClick={handleBack}>
-                                        <span className="frame14734-thq-text-elm205">Retour</span>
-                                    </div>
-                                    <div className="frame14734-thq-frame14150-elm4" onClick={handleContinue}>
-                                        <span className="frame14734-thq-text-elm206">Envoyer</span>
-                                    </div>
-                                </div>
-                            </div>
+                    <div className="p-8">
+                        <div className="text-center mb-8">
+                            <h2 className="text-2xl font-bold text-[#222325] mb-2">
+                                Brief du projet
+                            </h2>
+                            <p className="text-[#74767e]">
+                                Décris ton besoin pour que le créateur puisse démarrer.
+                            </p>
+                        </div>
+
+                        <textarea
+                            placeholder="Objectif du projet, contexte, style attendu, références..."
+                            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl resize-none mb-6"
+                            rows={8}
+                            value={formData.brief || ''}
+                            onChange={(e) => setFormData({ ...formData, brief: e.target.value })}
+                        />
+
+                        <div className="flex justify-between items-center pt-6 border-t border-gray-200">
+                            <button onClick={() => setStep('payment')} className="text-[#74767e]">← Retour</button>
+                            <button
+                                onClick={handleSubmitBrief}
+                                disabled={!formData.brief}
+                                className="px-8 py-3 bg-[#fea38e] hover:bg-[#e8937f] text-white font-bold rounded-full disabled:opacity-50"
+                            >
+                                Envoyer le brief
+                            </button>
                         </div>
                     </div>
                 )}
 
-                {/* Step 5: Confirmation */}
-                {step === 'confirmation' && (
-                    <div className="frame14734-thq-frame-elm18">
-                        <img src="/vector1301-wsqu.svg" alt="" className="frame14734-thq-vector-elm29" />
-                        <div className="frame14734-thq-frame14263-elm">
-                            <div className="frame14734-thq-frame14262-elm">
-                                <div className="frame14734-thq-frame14260-elm">
-                                    <div className="frame14734-thq-frame14259-elm">
-                                        <span className="frame14734-thq-text-elm207">Commande créée ✅</span>
-                                        <span className="frame14734-thq-text-elm208">
-                                            Étape 5/5 · Le vendeur va valider ton brief
-                                        </span>
-                                    </div>
-                                </div>
-                                <div className="frame14734-thq-group-elm19">
-                                    <div className="frame14734-thq-frame14256-elm">
-                                        <div className="frame14734-thq-frame14255-elm">
-                                            <span className="frame14734-thq-text-elm209">Statut</span>
-                                            <span className="frame14734-thq-text-elm210">
-                                                En attente de validation du brief par le vendeur
-                                            </span>
-                                            <span className="frame14734-thq-text-elm211">Temps de réponse attendu</span>
-                                            <span className="frame14734-thq-text-elm212">Moins de 24h</span>
-                                            <span className="frame14734-thq-text-elm213">
-                                                Tu peux modifier le brief tant qu'il n'est pas accepté.
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="frame14734-thq-frame14261-elm">
-                                    <div className="frame14734-thq-frame14156-elm2" onClick={onClose}>
-                                        <span className="frame14734-thq-text-elm215">Aller à l'espace de commande</span>
-                                    </div>
-                                </div>
+                {/* ========== STEP 5: SUCCESS ========== */}
+                {step === 'success' && (
+                    <div className="p-8 bg-gradient-to-b from-green-50 to-[#f8f5f0]">
+                        <div className="text-center py-8">
+                            <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <span className="text-4xl text-white">✓</span>
                             </div>
+                            <h2 className="text-2xl font-bold text-[#222325] mb-2">
+                                Commande créée !
+                            </h2>
+                            <p className="text-[#74767e] max-w-md mx-auto">
+                                Le créateur va valider ton brief sous 24h.
+                            </p>
+                        </div>
+
+                        <div className="space-y-3">
+                            <button
+                                onClick={onClose}
+                                className="w-full px-6 py-4 bg-[#fea38e] hover:bg-[#e8937f] text-white font-bold rounded-xl"
+                            >
+                                Voir ma commande
+                            </button>
+                            <button
+                                onClick={onClose}
+                                className="w-full py-3 text-[#74767e] hover:text-[#222325] text-sm"
+                            >
+                                Retour au dashboard
+                            </button>
                         </div>
                     </div>
                 )}

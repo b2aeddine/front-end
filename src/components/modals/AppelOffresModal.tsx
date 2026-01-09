@@ -1,9 +1,9 @@
 /**
- * Appel d'Offres Modal - 4-step job posting wizard
- * Converted from frame14736.js
+ * Appel d'Offres Modal - Adoption-First Design
+ * 3 steps: Brief → Budget → Success
  */
 import React, { useState } from 'react';
-import './AppelOffresModal.css';
+import { createJobPosting } from '../../lib/queries/jobs';
 
 interface AppelOffresModalProps {
     isOpen: boolean;
@@ -12,410 +12,361 @@ interface AppelOffresModalProps {
 }
 
 interface AppelOffresData {
+    id?: string;
     title: string;
     category: string;
-    skills: string[];
     description: string;
-    projectSize: 'small' | 'medium' | 'large';
-    duration: string;
-    startDate: string;
-    deliverables: string;
-    budgetType: 'fixed' | 'hourly';
     budgetMin: number;
     budgetMax: number;
-    currency: string;
-    urgency: 'normal' | 'priority';
-    visibility: 'public' | 'unlisted' | 'private';
+    budgetType: 'fixed' | 'hourly';
+    screeningQuestion?: string;
 }
 
-type Step = 'description' | 'budget' | 'screening' | 'publication';
+type Step = 'brief' | 'budget' | 'success';
+
+// Category ID mapping (simplified - in production, fetch from API)
+const CATEGORY_MAP: Record<string, string> = {
+    'video': 'cat-video',
+    'design': 'cat-design',
+    'dev': 'cat-dev',
+    'marketing': 'cat-marketing',
+    'writing': 'cat-writing',
+};
 
 export const AppelOffresModal: React.FC<AppelOffresModalProps> = ({
     isOpen,
     onClose,
     onComplete,
 }) => {
-    const [step, setStep] = useState<Step>('description');
+    const [step, setStep] = useState<Step>('brief');
     const [formData, setFormData] = useState<Partial<AppelOffresData>>({
         budgetType: 'fixed',
-        currency: 'EUR',
-        urgency: 'normal',
-        visibility: 'public',
     });
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [createdJobId, setCreatedJobId] = useState<string | null>(null);
 
     if (!isOpen) return null;
 
-    const handleContinue = () => {
-        switch (step) {
-            case 'description':
-                setStep('budget');
-                break;
-            case 'budget':
-                setStep('screening');
-                break;
-            case 'screening':
-                setStep('publication');
-                break;
-            case 'publication':
-                onComplete?.(formData as AppelOffresData);
-                onClose();
-                break;
+    const handlePublish = async () => {
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const result = await createJobPosting({
+                title: formData.title || 'Mon appel d\'offres',
+                description: formData.description || '',
+                category_id: CATEGORY_MAP[formData.category || 'video'] || 'cat-video',
+                budget_min: formData.budgetMin || 100,
+                budget_max: formData.budgetMax || 500,
+                budget_type: formData.budgetType || 'fixed',
+                screening_questions: formData.screeningQuestion ? [formData.screeningQuestion] : [],
+            });
+
+            if (result.error) {
+                setError(result.error);
+                setIsLoading(false);
+                return;
+            }
+
+            setCreatedJobId(result.data?.id || null);
+            onComplete?.({ ...formData, id: result.data?.id } as AppelOffresData);
+            setStep('success');
+        } catch (err) {
+            setError('Une erreur est survenue. Réessaie plus tard.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    const handleBack = () => {
-        switch (step) {
-            case 'budget':
-                setStep('description');
-                break;
-            case 'screening':
-                setStep('budget');
-                break;
-            case 'publication':
-                setStep('screening');
-                break;
+    const handleViewProposals = () => {
+        onClose();
+        if (createdJobId) {
+            window.location.href = `/dashboard/jobs/${createdJobId}`;
         }
     };
 
-    const handleSaveDraft = () => {
-        console.log('Saving draft:', formData);
-        // TODO: Save to backend
+    const handleShareLink = () => {
+        const link = createdJobId
+            ? `https://collabmarket.com/jobs/${createdJobId}`
+            : `https://collabmarket.com/jobs/${Date.now()}`;
+        navigator.clipboard?.writeText(link);
     };
 
     return (
-        <div className="frame14736-container1" onClick={(e) => e.target === e.currentTarget && onClose()}>
-            <div className="frame14736-thq-frame14736-elm">
-                {/* Step 1: Description */}
-                {step === 'description' && (
-                    <div className="frame14736-thq-frame-elm1">
-                        <img src="/vector1371-ctzg.svg" alt="" className="frame14736-thq-vector-elm1" />
-                        <img src="/vector1371-awb.svg" alt="" className="frame14736-thq-vector-elm2" />
-                        <div className="frame14736-thq-frame14517-elm1">
-                            <div className="frame14736-thq-frame14595-elm">
-                                <div className="frame14736-thq-frame14516-elm">
-                                    <span className="frame14736-thq-text-elm100">Créer un appel d'offres</span>
-                                    <span className="frame14736-thq-text-elm101">
-                                        Style Upwork : brief clair + scope + skills + pièces jointes + screening.
-                                    </span>
-                                </div>
-                                <img src="/group1381-0y3s.svg" alt="" className="frame14736-thq-group-elm1" />
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            onClick={(e) => e.target === e.currentTarget && step !== 'success' && onClose()}
+        >
+            <div className="bg-[#f8f5f0] rounded-2xl w-full max-w-2xl mx-4 shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+
+                {/* ========== STEP 1: BRIEF ========== */}
+                {step === 'brief' && (
+                    <div className="p-8">
+                        {/* Promise phrase */}
+                        <div className="text-center mb-8">
+                            <h2 className="text-2xl font-bold text-[#222325] mb-2">
+                                Créer un appel d'offres
+                            </h2>
+                            <p className="text-[#74767e]">
+                                Explique ton besoin, on s'occupe de trouver les bons profils.
+                            </p>
+                        </div>
+
+                        {/* Step indicator */}
+                        <div className="flex items-center justify-center gap-2 mb-8">
+                            <div className="w-8 h-8 rounded-full bg-[#fea38e] text-white flex items-center justify-center font-bold">1</div>
+                            <div className="w-12 h-1 bg-gray-300"></div>
+                            <div className="w-8 h-8 rounded-full bg-gray-300 text-gray-500 flex items-center justify-center font-bold">2</div>
+                            <div className="w-12 h-1 bg-gray-300"></div>
+                            <div className="w-8 h-8 rounded-full bg-gray-300 text-gray-500 flex items-center justify-center font-bold">✓</div>
+                        </div>
+
+                        {/* Form fields */}
+                        <div className="space-y-6">
+                            {/* Title */}
+                            <div>
+                                <label className="block text-sm font-semibold text-[#222325] mb-2">
+                                    Titre de la mission
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="Ex : Recherche monteur UGC pour 20 vidéos/mois"
+                                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#fea38e] focus:border-transparent"
+                                    value={formData.title || ''}
+                                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                />
                             </div>
-                            <div className="frame14736-thq-frame14515-elm">
-                                <span className="frame14736-thq-text-elm102">Titre</span>
-                                <div className="frame14736-thq-frame14500-elm">
-                                    <input
-                                        type="text"
-                                        placeholder='Ex : "Recherche monteur UGC pour 20 vidéos/mois (long terme)"'
-                                        style={{ background: 'transparent', border: 'none', width: '100%', outline: 'none', color: 'inherit' }}
-                                        value={formData.title || ''}
-                                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                    />
-                                </div>
-                                <span className="frame14736-thq-text-elm104">Catégorie &amp; compétences</span>
-                                <div className="frame14736-thq-frame14509-elm">
-                                    <div className="frame14736-thq-frame14501-elm">
-                                        <select
-                                            style={{ background: 'transparent', border: 'none', width: '100%', outline: 'none', cursor: 'pointer' }}
-                                            value={formData.category || ''}
-                                            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                        >
-                                            <option value="">Catégorie</option>
-                                            <option value="video">Vidéo</option>
-                                            <option value="design">Design</option>
-                                            <option value="dev">Développement</option>
-                                            <option value="marketing">Marketing</option>
-                                        </select>
-                                    </div>
-                                    <div className="frame14736-thq-frame14502-elm">
-                                        <input
-                                            type="text"
-                                            placeholder="Skills (max 10) : Premiere, UGC, Ads…"
-                                            style={{ background: 'transparent', border: 'none', width: '100%', outline: 'none', color: 'inherit' }}
-                                        />
-                                    </div>
-                                </div>
-                                <span className="frame14736-thq-text-elm107">Description détaillée</span>
-                                <div className="frame14736-thq-frame14503-elm">
-                                    <textarea
-                                        placeholder="Inclure : contexte, objectifs, livrables, style attendu, deadlines, critères de réussite, exemples."
-                                        style={{
-                                            background: 'transparent',
-                                            border: 'none',
-                                            width: '100%',
-                                            outline: 'none',
-                                            resize: 'none',
-                                            minHeight: '80px',
-                                            color: 'inherit'
-                                        }}
-                                        value={formData.description || ''}
-                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    />
-                                </div>
+
+                            {/* Category */}
+                            <div>
+                                <label className="block text-sm font-semibold text-[#222325] mb-2">
+                                    Catégorie
+                                </label>
+                                <select
+                                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#fea38e] focus:border-transparent cursor-pointer"
+                                    value={formData.category || ''}
+                                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                >
+                                    <option value="">Sélectionne une catégorie</option>
+                                    <option value="video">Vidéo</option>
+                                    <option value="design">Design</option>
+                                    <option value="dev">Développement</option>
+                                    <option value="marketing">Marketing</option>
+                                    <option value="writing">Rédaction</option>
+                                </select>
                             </div>
-                            <div className="frame14736-thq-frame14514-elm">
-                                <div className="frame14736-thq-frame14512-elm">
-                                    <span className="frame14736-thq-text-elm110">Scope</span>
-                                    <div className="frame14736-thq-frame14511-elm">
-                                        <div className="frame14736-thq-frame14510-elm">
-                                            <div className="frame14736-thq-frame14504-elm">
-                                                <span className="frame14736-thq-text-elm111">Taille projet</span>
-                                            </div>
-                                            <div className="frame14736-thq-frame14505-elm">
-                                                <span className="frame14736-thq-text-elm112">Durée</span>
-                                            </div>
-                                            <div className="frame14736-thq-frame14506-elm">
-                                                <span className="frame14736-thq-text-elm113">Démarrage</span>
-                                            </div>
-                                        </div>
-                                        <div className="frame14736-thq-frame14507-elm">
-                                            <input
-                                                type="text"
-                                                placeholder="Livrables attendus (liste) + format + quantité"
-                                                style={{ background: 'transparent', border: 'none', width: '100%', outline: 'none', color: 'inherit' }}
-                                                value={formData.deliverables || ''}
-                                                onChange={(e) => setFormData({ ...formData, deliverables: e.target.value })}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="frame14736-thq-frame14513-elm">
-                                    <span className="frame14736-thq-text-elm115">Pièces jointes</span>
-                                    <div className="frame14736-thq-frame14508-elm">
-                                        <span className="frame14736-thq-text-elm116">
-                                            Dépose un brief (PDF), charte, exemples
-                                        </span>
-                                        <span className="frame14736-thq-text-elm117">PDF/PNG/JPG/ZIP — optionnel</span>
-                                    </div>
-                                </div>
+
+                            {/* Description */}
+                            <div>
+                                <label className="block text-sm font-semibold text-[#222325] mb-2">
+                                    Description du besoin
+                                </label>
+                                <textarea
+                                    placeholder="Décris ton projet : contexte, objectifs, livrables attendus, style, deadlines..."
+                                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#fea38e] focus:border-transparent resize-none"
+                                    rows={5}
+                                    value={formData.description || ''}
+                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                />
                             </div>
-                            <div className="frame14736-thq-frame14357-elm">
-                                <div className="frame14736-thq-frame14355-elm1">
-                                    <div className="frame14736-thq-frame14338-elm1" onClick={onClose}>
-                                        <span className="frame14736-thq-text-elm118">Annuler</span>
-                                    </div>
-                                    <div className="frame14736-thq-frame14339-elm1" onClick={handleSaveDraft}>
-                                        <span className="frame14736-thq-text-elm119">Enregistrer le brouillon</span>
-                                    </div>
-                                </div>
-                                <div className="frame14736-thq-frame14338-elm2" onClick={handleContinue}>
-                                    <span className="frame14736-thq-text-elm120">Continuer</span>
-                                </div>
-                            </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
+                            <button
+                                onClick={onClose}
+                                className="px-6 py-3 text-[#74767e] hover:text-[#222325] transition-colors"
+                            >
+                                Annuler
+                            </button>
+                            <button
+                                onClick={() => setStep('budget')}
+                                disabled={!formData.title || !formData.category || !formData.description}
+                                className="px-8 py-3 bg-[#fea38e] hover:bg-[#e8937f] text-white font-bold rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Continuer →
+                            </button>
                         </div>
                     </div>
                 )}
 
-                {/* Step 2: Budget & Contrat */}
+                {/* ========== STEP 2: BUDGET ========== */}
                 {step === 'budget' && (
-                    <div className="frame14736-thq-frame-elm2">
-                        <img src="/vector1371-a9q.svg" alt="" className="frame14736-thq-vector-elm3" />
-                        <img src="/vector1371-kg39.svg" alt="" className="frame14736-thq-vector-elm4" />
-                        <div className="frame14736-thq-frame14538-elm1">
-                            <div className="frame14736-thq-frame14596-elm">
-                                <div className="frame14736-thq-frame14537-elm">
-                                    <span className="frame14736-thq-text-elm121">Appel d'offres — Budget &amp; contrat</span>
-                                    <span className="frame14736-thq-text-elm122">
-                                        Fixe / horaire, fourchettes, paiement sécurisé (jalons), conditions.
-                                    </span>
-                                </div>
-                                <img src="/group1381-xb05.svg" alt="" className="frame14736-thq-group-elm2" />
-                            </div>
-                            <div className="frame14736-thq-frame14536-elm">
-                                <div className="frame14736-thq-frame14527-elm">
-                                    <span className="frame14736-thq-text-elm123">Type &amp; budget</span>
-                                    <div className="frame14736-thq-frame14526-elm">
-                                        <div className="frame14736-thq-frame14525-elm">
-                                            <span className="frame14736-thq-text-elm124">Type de paiement</span>
-                                            <span className="frame14736-thq-text-elm125">Budget (fourchette)</span>
-                                            <span className="frame14736-thq-text-elm126">Devise</span>
-                                            <span className="frame14736-thq-text-elm127">Urgence</span>
-                                        </div>
-                                        <div className="frame14736-thq-frame14524-elm">
-                                            <div className="frame14736-thq-frame14518-elm">
-                                                <select
-                                                    style={{ background: 'transparent', border: 'none', width: '100%', outline: 'none', cursor: 'pointer' }}
-                                                    value={formData.budgetType}
-                                                    onChange={(e) => setFormData({ ...formData, budgetType: e.target.value as 'fixed' | 'hourly' })}
-                                                >
-                                                    <option value="fixed">Forfait</option>
-                                                    <option value="hourly">Horaire</option>
-                                                </select>
-                                            </div>
-                                            <div className="frame14736-thq-frame14523-elm">
-                                                <div className="frame14736-thq-frame14519-elm">
-                                                    <input
-                                                        type="number"
-                                                        placeholder="Min"
-                                                        style={{ background: 'transparent', border: 'none', width: '100%', outline: 'none' }}
-                                                        value={formData.budgetMin || ''}
-                                                        onChange={(e) => setFormData({ ...formData, budgetMin: Number(e.target.value) })}
-                                                    />
-                                                </div>
-                                                <div className="frame14736-thq-frame14520-elm">
-                                                    <input
-                                                        type="number"
-                                                        placeholder="Max"
-                                                        style={{ background: 'transparent', border: 'none', width: '100%', outline: 'none' }}
-                                                        value={formData.budgetMax || ''}
-                                                        onChange={(e) => setFormData({ ...formData, budgetMax: Number(e.target.value) })}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="frame14736-thq-frame14521-elm">
-                                                <span className="frame14736-thq-text-elm131">EUR / USD…</span>
-                                            </div>
-                                            <div className="frame14736-thq-frame14522-elm">
-                                                <select
-                                                    style={{ background: 'transparent', border: 'none', width: '100%', outline: 'none', cursor: 'pointer' }}
-                                                    value={formData.urgency}
-                                                    onChange={(e) => setFormData({ ...formData, urgency: e.target.value as 'normal' | 'priority' })}
-                                                >
-                                                    <option value="normal">Normal</option>
-                                                    <option value="priority">Prioritaire</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <span className="frame14736-thq-text-elm133">
-                                        Conseil : mets une fourchette réaliste pour attirer des bons profils.
-                                    </span>
+                    <div className="p-8">
+                        {/* Header */}
+                        <div className="text-center mb-8">
+                            <h2 className="text-2xl font-bold text-[#222325] mb-2">
+                                Budget & Filtres
+                            </h2>
+                            <p className="text-[#74767e]">
+                                Définis ton budget pour attirer les bons profils.
+                            </p>
+                        </div>
+
+                        {/* Step indicator */}
+                        <div className="flex items-center justify-center gap-2 mb-8">
+                            <div className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-bold">✓</div>
+                            <div className="w-12 h-1 bg-[#fea38e]"></div>
+                            <div className="w-8 h-8 rounded-full bg-[#fea38e] text-white flex items-center justify-center font-bold">2</div>
+                            <div className="w-12 h-1 bg-gray-300"></div>
+                            <div className="w-8 h-8 rounded-full bg-gray-300 text-gray-500 flex items-center justify-center font-bold">✓</div>
+                        </div>
+
+                        {/* Form fields */}
+                        <div className="space-y-6">
+                            {/* Budget type */}
+                            <div>
+                                <label className="block text-sm font-semibold text-[#222325] mb-3">
+                                    Type de budget
+                                </label>
+                                <div className="flex gap-4">
+                                    <button
+                                        onClick={() => setFormData({ ...formData, budgetType: 'fixed' })}
+                                        className={`flex-1 py-3 px-4 rounded-xl border-2 transition-all ${formData.budgetType === 'fixed'
+                                            ? 'border-[#fea38e] bg-[#fea38e]/10 text-[#fea38e]'
+                                            : 'border-gray-200 bg-white text-[#74767e]'
+                                            }`}
+                                    >
+                                        💰 Forfait
+                                    </button>
+                                    <button
+                                        onClick={() => setFormData({ ...formData, budgetType: 'hourly' })}
+                                        className={`flex-1 py-3 px-4 rounded-xl border-2 transition-all ${formData.budgetType === 'hourly'
+                                            ? 'border-[#fea38e] bg-[#fea38e]/10 text-[#fea38e]'
+                                            : 'border-gray-200 bg-white text-[#74767e]'
+                                            }`}
+                                    >
+                                        ⏱️ Horaire
+                                    </button>
                                 </div>
                             </div>
-                            <div className="frame14736-thq-frame14517-elm2">
-                                <div className="frame14736-thq-frame14355-elm2">
-                                    <div className="frame14736-thq-frame14338-elm3" onClick={handleBack}>
-                                        <span className="frame14736-thq-text-elm142">Retour</span>
-                                    </div>
-                                    <div className="frame14736-thq-frame14339-elm2" onClick={handleSaveDraft}>
-                                        <span className="frame14736-thq-text-elm143">Enregistrer le brouillon</span>
-                                    </div>
+
+                            {/* Budget range */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-semibold text-[#222325] mb-2">
+                                        Budget min (€)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        placeholder="100"
+                                        className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#fea38e] focus:border-transparent"
+                                        value={formData.budgetMin || ''}
+                                        onChange={(e) => setFormData({ ...formData, budgetMin: Number(e.target.value) })}
+                                    />
                                 </div>
-                                <div className="frame14736-thq-frame14338-elm4" onClick={handleContinue}>
-                                    <span className="frame14736-thq-text-elm144">Continuer</span>
+                                <div>
+                                    <label className="block text-sm font-semibold text-[#222325] mb-2">
+                                        Budget max (€)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        placeholder="500"
+                                        className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#fea38e] focus:border-transparent"
+                                        value={formData.budgetMax || ''}
+                                        onChange={(e) => setFormData({ ...formData, budgetMax: Number(e.target.value) })}
+                                    />
                                 </div>
                             </div>
+
+                            {/* Screening question (optional) */}
+                            <div>
+                                <label className="block text-sm font-semibold text-[#222325] mb-2">
+                                    Question de filtre <span className="text-[#74767e] font-normal">(optionnel)</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="Ex : Peux-tu me montrer 2 exemples de ton travail ?"
+                                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#fea38e] focus:border-transparent"
+                                    value={formData.screeningQuestion || ''}
+                                    onChange={(e) => setFormData({ ...formData, screeningQuestion: e.target.value })}
+                                />
+                                <p className="text-xs text-[#74767e] mt-2">
+                                    Cette question sera posée aux candidats pour filtrer les profils.
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Error message */}
+                        {error && (
+                            <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center mb-6">
+                                <p className="text-red-700 font-medium">
+                                    ❌ {error}
+                                </p>
+                            </div>
+                        )}
+
+                        {/* Actions */}
+                        <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
+                            <button
+                                onClick={() => setStep('brief')}
+                                className="px-6 py-3 text-[#74767e] hover:text-[#222325] transition-colors"
+                                disabled={isLoading}
+                            >
+                                ← Retour
+                            </button>
+                            <button
+                                onClick={handlePublish}
+                                disabled={!formData.budgetMin || !formData.budgetMax || isLoading}
+                                className="px-8 py-3 bg-[#1f392c] hover:bg-[#2d4f3f] text-white font-bold rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isLoading ? '⏳ Publication...' : '🚀 Publier l\'appel d\'offres'}
+                            </button>
                         </div>
                     </div>
                 )}
 
-                {/* Step 3: Screening */}
-                {step === 'screening' && (
-                    <div className="frame14736-thq-frame-elm3">
-                        <img src="/vector1371-eh7.svg" alt="" className="frame14736-thq-vector-elm5" />
-                        <img src="/vector1371-glam.svg" alt="" className="frame14736-thq-vector-elm6" />
-                        <div className="frame14736-thq-frame14560-elm">
-                            <div className="frame14736-thq-frame14597-elm">
-                                <div className="frame14736-thq-frame14559-elm">
-                                    <span className="frame14736-thq-text-elm145">Appel d'offres — Screening &amp; filtres</span>
-                                    <span className="frame14736-thq-text-elm146">
-                                        Comme Upwork : questions, prérequis, pièces, critères de tri automatique.
-                                    </span>
-                                </div>
-                                <img src="/group1381-m6pg.svg" alt="" className="frame14736-thq-group-elm3" />
+                {/* ========== STEP 3: SUCCESS ========== */}
+                {step === 'success' && (
+                    <div className="p-8 bg-gradient-to-b from-blue-50 to-[#f8f5f0]">
+                        {/* Visual success */}
+                        <div className="text-center py-8">
+                            <div className="w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <span className="text-4xl text-white">📢</span>
                             </div>
-                            <div className="frame14736-thq-frame14558-elm">
-                                <div className="frame14736-thq-frame14550-elm">
-                                    <span className="frame14736-thq-text-elm147">Questions de screening</span>
-                                    <span className="frame14736-thq-text-elm148">
-                                        Affichées dans la candidature (anti "candidats random").
-                                    </span>
-                                    <div className="frame14736-thq-frame14549-elm">
-                                        <div className="frame14736-thq-frame14539-elm">
-                                            <span className="frame14736-thq-text-elm149">
-                                                Q1 — "Montre 2 exemples proches de ce style (lien)."
-                                            </span>
-                                            <span className="frame14736-thq-text-elm150">Type : lien / upload / texte</span>
-                                        </div>
-                                        <div className="frame14736-thq-frame14542-elm">
-                                            <span className="frame14736-thq-text-elm153">
-                                                Q2 — "Quel est ton délai réaliste pour le lot 1 ?"
-                                            </span>
-                                            <span className="frame14736-thq-text-elm154">Type : texte court / nombre</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="frame14736-thq-frame14538-elm2">
-                                <div className="frame14736-thq-frame14355-elm3">
-                                    <div className="frame14736-thq-frame14338-elm5" onClick={handleBack}>
-                                        <span className="frame14736-thq-text-elm173">Retour</span>
-                                    </div>
-                                    <div className="frame14736-thq-frame14339-elm3" onClick={handleSaveDraft}>
-                                        <span className="frame14736-thq-text-elm174">Enregistrer le brouillon</span>
-                                    </div>
-                                </div>
-                                <div className="frame14736-thq-frame14338-elm6" onClick={handleContinue}>
-                                    <span className="frame14736-thq-text-elm175">Continuer</span>
-                                </div>
+                            <h2 className="text-2xl font-bold text-[#222325] mb-2">
+                                Ton appel d'offres est en ligne !
+                            </h2>
+                            <p className="text-[#74767e] max-w-md mx-auto">
+                                Les freelances peuvent maintenant te proposer leurs services.
+                            </p>
+                        </div>
+
+                        {/* Summary */}
+                        <div className="bg-white rounded-xl p-6 mb-8 border border-gray-200">
+                            <h3 className="font-bold text-[#222325] mb-2">{formData.title}</h3>
+                            <p className="text-[#74767e] text-sm mb-4 line-clamp-2">{formData.description}</p>
+                            <div className="flex gap-4 text-sm">
+                                <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full">
+                                    {formData.budgetMin}€ - {formData.budgetMax}€
+                                </span>
+                                <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full">
+                                    {formData.category}
+                                </span>
                             </div>
                         </div>
-                    </div>
-                )}
 
-                {/* Step 4: Publication */}
-                {step === 'publication' && (
-                    <div className="frame14736-thq-frame-elm4">
-                        <img src="/vector1371-5ipc.svg" alt="" className="frame14736-thq-vector-elm7" />
-                        <img src="/vector1371-tu7u.svg" alt="" className="frame14736-thq-vector-elm8" />
-                        <div className="frame14736-thq-frame14579-elm">
-                            <div className="frame14736-thq-frame14598-elm">
-                                <div className="frame14736-thq-frame14578-elm">
-                                    <span className="frame14736-thq-text-elm176">Appel d'offres — Publication</span>
-                                    <span className="frame14736-thq-text-elm177">
-                                        Visibilité, invitations, deadline, gestion des candidatures, publication.
-                                    </span>
-                                </div>
-                                <img src="/group1381-pi1l.svg" alt="" className="frame14736-thq-group-elm4" />
-                            </div>
-                            <div className="frame14736-thq-frame14577-elm">
-                                <div className="frame14736-thq-frame14571-elm">
-                                    <span className="frame14736-thq-text-elm178">Visibilité</span>
-                                    <div className="frame14736-thq-frame14568-elm">
-                                        <div className="frame14736-thq-frame14566-elm">
-                                            <span className="frame14736-thq-text-elm179">Qui peut voir ?</span>
-                                            <span className="frame14736-thq-text-elm180">Date limite candidatures</span>
-                                            <span className="frame14736-thq-text-elm181">Notifications</span>
-                                        </div>
-                                        <div className="frame14736-thq-frame14567-elm">
-                                            <div className="frame14736-thq-frame14561-elm">
-                                                <select
-                                                    style={{ background: 'transparent', border: 'none', width: '100%', outline: 'none', cursor: 'pointer' }}
-                                                    value={formData.visibility}
-                                                    onChange={(e) => setFormData({ ...formData, visibility: e.target.value as 'public' | 'unlisted' | 'private' })}
-                                                >
-                                                    <option value="public">Public</option>
-                                                    <option value="unlisted">Non listé</option>
-                                                    <option value="private">Privé</option>
-                                                </select>
-                                            </div>
-                                            <div className="frame14736-thq-frame14564-elm">
-                                                <div className="frame14736-thq-frame14562-elm">
-                                                    <input
-                                                        type="date"
-                                                        style={{ background: 'transparent', border: 'none', outline: 'none' }}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="frame14736-thq-frame14565-elm">
-                                                <span className="frame14736-thq-text-elm185">Email + app</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="frame14736-thq-frame14517-elm3">
-                                <div className="frame14736-thq-frame14355-elm4">
-                                    <div className="frame14736-thq-frame14338-elm7" onClick={handleBack}>
-                                        <span className="frame14736-thq-text-elm198">Retour</span>
-                                    </div>
-                                    <div className="frame14736-thq-frame14339-elm4" onClick={handleSaveDraft}>
-                                        <span className="frame14736-thq-text-elm199">Enregistrer le brouillon</span>
-                                    </div>
-                                </div>
-                                <div className="frame14736-thq-frame14338-elm8" onClick={handleContinue}>
-                                    <span className="frame14736-thq-text-elm200">Publier</span>
-                                </div>
-                            </div>
+                        {/* What's next */}
+                        <div className="space-y-3">
+                            <button
+                                onClick={handleViewProposals}
+                                className="w-full px-6 py-4 bg-[#fea38e] hover:bg-[#e8937f] text-white font-bold rounded-xl transition-colors"
+                            >
+                                Voir les propositions
+                            </button>
+                            <button
+                                onClick={handleShareLink}
+                                className="w-full px-6 py-4 bg-white hover:bg-gray-50 text-[#222325] font-medium rounded-xl border border-gray-200 transition-colors"
+                            >
+                                📋 Copier le lien de partage
+                            </button>
+                            <button
+                                onClick={onClose}
+                                className="w-full py-3 text-[#74767e] hover:text-[#222325] text-sm transition-colors"
+                            >
+                                Retour au dashboard
+                            </button>
                         </div>
                     </div>
                 )}

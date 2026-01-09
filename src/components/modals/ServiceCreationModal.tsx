@@ -1,9 +1,11 @@
 /**
- * Service Creation Modal - Multi-step service wizard
- * Converted from frame14735.js
+ * Service Creation Modal - Adoption-First Design
+ * 3 steps: Basics → Pricing → Success
  */
 import React, { useState } from 'react';
-import './ServiceCreationModal.css';
+import { PortfolioItemModal } from './PortfolioItemModal';
+import { SubServiceModal } from './SubServiceModal';
+import { createService } from '../../lib/queries/services';
 
 interface ServiceCreationModalProps {
     isOpen: boolean;
@@ -12,25 +14,32 @@ interface ServiceCreationModalProps {
 }
 
 interface ServiceData {
+    id?: string;
     title: string;
     category: string;
-    subcategory: string;
-    description: string;
-    packages: Package[];
     deliverables: string;
-    tags: string[];
+    tags: string;
+    packages: Package[];
 }
 
 interface Package {
     name: string;
-    description: string;
     deliverables: number;
     deliveryDays: number;
     revisions: number;
     price: number;
 }
 
-type Step = 'basics' | 'packages' | 'process' | 'media' | 'affiliation';
+type Step = 'basics' | 'pricing' | 'success';
+
+// Category ID mapping (simplified - in production, fetch from API)
+const CATEGORY_MAP: Record<string, string> = {
+    'video': 'cat-video',
+    'design': 'cat-design',
+    'dev': 'cat-dev',
+    'marketing': 'cat-marketing',
+    'writing': 'cat-writing',
+};
 
 export const ServiceCreationModal: React.FC<ServiceCreationModalProps> = ({
     isOpen,
@@ -40,396 +49,396 @@ export const ServiceCreationModal: React.FC<ServiceCreationModalProps> = ({
     const [step, setStep] = useState<Step>('basics');
     const [formData, setFormData] = useState<Partial<ServiceData>>({
         packages: [
-            { name: 'Basic', description: '', deliverables: 1, deliveryDays: 2, revisions: 1, price: 49 },
-            { name: 'Standard', description: '', deliverables: 3, deliveryDays: 4, revisions: 2, price: 129 },
-            { name: 'Premium', description: '', deliverables: 6, deliveryDays: 7, revisions: 3, price: 249 },
+            { name: 'Basic', deliverables: 1, deliveryDays: 2, revisions: 1, price: 49 },
+            { name: 'Standard', deliverables: 3, deliveryDays: 4, revisions: 2, price: 129 },
+            { name: 'Premium', deliverables: 6, deliveryDays: 7, revisions: 3, price: 249 },
         ],
     });
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [createdServiceId, setCreatedServiceId] = useState<string | null>(null);
+
+    // Sub-modal states
+    const [isPortfolioModalOpen, setIsPortfolioModalOpen] = useState(false);
+    const [isSubServiceModalOpen, setIsSubServiceModalOpen] = useState(false);
 
     if (!isOpen) return null;
 
-    const handleContinue = () => {
-        switch (step) {
-            case 'basics':
-                setStep('packages');
-                break;
-            case 'packages':
-                setStep('process');
-                break;
-            case 'process':
-                setStep('media');
-                break;
-            case 'media':
-                setStep('affiliation');
-                break;
-            case 'affiliation':
-                onComplete?.(formData as ServiceData);
-                onClose();
-                break;
+    const handlePublish = async () => {
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            // Map form data to API format
+            const packages = (formData.packages || []).map((pkg, index) => ({
+                name: (['basic', 'standard', 'premium'] as const)[index],
+                title: pkg.name,
+                description: `${pkg.deliverables} livrables inclus`,
+                price: pkg.price,
+                delivery_days: pkg.deliveryDays,
+                revisions: pkg.revisions,
+                features: [],
+            }));
+
+            const result = await createService({
+                title: formData.title || 'Mon service',
+                description: formData.deliverables || '',
+                category_id: CATEGORY_MAP[formData.category || 'video'] || 'cat-video',
+                service_role: 'freelance',
+                search_tags: formData.tags?.split(',').map(t => t.trim()) || [],
+                packages,
+            });
+
+            if (result.error) {
+                setError(result.error);
+                setIsLoading(false);
+                return;
+            }
+
+            setCreatedServiceId(result.data?.id || null);
+            onComplete?.({ ...formData, id: result.data?.id } as ServiceData);
+            setStep('success');
+        } catch (err) {
+            setError('Une erreur est survenue. Réessaie plus tard.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    const handleBack = () => {
-        switch (step) {
-            case 'packages':
-                setStep('basics');
-                break;
-            case 'process':
-                setStep('packages');
-                break;
-            case 'media':
-                setStep('process');
-                break;
-            case 'affiliation':
-                setStep('media');
-                break;
+    const handleViewService = () => {
+        onClose();
+        if (createdServiceId) {
+            // TODO: Navigate to service page with createdServiceId
+            window.location.href = `/service/${createdServiceId}`;
         }
     };
 
-    const handleSaveDraft = () => {
-        console.log('Saving draft:', formData);
-        // TODO: Save to backend
+    const handleAddExample = () => {
+        setIsPortfolioModalOpen(true);
+    };
+
+    const handleAddCollaborator = () => {
+        setIsSubServiceModalOpen(true);
+    };
+
+    const updatePackage = (index: number, field: keyof Package, value: number) => {
+        const newPackages = [...(formData.packages || [])];
+        newPackages[index] = { ...newPackages[index], [field]: value };
+        setFormData({ ...formData, packages: newPackages });
     };
 
     return (
-        <div className="frame14735-container1" onClick={(e) => e.target === e.currentTarget && onClose()}>
-            <div className="frame14735-thq-frame14735-elm">
-                {/* Step 1: Basics */}
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            onClick={(e) => e.target === e.currentTarget && step !== 'success' && onClose()}
+        >
+            <div className="bg-[#f8f5f0] rounded-2xl w-full max-w-2xl mx-4 shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+
+                {/* ========== STEP 1: BASICS ========== */}
                 {step === 'basics' && (
-                    <div className="frame14735-thq-frame-elm1">
-                        <img
-                            src="/vector1371-qnh7.svg"
-                            alt=""
-                            className="frame14735-thq-vector-elm1"
-                        />
-                        <div className="frame14735-thq-frame14362-elm">
-                            <div className="frame14735-thq-frame14338-elm10"></div>
-                            <div className="frame14735-thq-frame14591-elm">
-                                <span className="frame14735-thq-text-elm100">Créer un service</span>
-                                <img
-                                    src="/frame145881381-e75q.svg"
-                                    alt=""
-                                    className="frame14735-thq-frame14588-elm1"
+                    <div className="p-8">
+                        {/* Promise phrase */}
+                        <div className="text-center mb-8">
+                            <h2 className="text-2xl font-bold text-[#222325] mb-2">
+                                Créer un service
+                            </h2>
+                            <p className="text-[#74767e]">
+                                Crée une offre claire que les clients peuvent acheter immédiatement.
+                            </p>
+                        </div>
+
+                        {/* Step indicator */}
+                        <div className="flex items-center justify-center gap-2 mb-8">
+                            <div className="w-8 h-8 rounded-full bg-[#fea38e] text-white flex items-center justify-center font-bold">1</div>
+                            <div className="w-12 h-1 bg-gray-300"></div>
+                            <div className="w-8 h-8 rounded-full bg-gray-300 text-gray-500 flex items-center justify-center font-bold">2</div>
+                            <div className="w-12 h-1 bg-gray-300"></div>
+                            <div className="w-8 h-8 rounded-full bg-gray-300 text-gray-500 flex items-center justify-center font-bold">✓</div>
+                        </div>
+
+                        {/* Form fields - ONLY essential ones */}
+                        <div className="space-y-6">
+                            {/* Title */}
+                            <div>
+                                <label className="block text-sm font-semibold text-[#222325] mb-2">
+                                    Titre du service
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="Ex : Je monte tes vidéos TikTok avec sous-titres + hooks"
+                                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#fea38e] focus:border-transparent"
+                                    value={formData.title || ''}
+                                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                 />
                             </div>
-                            <div className="frame14735-thq-frame14361-elm">
-                                <div className="frame14735-thq-frame14357-elm1">
-                                    <span className="frame14735-thq-text-elm101">
-                                        Champs recommandés pour convertir : titre clair + livrables précis + tags.
-                                    </span>
-                                    <span className="frame14735-thq-text-elm102">Titre du service</span>
-                                    <div className="frame14735-thq-frame14339-elm1">
-                                        <input
-                                            type="text"
-                                            placeholder="Ex : Je monte tes vidéos TikTok avec sous-titres + hooks"
-                                            style={{ background: 'transparent', border: 'none', width: '100%', outline: 'none', color: 'inherit', fontSize: 'inherit' }}
-                                            value={formData.title || ''}
-                                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                        />
-                                    </div>
-                                    <span className="frame14735-thq-text-elm104">
-                                        Conseil : résultat + format + délai ("en 48h").
-                                    </span>
-                                    <span className="frame14735-thq-text-elm105">Catégorie</span>
-                                    <div className="frame14735-thq-frame14354-elm">
-                                        <div className="frame14735-thq-frame14340-elm">
-                                            <select
-                                                style={{ background: 'transparent', border: 'none', width: '100%', outline: 'none', cursor: 'pointer' }}
-                                                value={formData.category || ''}
-                                                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                            >
-                                                <option value="">Design / Vidéo / Dev / Marketing…</option>
-                                                <option value="design">Design</option>
-                                                <option value="video">Vidéo</option>
-                                                <option value="dev">Développement</option>
-                                                <option value="marketing">Marketing</option>
-                                            </select>
-                                        </div>
-                                        <div className="frame14735-thq-frame14341-elm">
-                                            <span className="frame14735-thq-text-elm107">Sous-catégorie</span>
-                                        </div>
-                                    </div>
-                                    <span className="frame14735-thq-text-elm108">Langue &amp; zone</span>
-                                    <div className="frame14735-thq-frame14353-elm">
-                                        <div className="frame14735-thq-frame14342-elm">
-                                            <span className="frame14735-thq-text-elm109">Langue du service</span>
-                                        </div>
-                                        <div className="frame14735-thq-frame14343-elm">
-                                            <span className="frame14735-thq-text-elm110">Fuseau horaire</span>
-                                        </div>
-                                        <div className="frame14735-thq-frame14344-elm">
-                                            <span className="frame14735-thq-text-elm111">Pays ciblés</span>
-                                        </div>
-                                    </div>
-                                    <span className="frame14735-thq-text-elm112">Type d'offre</span>
-                                    <div className="frame14735-thq-frame14352-elm">
-                                        <div className="frame14735-thq-frame14345-elm">
-                                            <span className="frame14735-thq-text-elm113">Prestation "one-shot"</span>
-                                        </div>
-                                        <div className="frame14735-thq-frame14346-elm">
-                                            <span className="frame14735-thq-text-elm114">Récurrent / abonnement</span>
-                                        </div>
-                                        <div className="frame14735-thq-frame14350-elm">
-                                            <span className="frame14735-thq-text-elm115">Disponible en urgence</span>
-                                        </div>
-                                    </div>
-                                    <span className="frame14735-thq-text-elm116">Livrables &amp; formats</span>
-                                    <div className="frame14735-thq-frame14347-elm">
-                                        <textarea
-                                            placeholder="Décris précisément ce que le client reçoit (ex: 3 vidéos 9:16 + fichiers .mp4 + miniatures .png)."
-                                            style={{ background: 'transparent', border: 'none', width: '100%', outline: 'none', resize: 'none', minHeight: '60px', color: 'inherit' }}
-                                            value={formData.deliverables || ''}
-                                            onChange={(e) => setFormData({ ...formData, deliverables: e.target.value })}
-                                        />
-                                    </div>
-                                    <span className="frame14735-thq-text-elm119">Tags (recherche)</span>
-                                    <div className="frame14735-thq-frame14351-elm">
-                                        <div className="frame14735-thq-frame14348-elm">
+
+                            {/* Category */}
+                            <div>
+                                <label className="block text-sm font-semibold text-[#222325] mb-2">
+                                    Catégorie
+                                </label>
+                                <select
+                                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#fea38e] focus:border-transparent cursor-pointer"
+                                    value={formData.category || ''}
+                                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                >
+                                    <option value="">Sélectionne une catégorie</option>
+                                    <option value="video">Vidéo</option>
+                                    <option value="design">Design</option>
+                                    <option value="dev">Développement</option>
+                                    <option value="marketing">Marketing</option>
+                                    <option value="writing">Rédaction</option>
+                                </select>
+                            </div>
+
+                            {/* Deliverables */}
+                            <div>
+                                <label className="block text-sm font-semibold text-[#222325] mb-2">
+                                    Ce que le client reçoit
+                                </label>
+                                <textarea
+                                    placeholder="Ex: 3 vidéos format 9:16 + fichiers sources + miniatures"
+                                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#fea38e] focus:border-transparent resize-none"
+                                    rows={3}
+                                    value={formData.deliverables || ''}
+                                    onChange={(e) => setFormData({ ...formData, deliverables: e.target.value })}
+                                />
+                            </div>
+
+                            {/* Tags */}
+                            <div>
+                                <label className="block text-sm font-semibold text-[#222325] mb-2">
+                                    Tags (pour la recherche)
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="UGC, TikTok, Montage, Shopify..."
+                                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#fea38e] focus:border-transparent"
+                                    value={formData.tags || ''}
+                                    onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
+                            <button
+                                onClick={onClose}
+                                className="px-6 py-3 text-[#74767e] hover:text-[#222325] transition-colors"
+                            >
+                                Annuler
+                            </button>
+                            <button
+                                onClick={() => setStep('pricing')}
+                                disabled={!formData.title || !formData.category}
+                                className="px-8 py-3 bg-[#fea38e] hover:bg-[#e8937f] text-white font-bold rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Continuer →
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* ========== STEP 2: PRICING ========== */}
+                {step === 'pricing' && (
+                    <div className="p-8">
+                        {/* Header */}
+                        <div className="text-center mb-8">
+                            <h2 className="text-2xl font-bold text-[#222325] mb-2">
+                                Prix & Délais
+                            </h2>
+                            <p className="text-[#74767e]">
+                                Définis tes offres. Après cette étape, ton service sera achetable.
+                            </p>
+                        </div>
+
+                        {/* Step indicator */}
+                        <div className="flex items-center justify-center gap-2 mb-8">
+                            <div className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-bold">✓</div>
+                            <div className="w-12 h-1 bg-[#fea38e]"></div>
+                            <div className="w-8 h-8 rounded-full bg-[#fea38e] text-white flex items-center justify-center font-bold">2</div>
+                            <div className="w-12 h-1 bg-gray-300"></div>
+                            <div className="w-8 h-8 rounded-full bg-gray-300 text-gray-500 flex items-center justify-center font-bold">✓</div>
+                        </div>
+
+                        {/* Packages grid */}
+                        <div className="grid grid-cols-3 gap-4 mb-6">
+                            {formData.packages?.map((pkg, index) => (
+                                <div
+                                    key={pkg.name}
+                                    className={`p-4 rounded-xl border-2 ${index === 1 ? 'border-[#fea38e] bg-[#fea38e]/5' : 'border-gray-200 bg-white'}`}
+                                >
+                                    <h3 className={`font-bold text-center mb-4 ${index === 1 ? 'text-[#fea38e]' : 'text-[#222325]'}`}>
+                                        {pkg.name}
+                                        {index === 1 && <span className="block text-xs font-normal mt-1">Recommandé</span>}
+                                    </h3>
+
+                                    <div className="space-y-3">
+                                        <div>
+                                            <label className="text-xs text-[#74767e]">Prix (€)</label>
                                             <input
-                                                type="text"
-                                                placeholder="Tape et ajoute : UGC, Shopify, After Effects… (max 10)"
-                                                style={{ background: 'transparent', border: 'none', width: '100%', outline: 'none', color: 'inherit' }}
+                                                type="number"
+                                                value={pkg.price}
+                                                onChange={(e) => updatePackage(index, 'price', Number(e.target.value))}
+                                                className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-center font-bold"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-[#74767e]">Livrables</label>
+                                            <input
+                                                type="number"
+                                                value={pkg.deliverables}
+                                                onChange={(e) => updatePackage(index, 'deliverables', Number(e.target.value))}
+                                                className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-center"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-[#74767e]">Délai (jours)</label>
+                                            <input
+                                                type="number"
+                                                value={pkg.deliveryDays}
+                                                onChange={(e) => updatePackage(index, 'deliveryDays', Number(e.target.value))}
+                                                className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-center"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-[#74767e]">Révisions</label>
+                                            <input
+                                                type="number"
+                                                value={pkg.revisions}
+                                                onChange={(e) => updatePackage(index, 'revisions', Number(e.target.value))}
+                                                className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-center"
                                             />
                                         </div>
                                     </div>
-                                    <div className="frame14735-thq-frame14356-elm">
-                                        <div className="frame14735-thq-frame14355-elm1">
-                                            <div className="frame14735-thq-frame14338-elm11" onClick={onClose}>
-                                                <span className="frame14735-thq-text-elm122">Annuler</span>
-                                            </div>
-                                            <div className="frame14735-thq-frame14339-elm2" onClick={handleSaveDraft}>
-                                                <span className="frame14735-thq-text-elm123">Enregistrer le brouillon</span>
-                                            </div>
-                                        </div>
-                                        <div className="frame14735-thq-frame14338-elm12" onClick={handleContinue}>
-                                            <span className="frame14735-thq-text-elm124">Continuer</span>
-                                        </div>
-                                    </div>
                                 </div>
+                            ))}
+                        </div>
+
+                        {/* Trigger message */}
+                        <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center mb-6">
+                            <p className="text-green-700 font-medium">
+                                💡 Après publication, ton service sera immédiatement visible et achetable.
+                            </p>
+                        </div>
+
+                        {/* Error message */}
+                        {error && (
+                            <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center mb-6">
+                                <p className="text-red-700 font-medium">
+                                    ❌ {error}
+                                </p>
                             </div>
+                        )}
+
+                        {/* Actions */}
+                        <div className="flex justify-between items-center pt-6 border-t border-gray-200">
+                            <button
+                                onClick={() => setStep('basics')}
+                                className="px-6 py-3 text-[#74767e] hover:text-[#222325] transition-colors"
+                                disabled={isLoading}
+                            >
+                                ← Retour
+                            </button>
+                            <button
+                                onClick={handlePublish}
+                                disabled={isLoading}
+                                className="px-8 py-3 bg-[#1f392c] hover:bg-[#2d4f3f] text-white font-bold rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isLoading ? '⏳ Publication...' : '🚀 Publier le service'}
+                            </button>
                         </div>
                     </div>
                 )}
 
-                {/* Step 2: Packages & Prix */}
-                {step === 'packages' && (
-                    <div className="frame14735-thq-frame-elm2">
-                        <img
-                            src="/vector1371-mb1.svg"
-                            alt=""
-                            className="frame14735-thq-vector-elm2"
-                        />
-                        <div className="frame14735-thq-frame14398-elm1">
-                            <div className="frame14735-thq-frame14586-elm">
-                                <span className="frame14735-thq-text-elm125">Créer un service — Packages &amp; prix</span>
-                                <img
-                                    src="/frame145881381-9c4g.svg"
-                                    alt=""
-                                    className="frame14735-thq-frame14588-elm2"
-                                />
+                {/* ========== STEP 3: SUCCESS (Moment de bascule) ========== */}
+                {step === 'success' && (
+                    <div className="p-8 bg-gradient-to-b from-green-50 to-[#f8f5f0]">
+                        {/* Visual success */}
+                        <div className="text-center py-8">
+                            <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <span className="text-4xl text-white">✓</span>
                             </div>
-                            <span className="frame14735-thq-text-elm126">Table des packages</span>
-                            <div className="frame14735-thq-frame14397-elm">
-                                <div className="frame14735-thq-frame14396-elm">
-                                    <span className="frame14735-thq-text-elm127">Éléments</span>
-                                    <span className="frame14735-thq-text-elm128">Nom du package</span>
-                                    <span className="frame14735-thq-text-elm129">Description courte</span>
-                                    <span className="frame14735-thq-text-elm130">Livrables (quantité)</span>
-                                    <span className="frame14735-thq-text-elm131">Délai</span>
-                                    <span className="frame14735-thq-text-elm132">Révisions incluses</span>
-                                    <span className="frame14735-thq-text-elm133">Prix</span>
-                                </div>
-                                <div className="frame14735-thq-frame14386-elm">
-                                    <div className="frame14735-thq-frame14385-elm">
-                                        <span className="frame14735-thq-text-elm134">Basic</span>
-                                        <span className="frame14735-thq-text-elm135">Standard</span>
-                                        <span className="frame14735-thq-text-elm136">Premium</span>
-                                    </div>
-                                    <div className="frame14735-thq-frame14384-elm">
-                                        {/* Basic column */}
-                                        <div className="frame14735-thq-frame14375-elm">
-                                            <div className="frame14735-thq-frame14363-elm">
-                                                <span className="frame14735-thq-text-elm137">Starter</span>
-                                            </div>
-                                            <div className="frame14735-thq-frame14364-elm"></div>
-                                            <div className="frame14735-thq-frame14365-elm">
-                                                <span className="frame14735-thq-text-elm138">ex: 1 vidéo</span>
-                                            </div>
-                                            <div className="frame14735-thq-frame14366-elm">
-                                                <span className="frame14735-thq-text-elm139">2 jours</span>
-                                            </div>
-                                            <div className="frame14735-thq-frame14367-elm"></div>
-                                            <div className="frame14735-thq-frame14368-elm">
-                                                <span className="frame14735-thq-text-elm140">€ 49</span>
-                                            </div>
-                                        </div>
-                                        {/* Standard column */}
-                                        <div className="frame14735-thq-frame14376-elm">
-                                            <div className="frame14735-thq-frame14369-elm">
-                                                <span className="frame14735-thq-text-elm141">Pro</span>
-                                            </div>
-                                            <div className="frame14735-thq-frame14370-elm"></div>
-                                            <div className="frame14735-thq-frame14371-elm">
-                                                <span className="frame14735-thq-text-elm142">ex: 3 vidéos</span>
-                                            </div>
-                                            <div className="frame14735-thq-frame14372-elm">
-                                                <span className="frame14735-thq-text-elm143">4 jours</span>
-                                            </div>
-                                            <div className="frame14735-thq-frame14373-elm"></div>
-                                            <div className="frame14735-thq-frame14374-elm">
-                                                <span className="frame14735-thq-text-elm144">€ 129</span>
-                                            </div>
-                                        </div>
-                                        {/* Premium column */}
-                                        <div className="frame14735-thq-frame14383-elm">
-                                            <div className="frame14735-thq-frame14377-elm">
-                                                <span className="frame14735-thq-text-elm145">Elite</span>
-                                            </div>
-                                            <div className="frame14735-thq-frame14378-elm"></div>
-                                            <div className="frame14735-thq-frame14379-elm">
-                                                <span className="frame14735-thq-text-elm146">ex: 6</span>
-                                            </div>
-                                            <div className="frame14735-thq-frame14380-elm">
-                                                <span className="frame14735-thq-text-elm147">7 j</span>
-                                            </div>
-                                            <div className="frame14735-thq-frame14381-elm"></div>
-                                            <div className="frame14735-thq-frame14382-elm">
-                                                <span className="frame14735-thq-text-elm148">€ 249</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <span className="frame14735-thq-text-elm149">Options (extras)</span>
-                            <div className="frame14735-thq-frame14395-elm">
-                                <div className="frame14735-thq-frame14394-elm">
-                                    <div className="frame14735-thq-frame14393-elm">
-                                        <span className="frame14735-thq-text-elm150">+ Livraison express</span>
-                                        <span className="frame14735-thq-text-elm151">(+€ / -jours)</span>
-                                    </div>
-                                    <span className="frame14735-thq-text-elm152">+ Révision supplémentaire</span>
-                                </div>
-                            </div>
-                            <span className="frame14735-thq-text-elm158">
-                                Conseil : garde Basic simple, Standard = meilleur rapport, Premium = "tout inclus".
-                            </span>
-                            <div className="frame14735-thq-frame14357-elm2">
-                                <div className="frame14735-thq-frame14355-elm2">
-                                    <div className="frame14735-thq-frame14338-elm13" onClick={onClose}>
-                                        <span className="frame14735-thq-text-elm159">Annuler</span>
-                                    </div>
-                                    <div className="frame14735-thq-frame14339-elm3" onClick={handleSaveDraft}>
-                                        <span className="frame14735-thq-text-elm160">Enregistrer le brouillon</span>
-                                    </div>
-                                </div>
-                                <div className="frame14735-thq-frame14338-elm14" onClick={handleContinue}>
-                                    <span className="frame14735-thq-text-elm161">Continuer</span>
-                                </div>
+                            <h2 className="text-2xl font-bold text-[#222325] mb-2">
+                                Ton service est en ligne !
+                            </h2>
+                            <p className="text-[#74767e] max-w-md mx-auto">
+                                Les clients peuvent maintenant le découvrir et le commander.
+                            </p>
+                        </div>
+
+                        {/* Service summary */}
+                        <div className="bg-white rounded-xl p-6 mb-8 border border-gray-200">
+                            <h3 className="font-bold text-[#222325] mb-2">{formData.title}</h3>
+                            <p className="text-[#74767e] text-sm mb-4">{formData.deliverables}</p>
+                            <div className="flex gap-4 text-sm">
+                                <span className="bg-[#fea38e]/10 text-[#fea38e] px-3 py-1 rounded-full">
+                                    À partir de {formData.packages?.[0]?.price}€
+                                </span>
+                                <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full">
+                                    {formData.category}
+                                </span>
                             </div>
                         </div>
-                    </div>
-                )}
 
-                {/* Step 3: Process - Simplified placeholder */}
-                {step === 'process' && (
-                    <div className="frame14735-thq-frame-elm3">
-                        <img src="/vector1371-9my.svg" alt="" className="frame14735-thq-vector-elm3" />
-                        <div className="frame14735-thq-frame14425-elm1">
-                            <div className="frame14735-thq-frame14423-elm">
-                                <div className="frame14735-thq-frame14590-elm1">
-                                    <div className="frame14735-thq-frame14422-elm">
-                                        <span className="frame14735-thq-text-elm162">
-                                            Créer un service — Process &amp; exigences
-                                        </span>
-                                        <span className="frame14735-thq-text-elm163">
-                                            Définis le workflow, les infos demandées au client et les règles de révision.
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="frame14735-thq-frame14424-elm">
-                                <div className="frame14735-thq-frame14398-elm2">
-                                    <div className="frame14735-thq-frame14355-elm3">
-                                        <div className="frame14735-thq-frame14338-elm15" onClick={handleBack}>
-                                            <span className="frame14735-thq-text-elm187">Retour</span>
-                                        </div>
-                                        <div className="frame14735-thq-frame14339-elm4" onClick={handleSaveDraft}>
-                                            <span className="frame14735-thq-text-elm188">Enregistrer le brouillon</span>
-                                        </div>
-                                    </div>
-                                    <div className="frame14735-thq-frame14338-elm16" onClick={handleContinue}>
-                                        <span className="frame14735-thq-text-elm189">Continuer</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                        {/* What's next */}
+                        <div className="space-y-3">
+                            <button
+                                onClick={handleViewService}
+                                className="w-full px-6 py-4 bg-[#fea38e] hover:bg-[#e8937f] text-white font-bold rounded-xl transition-colors"
+                            >
+                                Voir mon service
+                            </button>
 
-                {/* Step 4: Media - Simplified placeholder */}
-                {step === 'media' && (
-                    <div className="frame14735-thq-frame-elm4">
-                        <img src="/vector1371-7cyy.svg" alt="" className="frame14735-thq-vector-elm4" />
-                        <div className="frame14735-thq-frame14448-elm">
-                            <div className="frame14735-thq-frame14592-elm">
-                                <div className="frame14735-thq-frame14447-elm">
-                                    <span className="frame14735-thq-text-elm190">
-                                        Créer un service — Médias &amp; preuves
-                                    </span>
-                                    <span className="frame14735-thq-text-elm191">
-                                        Images/vidéo, PDF, exemples avant/après, FAQ, conditions.
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="frame14735-thq-frame14357-elm3">
-                                <div className="frame14735-thq-frame14355-elm4">
-                                    <div className="frame14735-thq-frame14338-elm17" onClick={handleBack}>
-                                        <span className="frame14735-thq-text-elm212">Retour</span>
-                                    </div>
-                                    <div className="frame14735-thq-frame14339-elm5" onClick={handleSaveDraft}>
-                                        <span className="frame14735-thq-text-elm213">Enregistrer le brouillon</span>
-                                    </div>
-                                </div>
-                                <div className="frame14735-thq-frame14338-elm18" onClick={handleContinue}>
-                                    <span className="frame14735-thq-text-elm214">Continuer</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                            {/* Portfolio CTA */}
+                            <button
+                                onClick={handleAddExample}
+                                className="w-full px-6 py-4 bg-white hover:bg-gray-50 text-[#222325] font-medium rounded-xl border border-gray-200 transition-colors flex items-center justify-center gap-2"
+                            >
+                                <span>📷</span>
+                                <span>Ajouter un exemple (+30% de ventes)</span>
+                            </button>
 
-                {/* Step 5: Affiliation */}
-                {step === 'affiliation' && (
-                    <div className="frame14735-thq-frame-elm5">
-                        <img src="/vector1371-x0op.svg" alt="" className="frame14735-thq-vector-elm5" />
-                        <div className="frame14735-thq-frame14478-elm">
-                            <div className="frame14735-thq-frame14593-elm">
-                                <div className="frame14735-thq-frame14474-elm">
-                                    <span className="frame14735-thq-text-elm215">
-                                        Créer un service — Affiliation &amp; codes
-                                    </span>
-                                    <span className="frame14735-thq-text-elm216">
-                                        Active la promo par affiliés : commission + code client + règles d'attribution.
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="frame14735-thq-frame14398-elm3">
-                                <div className="frame14735-thq-frame14355-elm5">
-                                    <div className="frame14735-thq-frame14338-elm19" onClick={handleBack}>
-                                        <span>Retour</span>
-                                    </div>
-                                    <div className="frame14735-thq-frame14339-elm6" onClick={handleSaveDraft}>
-                                        <span>Enregistrer le brouillon</span>
-                                    </div>
-                                </div>
-                                <div className="frame14735-thq-frame14338-elm20" onClick={handleContinue}>
-                                    <span>Publier le service</span>
-                                </div>
-                            </div>
+                            {/* SubService CTA */}
+                            <button
+                                onClick={handleAddCollaborator}
+                                className="w-full px-6 py-4 bg-white hover:bg-gray-50 text-[#222325] font-medium rounded-xl border border-gray-200 transition-colors flex items-center justify-center gap-2"
+                            >
+                                <span>👥</span>
+                                <span>Ajouter un collaborateur</span>
+                            </button>
+
+                            <button
+                                onClick={onClose}
+                                className="w-full py-3 text-[#74767e] hover:text-[#222325] text-sm transition-colors"
+                            >
+                                Retour au dashboard
+                            </button>
                         </div>
                     </div>
                 )}
             </div>
+
+            {/* Sub-modals */}
+            <PortfolioItemModal
+                isOpen={isPortfolioModalOpen}
+                onClose={() => setIsPortfolioModalOpen(false)}
+                serviceName={formData.title}
+                onComplete={(data) => {
+                    console.log('Portfolio item added:', data);
+                    setIsPortfolioModalOpen(false);
+                }}
+            />
+
+            <SubServiceModal
+                isOpen={isSubServiceModalOpen}
+                onClose={() => setIsSubServiceModalOpen(false)}
+                serviceName={formData.title}
+                onComplete={(data) => {
+                    console.log('Sub-service added:', data);
+                    setIsSubServiceModalOpen(false);
+                }}
+            />
         </div>
     );
 };

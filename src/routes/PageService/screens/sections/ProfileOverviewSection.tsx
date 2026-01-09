@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";
 import { Separator } from "../../components/ui/separator";
+import { ServiceGallery } from "./ServiceGallery";
 import { useServiceContext } from "../../PageService";
 import { ServicePackage } from "../../../../lib/queries/services";
 import { createOrder } from "../../../../lib/queries/orders";
@@ -311,11 +312,8 @@ export const ProfileOverviewSection = (): JSX.Element => {
             </div>
           </div>
 
-          <img
-            className="w-[764px]"
-            alt="Divider"
-            src="https://c.animaapp.com/mjsa8xj74uh4Dq/img/frame-14689.svg"
-          />
+          {/* Service Gallery */}
+          <ServiceGallery />
 
           <div className="flex flex-col items-center gap-1.5 w-full">
             <div className="flex flex-col w-[328px] items-end">
@@ -355,8 +353,8 @@ export const ProfileOverviewSection = (): JSX.Element => {
                     key={pkg}
                     onClick={() => setSelectedPackage(pkg)}
                     className={`flex-1 py-4 px-2 text-center font-semibold text-sm transition-all duration-150 ease-out border-b-[3px] ${isActive
-                        ? 'bg-[#fea38e] text-white border-[#e8927c]'
-                        : 'bg-[#f5f5f5] text-[#6b7280] border-transparent hover:bg-[#ebebeb]'
+                      ? 'bg-[#fea38e] text-white border-[#e8927c]'
+                      : 'bg-[#f5f5f5] text-[#6b7280] border-transparent hover:bg-[#ebebeb]'
                       }`}
                   >
                     {labels[pkg]}
