@@ -7,3 +7,4 @@ export { RegistrationModal } from './RegistrationModal';
 export { ServiceCreationModal } from './ServiceCreationModal';
 export { OrderCreationModal } from './OrderCreationModal';
 export { AppelOffresModal } from './AppelOffresModal';
+export { AccountSetupModal } from './AccountSetupModal';
