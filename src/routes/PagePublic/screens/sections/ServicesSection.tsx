@@ -43,23 +43,23 @@ export const ServicesSection = (): JSX.Element => {
   };
 
   return (
-    <section className="flex flex-col w-full items-center gap-2">
-      <header className="flex flex-col w-[121.73px] items-center">
-        <h2 className="flex items-center justify-center self-stretch h-8 mt-[-1.00px] [font-family:'Inter',Helvetica] font-bold text-[#222325] text-2xl text-center tracking-[0] leading-8 whitespace-nowrap">
+    <section className="flex flex-col w-full items-center gap-2 animate-fade-up opacity-0" style={{"--animation-delay": "0.3s"} as React.CSSProperties}>
+      <header className="flex flex-col w-[121.73px] items-center animate-scale-up">
+        <h2 className="flex items-center justify-center self-stretch h-8 mt-[-1.00px] [font-family:'Inter',Helvetica] font-bold text-[#222325] text-2xl text-center tracking-[0] leading-8 whitespace-nowrap hover:text-[#fea38e] transition-colors">
           Portfolio
         </h2>
 
         <img
-          className="w-[121.73px] h-[25.39px]"
+          className="w-[121.73px] h-[25.39px] animate-pulse-glow"
           alt="Vector"
           src="https://c.animaapp.com/mjs9uq4eaVmanC/img/vector.svg"
         />
       </header>
 
       <div className="flex items-start gap-4 w-full">
-        <Card className="flex-1 rounded-[14px] shadow-[2px_7px_15px_#0000001a,9px_26px_28px_#00000017,21px_60px_38px_#0000000d,37px_106px_45px_#00000003,57px_166px_49px_transparent] bg-[linear-gradient(215deg,rgba(254,163,142,1)_0%,rgba(248,245,240,1)_100%)] border-[#dadbdd]">
+        <Card className="flex-1 rounded-[14px] shadow-[2px_7px_15px_#0000001a,9px_26px_28px_#00000017,21px_60px_38px_#0000000d,37px_106px_45px_#00000003,57px_166px_49px_transparent] bg-[linear-gradient(215deg,rgba(254,163,142,1)_0%,rgba(248,245,240,1)_100%)] border-[#dadbdd] hover-scale animate-fade-in group">
           <CardContent className="p-0">
-            <div className="w-full h-[450.28px] rounded-2xl border border-solid border-[#dadbdd]">
+            <div className="w-full h-[450.28px] rounded-2xl border border-solid border-[#dadbdd] overflow-hidden">
               <div className="flex items-start gap-[38px] pt-[33px] px-[25px]">
                 <div className="flex flex-col w-[514px] items-start gap-6">
                   <div className="flex flex-col items-start gap-[19px] w-full">
@@ -81,7 +81,7 @@ export const ServicesSection = (): JSX.Element => {
                       </p>
                     </div>
 
-                    <Badge className="h-auto inline-flex items-center justify-center gap-2.5 px-[13px] py-[9px] bg-[#fea38e] rounded-full border border-solid border-[#e4e5e7] hover:bg-[#fea38e]">
+                    <Badge className="h-auto inline-flex items-center justify-center gap-2.5 px-[13px] py-[9px] bg-[#fea38e] rounded-full border border-solid border-[#e4e5e7] hover:bg-[#fe8f77] transition-all hover:scale-110 hover:shadow-glow-primary cursor-pointer animate-scale-up">
                       <span className="flex items-center justify-center w-fit mt-[-5.50px] mb-[-3.50px] [font-family:'Inter',Helvetica] text-[#f8f5f0] leading-5 whitespace-nowrap font-normal text-sm tracking-[0]">
                         {projectData.tag}
                       </span>
@@ -130,10 +130,10 @@ export const ServicesSection = (): JSX.Element => {
                   <Button
                     onClick={() => handleSimilarResult(projectData.title)}
                     variant="ghost"
-                    className="text-[#fea38e] hover:text-[#e8937f] hover:bg-[#fea38e]/10 p-0 h-auto font-semibold flex items-center gap-1"
+                    className="text-[#fea38e] hover:text-[#e8937f] hover:bg-[#fea38e]/10 p-0 h-auto font-semibold flex items-center gap-1 transition-all hover:scale-105 group/cta"
                   >
                     Je veux un résultat similaire
-                    <ArrowRightIcon className="w-4 h-4" />
+                    <ArrowRightIcon className="w-4 h-4 transition-transform group-hover/cta:translate-x-1" />
                   </Button>
                 </div>
 
@@ -161,12 +161,12 @@ export const ServicesSection = (): JSX.Element => {
         </Card>
 
         {/* Thumbnails sur le côté droit */}
-        <div className="flex flex-col w-[189px] items-start gap-3">
+        <div className="flex flex-col w-[189px] items-start gap-3 animate-fade-in" style={{"--animation-delay": "0.4s"} as React.CSSProperties}>
           {thumbnails.map((thumbnail, index) => (
-            <div key={index} className="w-full h-[142.09px] relative group">
+            <div key={index} className="w-full h-[142.09px] relative group animate-scale-up" style={{"--animation-delay": `${0.5 + index * 0.1}s`} as React.CSSProperties}>
               {thumbnail.showCount ? (
                 <div
-                  className={`w-[189px] h-[142px] flex flex-col items-center justify-center rounded-md overflow-hidden ${thumbnail.borderClass} hover:border-[#fea38e] transition-colors cursor-pointer`}
+                  className={`w-[189px] h-[142px] flex flex-col items-center justify-center rounded-md overflow-hidden ${thumbnail.borderClass} hover:border-[#fea38e] transition-all cursor-pointer hover:scale-105 hover:shadow-glow-primary`}
                 >
                   <span className="h-[18px] w-[31.45px] font-bold text-[#222325] text-base text-center leading-[26px] flex items-center justify-center [font-family:'Inter',Helvetica] tracking-[0] whitespace-nowrap">
                     +23
@@ -178,10 +178,10 @@ export const ServicesSection = (): JSX.Element => {
                 </div>
               ) : (
                 <div
-                  className={`w-[189px] h-[142px] flex justify-center rounded-md overflow-hidden ${thumbnail.borderClass} hover:border-[#fea38e] transition-colors cursor-pointer relative`}
+                  className={`w-[189px] h-[142px] flex justify-center rounded-md overflow-hidden ${thumbnail.borderClass} hover:border-[#fea38e] transition-all cursor-pointer relative hover:scale-105 hover:shadow-glow-primary`}
                 >
                   <div
-                    className={`${index === 0 ? "mt-1 w-[181px] h-[134.09px]" : "mt-px w-[187px] h-[140.09px]"} bg-cover bg-[50%_50%]`}
+                    className={`${index === 0 ? "mt-1 w-[181px] h-[134.09px]" : "mt-px w-[187px] h-[140.09px]"} bg-cover bg-[50%_50%] transition-transform group-hover:scale-110`}
                     style={{ backgroundImage: `url(${thumbnail.image})` }}
                   />
                   {/* Résultat sur hover */}
