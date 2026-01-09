@@ -109,36 +109,32 @@ export const OrderListSection = (): JSX.Element => {
             value: stats.total.toString(),
             change: 1.3,
             changeText: "Up from past week",
-            bgColor: "bg-white",
-            iconColor: "bg-[#FEF3C7]",
-            icon: "📦",
+            iconBgColor: "bg-[#FEF3C7]",
+            iconSrc: "https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon.png",
         },
         {
             title: "En cours",
             value: stats.inProgress.toString(),
             change: 1.3,
             changeText: "Up from past week",
-            bgColor: "bg-white",
-            iconColor: "bg-[#DBEAFE]",
-            icon: "🔄",
+            iconBgColor: "bg-[#DBEAFE]",
+            iconSrc: "https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon-2.png",
         },
         {
             title: "En attente",
             value: stats.pending.toString(),
             change: 1.3,
             changeText: "Up from past week",
-            bgColor: "bg-white",
-            iconColor: "bg-[#FEE2E2]",
-            icon: "⏳",
+            iconBgColor: "bg-[#FEE2E2]",
+            iconSrc: "https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon-1.png",
         },
         {
             title: "Terminées",
             value: stats.completed.toString(),
             change: 1.3,
             changeText: "Up from past week",
-            bgColor: "bg-white",
-            iconColor: "bg-[#D1FAE5]",
-            icon: "✓",
+            iconBgColor: "bg-[#D1FAE5]",
+            iconSrc: "https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon-3.png",
         },
     ];
 
@@ -168,7 +164,7 @@ export const OrderListSection = (): JSX.Element => {
                         {statsCards.map((stat, index) => (
                             <Card
                                 key={index}
-                                className={`${stat.bgColor} rounded-2xl border-0 shadow-sm hover:shadow-md transition-shadow`}
+                                className="bg-[#f8f5f0] rounded-2xl border border-gray-200/50 shadow-sm hover:shadow-md transition-all hover:border-gray-300/60"
                             >
                                 <CardContent className="p-6">
                                     <div className="flex items-start justify-between mb-4">
@@ -180,8 +176,8 @@ export const OrderListSection = (): JSX.Element => {
                                                 {isLoading ? '...' : stat.value}
                                             </h3>
                                         </div>
-                                        <div className={`${stat.iconColor} w-12 h-12 rounded-xl flex items-center justify-center text-2xl`}>
-                                            {stat.icon}
+                                        <div className={`${stat.iconBgColor} w-16 h-16 rounded-xl flex items-center justify-center p-3`}>
+                                            <img src={stat.iconSrc} alt="" className="w-full h-full object-contain" />
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-1">

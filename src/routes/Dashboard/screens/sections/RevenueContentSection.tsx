@@ -117,35 +117,31 @@ export const RevenueContentSection = (): JSX.Element => {
     const statsCards = [
         {
             title: "Total des revenus",
-            value: `$${stats.totalRevenue.toFixed(0)}`,
+            value: `€${stats.totalRevenue.toFixed(0)}`,
             change: stats.percentageChange,
-            bgColor: "bg-white",
-            iconColor: "bg-[#FEF3C7]",
-            icon: "💰",
+            iconBgColor: "bg-[#FEF3C7]",
+            iconSrc: "https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon.png",
         },
         {
             title: "En cours",
-            value: `$${stats.pendingRevenue.toFixed(0)}`,
+            value: `€${stats.pendingRevenue.toFixed(0)}`,
             change: stats.percentageChange,
-            bgColor: "bg-white",
-            iconColor: "bg-[#DBEAFE]",
-            icon: "📊",
+            iconBgColor: "bg-[#DBEAFE]",
+            iconSrc: "https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon-2.png",
         },
         {
             title: "En attente",
-            value: `$${stats.availableBalance.toFixed(0)}`,
+            value: `€${stats.availableBalance.toFixed(0)}`,
             change: stats.percentageChange,
-            bgColor: "bg-white",
-            iconColor: "bg-[#E0E7FF]",
-            icon: "⏳",
+            iconBgColor: "bg-[#E5E7EB]",
+            iconSrc: "https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon-1.png",
         },
         {
             title: "Terminées",
-            value: `$${stats.withdrawnTotal.toFixed(0)}`,
+            value: `€${stats.withdrawnTotal.toFixed(0)}`,
             change: stats.percentageChange,
-            bgColor: "bg-white",
-            iconColor: "bg-[#D1FAE5]",
-            icon: "✓",
+            iconBgColor: "bg-[#D1FAE5]",
+            iconSrc: "https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon-3.png",
         },
     ];
 
@@ -178,7 +174,7 @@ export const RevenueContentSection = (): JSX.Element => {
                         {statsCards.map((stat, index) => (
                             <Card
                                 key={index}
-                                className={`${stat.bgColor} rounded-2xl border-0 shadow-sm hover:shadow-md transition-shadow`}
+                                className="bg-[#f8f5f0] rounded-2xl border border-gray-200/50 shadow-sm hover:shadow-md transition-all hover:border-gray-300/60"
                             >
                                 <CardContent className="p-6">
                                     <div className="flex items-start justify-between mb-4">
@@ -190,8 +186,8 @@ export const RevenueContentSection = (): JSX.Element => {
                                                 {isLoading ? '...' : stat.value}
                                             </h3>
                                         </div>
-                                        <div className={`${stat.iconColor} w-12 h-12 rounded-xl flex items-center justify-center text-2xl`}>
-                                            {stat.icon}
+                                        <div className={`${stat.iconBgColor} w-16 h-16 rounded-xl flex items-center justify-center p-3`}>
+                                            <img src={stat.iconSrc} alt="" className="w-full h-full object-contain" />
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-1">
