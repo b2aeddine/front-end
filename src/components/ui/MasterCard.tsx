@@ -11,7 +11,8 @@ import { Button } from './button';
 interface MasterCardProps {
     headline: string;
     actionLabel: string;
-    actionPath: string;
+    actionPath?: string;
+    onAction?: () => void;
     variant?: 'primary' | 'secondary';
 }
 
@@ -19,9 +20,18 @@ export const MasterCard = ({
     headline,
     actionLabel,
     actionPath,
+    onAction,
     variant = 'primary',
 }: MasterCardProps): JSX.Element => {
     const navigate = useNavigate();
+
+    const handleClick = () => {
+        if (onAction) {
+            onAction();
+        } else if (actionPath) {
+            navigate(actionPath);
+        }
+    };
 
     return (
         <Card
@@ -42,7 +52,7 @@ export const MasterCard = ({
 
                 {/* Single CTA */}
                 <Button
-                    onClick={() => navigate(actionPath)}
+                    onClick={handleClick}
                     className="w-fit h-11 rounded-[10px] bg-[#fea38e] hover:bg-[#fe8e76] px-6 [font-family:'DM_Sans',Helvetica] font-bold text-[#f8f5f0] text-base transition-all duration-200"
                 >
                     {actionLabel}

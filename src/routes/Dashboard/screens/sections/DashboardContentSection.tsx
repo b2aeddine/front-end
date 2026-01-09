@@ -17,7 +17,7 @@ import { useAuth } from "../../../../lib/auth";
 import { fetchMyOrders, Order } from "../../../../lib/queries/orders";
 import { fetchDashboardStats, fetchRevenueStats } from "../../../../lib/queries/dashboard";
 import { useUserState, DashboardStats } from "../../../../lib/useUserState";
-import { ServiceCreationModal, AppelOffresModal } from "../../../../components/modals";
+import { ServiceCreationModal, AppelOffresModal, AccountSetupModal } from "../../../../components/modals";
 
 // Intent-based action buttons (role-based filtering happens invisibly)
 const actionButtons = [
@@ -78,6 +78,7 @@ export const DashboardContentSection = (): JSX.Element => {
   // Modal states
   const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
   const [isAppelOffresModalOpen, setIsAppelOffresModalOpen] = useState(false);
+  const [isAccountSetupModalOpen, setIsAccountSetupModalOpen] = useState(false);
 
   const [statsCards, setStatsCards] = useState([
     {
@@ -244,6 +245,11 @@ export const DashboardContentSection = (): JSX.Element => {
                 headline={userState.masterCard.headline}
                 actionLabel={userState.masterCard.actionLabel}
                 actionPath={userState.masterCard.actionPath}
+                onAction={
+                  userState.primaryState === 'profile_incomplete' || userState.priorityMode === 'onboarding'
+                    ? () => setIsAccountSetupModalOpen(true)
+                    : undefined
+                }
               />
 
               {/* 2. EXPECTED RESULT - Motivation zone */}
@@ -544,6 +550,15 @@ export const DashboardContentSection = (): JSX.Element => {
           console.log('Appel offres created:', data);
           setIsAppelOffresModalOpen(false);
           navigate('/dashboard/appels-offres');
+        }}
+      />
+      <AccountSetupModal
+        isOpen={isAccountSetupModalOpen}
+        onClose={() => setIsAccountSetupModalOpen(false)}
+        onComplete={() => {
+          setIsAccountSetupModalOpen(false);
+          // After account setup is complete, open the service creation modal
+          setIsServiceModalOpen(true);
         }}
       />
     </>
