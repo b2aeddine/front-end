@@ -58,22 +58,22 @@ export const PortfolioSection = (): JSX.Element => {
         {servicesData.map((service, index) => (
           <Card
             key={service.id}
-            className="flex flex-col w-full max-w-[389px] h-[430px] items-start justify-end relative border-0 shadow-none bg-transparent translate-y-[-1rem] animate-fade-in opacity-0 hover-scale group"
+            className="flex flex-col w-full max-w-[389px] h-[430px] items-start justify-end relative border-0 shadow-none bg-transparent translate-y-[-1rem] animate-fade-in opacity-0"
             style={{
               "--animation-delay": `${(index + 1) * 200}ms`,
             } as React.CSSProperties}
           >
             {/* Background structure - adjusted heights */}
-            <div className="absolute top-0 left-0 w-full h-[430px] transition-all">
+            <div className="absolute top-0 left-0 w-full h-[430px]">
               {/* Service image - top part */}
               <img
-                className="absolute top-0 left-0 w-full h-[180px] rounded-[15px_15px_0px_0px] object-cover transition-transform group-hover:scale-105"
+                className="absolute top-0 left-0 w-full h-[180px] rounded-[15px_15px_0px_0px] object-cover"
                 alt={service.title}
                 src={service.image}
               />
 
               {/* Gradient bottom - increased height for more content */}
-              <div className="absolute top-[180px] left-0 w-full h-[250px] rounded-[0px_0px_15px_15px] shadow-[1px_3px_7px_#0000001a,5px_11px_12px_#00000017,11px_25px_16px_#0000000d,19px_45px_19px_#00000003,29px_70px_21px_transparent] bg-[linear-gradient(180deg,rgba(254,163,142,1)_4%,rgba(248,245,240,1)_100%)] group-hover:shadow-glow-primary transition-all" />
+              <div className="absolute top-[180px] left-0 w-full h-[250px] rounded-[0px_0px_15px_15px] shadow-[1px_3px_7px_#0000001a,5px_11px_12px_#00000017,11px_25px_16px_#0000000d,19px_45px_19px_#00000003,29px_70px_21px_transparent] bg-[linear-gradient(180deg,rgba(254,163,142,1)_4%,rgba(248,245,240,1)_100%)]" />
             </div>
 
             {/* Content - positioned to start after image */}
@@ -114,9 +114,9 @@ export const PortfolioSection = (): JSX.Element => {
 
                 <Button
                   onClick={() => handleOrderService(service.id)}
-                  className="h-9 px-5 bg-[#fea38e] hover:bg-[#fe8f77] rounded-[10px] transition-all flex items-center gap-2 shadow-glow-primary-hover hover:scale-105 group/btn"
+                  className="h-9 px-5 bg-[#fea38e] hover:bg-[#fe8f77] rounded-[10px] transition-colors flex items-center gap-2"
                 >
-                  <ShoppingCartIcon className="w-4 h-4 transition-transform group-hover/btn:-translate-y-1" />
+                  <ShoppingCartIcon className="w-4 h-4" />
                   <span className="[font-family:'DM_Sans',Helvetica] font-extrabold italic text-[#f8f5f0] text-sm">
                     Commander
                   </span>
