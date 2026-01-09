@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import {
     FilterIcon,
     RotateCcwIcon,
+    TrendingUpIcon,
 } from "lucide-react";
 import { DashboardHeader } from "../../components/DashboardHeader";
 import { PageHeader } from "../../../../components/ui/PageHeader";
-import { StatsCard } from "../../../../components/ui/StatsCard";
+import { EmptyState } from "../../../../components/ui/EmptyState";
 import { Button } from "../../../../components/ui/button";
+import { Card, CardContent } from "../../../../components/ui/card";
 import {
     Select,
     SelectContent,
@@ -105,38 +107,26 @@ export const OrderListSection = (): JSX.Element => {
         {
             title: "Total des commandes",
             value: stats.total.toString(),
-            change: 1.3,
-            changeText: "Up from past week",
-            icon: "https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon-2.png",
-            iconBgColor: "green",
-            trending: "up" as const,
+            change: 0, // Placeholder as we don't have historical data yet
+            changeText: "toutes vos commandes"
         },
         {
             title: "En cours",
             value: stats.inProgress.toString(),
-            change: 1.3,
-            changeText: "Up from past week",
-            icon: "https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon-2.png",
-            iconBgColor: "blue",
-            trending: "up" as const,
+            change: 0,
+            changeText: "commandes actives"
         },
         {
             title: "En attente",
             value: stats.pending.toString(),
-            change: 1.3,
-            changeText: "Up from past week",
-            icon: "https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon-2.png",
-            iconBgColor: "orange",
-            trending: "up" as const,
+            change: 0,
+            changeText: "attente de traitement"
         },
         {
             title: "Terminées",
             value: stats.completed.toString(),
-            change: 1.3,
-            changeText: "Up from past week",
-            icon: "https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon-2.png",
-            iconBgColor: "cyan",
-            trending: "up" as const,
+            change: 0,
+            changeText: "commandes livrées"
         },
     ];
 
@@ -164,17 +154,43 @@ export const OrderListSection = (): JSX.Element => {
                     {/* KPIs Section */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
                         {statsCards.map((stat, index) => (
-                            <StatsCard
+                            <Card
                                 key={index}
-                                title={stat.title}
-                                value={stat.value}
-                                change={stat.change}
-                                changeText={stat.changeText}
-                                icon={stat.icon}
-                                iconBgColor={stat.iconBgColor}
-                                trending={stat.trending}
-                                isLoading={isLoading}
-                            />
+                                className="bg-[#f8f5f0] rounded-[6.64px] border border-solid border-[#97979766] shadow-[2.85px_2.85px_25.61px_#0000000d]"
+                            >
+                                <CardContent className="p-[7px] flex flex-col gap-2.5">
+                                    <div className="flex flex-col gap-0.5">
+                                        <div className="flex items-center justify-between gap-2">
+                                            <div className="opacity-80 [font-family:'Nunito_Sans',Helvetica] font-semibold text-[#202224] text-[10px] whitespace-pre-line">
+                                                {stat.title}
+                                            </div>
+                                            <img
+                                                className="w-[28.45px] h-[28.45px]"
+                                                alt="Icon"
+                                                src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon-2.png" // Blue Folder Icon
+                                            />
+                                        </div>
+
+                                        <div className="[font-family:'Nunito_Sans',Helvetica] font-bold text-[#202224] text-[13.3px] tracking-[0.47px]">
+                                            {isLoading ? '...' : stat.value}
+                                        </div>
+
+                                        <div className="flex items-center gap-1">
+                                            <TrendingUpIcon className="w-3 h-3 text-[#00b69b]" />
+                                            <div className="[font-family:'Nunito_Sans',Helvetica] font-semibold text-[7.6px]">
+                                                <span className="text-[#00b69b]">
+                                                    {/* Always positive/neutral for now as we don't have historical diffs */}
+                                                    Up
+                                                </span>
+                                                <span className="text-[#606060]">
+                                                    {" "}
+                                                    {stat.changeText}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
                         ))}
                     </div>
 
