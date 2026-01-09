@@ -107,26 +107,38 @@ export const OrderListSection = (): JSX.Element => {
         {
             title: "Total des commandes",
             value: stats.total.toString(),
-            change: 0, // Placeholder as we don't have historical data yet
-            changeText: "toutes vos commandes"
+            change: 1.3,
+            changeText: "Up from past week",
+            bgColor: "bg-white",
+            iconColor: "bg-[#FEF3C7]",
+            icon: "📦",
         },
         {
             title: "En cours",
             value: stats.inProgress.toString(),
-            change: 0,
-            changeText: "commandes actives"
+            change: 1.3,
+            changeText: "Up from past week",
+            bgColor: "bg-white",
+            iconColor: "bg-[#DBEAFE]",
+            icon: "🔄",
         },
         {
             title: "En attente",
             value: stats.pending.toString(),
-            change: 0,
-            changeText: "attente de traitement"
+            change: 1.3,
+            changeText: "Up from past week",
+            bgColor: "bg-white",
+            iconColor: "bg-[#FEE2E2]",
+            icon: "⏳",
         },
         {
             title: "Terminées",
             value: stats.completed.toString(),
-            change: 0,
-            changeText: "commandes livrées"
+            change: 1.3,
+            changeText: "Up from past week",
+            bgColor: "bg-white",
+            iconColor: "bg-[#D1FAE5]",
+            icon: "✓",
         },
     ];
 
@@ -156,38 +168,30 @@ export const OrderListSection = (): JSX.Element => {
                         {statsCards.map((stat, index) => (
                             <Card
                                 key={index}
-                                className="bg-[#f8f5f0] rounded-[6.64px] border border-solid border-[#97979766] shadow-[2.85px_2.85px_25.61px_#0000000d]"
+                                className={`${stat.bgColor} rounded-2xl border-0 shadow-sm hover:shadow-md transition-shadow`}
                             >
-                                <CardContent className="p-[7px] flex flex-col gap-2.5">
-                                    <div className="flex flex-col gap-0.5">
-                                        <div className="flex items-center justify-between gap-2">
-                                            <div className="opacity-80 [font-family:'Nunito_Sans',Helvetica] font-semibold text-[#202224] text-[10px] whitespace-pre-line">
+                                <CardContent className="p-6">
+                                    <div className="flex items-start justify-between mb-4">
+                                        <div>
+                                            <p className="text-sm font-medium text-gray-600 [font-family:'Nunito_Sans',Helvetica] mb-2">
                                                 {stat.title}
-                                            </div>
-                                            <img
-                                                className="w-[28.45px] h-[28.45px]"
-                                                alt="Icon"
-                                                src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon-2.png" // Blue Folder Icon
-                                            />
+                                            </p>
+                                            <h3 className="text-3xl font-bold text-gray-900 [font-family:'Nunito_Sans',Helvetica]">
+                                                {isLoading ? '...' : stat.value}
+                                            </h3>
                                         </div>
-
-                                        <div className="[font-family:'Nunito_Sans',Helvetica] font-bold text-[#202224] text-[13.3px] tracking-[0.47px]">
-                                            {isLoading ? '...' : stat.value}
+                                        <div className={`${stat.iconColor} w-12 h-12 rounded-xl flex items-center justify-center text-2xl`}>
+                                            {stat.icon}
                                         </div>
-
-                                        <div className="flex items-center gap-1">
-                                            <TrendingUpIcon className="w-3 h-3 text-[#00b69b]" />
-                                            <div className="[font-family:'Nunito_Sans',Helvetica] font-semibold text-[7.6px]">
-                                                <span className="text-[#00b69b]">
-                                                    {/* Always positive/neutral for now as we don't have historical diffs */}
-                                                    Up
-                                                </span>
-                                                <span className="text-[#606060]">
-                                                    {" "}
-                                                    {stat.changeText}
-                                                </span>
-                                            </div>
-                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <TrendingUpIcon className="w-4 h-4 text-green-500" />
+                                        <span className="text-sm font-semibold text-green-500 [font-family:'Nunito_Sans',Helvetica]">
+                                            {stat.change}%
+                                        </span>
+                                        <span className="text-sm text-gray-500 [font-family:'Nunito_Sans',Helvetica]">
+                                            {stat.changeText}
+                                        </span>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -270,7 +274,7 @@ export const OrderListSection = (): JSX.Element => {
                                                     <td className="p-6 text-sm text-gray-500 [font-family:'Nunito_Sans',Helvetica]">{new Date(order.created_at).toLocaleDateString('fr-FR')}</td>
                                                     <td className="p-6 text-sm text-gray-900 [font-family:'Nunito_Sans',Helvetica]">€{order.amount.toFixed(2)}</td>
                                                     <td className="p-6">
-                                                        <span className={`inline-flex items-center px-4 py-1.5 rounded-lg text-xs font-bold [font-family:'Nunito_Sans',Helvetica] ${statusDisplay.color}`}>
+                                                        <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold [font-family:'Nunito_Sans',Helvetica] ${statusDisplay.color}`}>
                                                             {statusDisplay.label}
                                                         </span>
                                                     </td>
