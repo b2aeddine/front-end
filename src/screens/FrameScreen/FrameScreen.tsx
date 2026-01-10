@@ -16,7 +16,8 @@ export const FrameScreen = (): JSX.Element => {
       data-model-id="155:5077"
     >
       <div className="flex flex-col w-full max-w-[1518px] items-center gap-7 relative px-4 md:px-0">
-        <div className="w-full translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:0ms]">
+        {/* Added relative z-[100] to ensure header dropdowns appear above subsequent sections */}
+        <div className="w-full translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:0ms] relative z-[100]">
           <HeroSection />
         </div>
 

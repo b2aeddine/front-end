@@ -57,6 +57,10 @@ export const ServiceGallery = ({ mediaItems = defaultMediaItems }: ServiceGaller
 
     return (
         <div className="flex flex-col gap-4 w-full max-w-[764px]">
+            {/* Gallery Label */}
+            <p className="[font-family:'Inter',Helvetica] font-medium text-[#6b7280] text-sm text-center">
+                📸 Exemples de résultats livrés
+            </p>
             {/* Main Image/Video Display */}
             <div className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden bg-[#e5e7eb] border border-[#dadbdd]">
                 {selectedItem?.type === "video" ? (
@@ -107,8 +111,8 @@ export const ServiceGallery = ({ mediaItems = defaultMediaItems }: ServiceGaller
                         key={item.id}
                         onClick={() => setSelectedIndex(index)}
                         className={`relative flex-shrink-0 w-[120px] h-[80px] rounded-lg overflow-hidden transition-all ${selectedIndex === index
-                                ? "ring-2 ring-[#fea38e] ring-offset-2"
-                                : "opacity-70 hover:opacity-100"
+                            ? "ring-2 ring-[#fea38e] ring-offset-2"
+                            : "opacity-70 hover:opacity-100"
                             }`}
                     >
                         <div
