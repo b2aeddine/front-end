@@ -139,12 +139,12 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                         {isAuthenticated ? (
                             <HeaderUserMenu />
                         ) : (
-                            /* Not Authenticated: Sign Up Button */
+                            /* Not Authenticated: Sign Up Button - Hidden on mobile, visible on sm+ */
                             <Button
                                 onClick={handleAuthClick}
-                                className="inline-flex items-center justify-center gap-2.5 px-6 py-2.5 bg-[#fea38e] rounded-full hover:bg-[#fe8e76] transition-all hover:scale-105 active:scale-95 shadow-sm hover:shadow-md h-auto ml-2 group"
+                                className="hidden sm:inline-flex items-center justify-center gap-2.5 px-4 sm:px-6 py-2 sm:py-2.5 bg-[#fea38e] rounded-full hover:bg-[#fe8e76] transition-all hover:scale-105 active:scale-95 shadow-sm hover:shadow-md h-auto ml-2 group min-h-[44px]"
                             >
-                                <span className="[font-family:'DM_Sans',Helvetica] font-semibold text-[#f8f5f0] text-base text-center tracking-[0.16px] leading-6 whitespace-nowrap group-hover:tracking-wide transition-all">
+                                <span className="[font-family:'DM_Sans',Helvetica] font-semibold text-[#f8f5f0] text-sm sm:text-base text-center tracking-[0.16px] leading-6 whitespace-nowrap group-hover:tracking-wide transition-all">
                                     S'inscrire
                                 </span>
                             </Button>
@@ -201,32 +201,32 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                     </div>
                 )}
 
-                {/* Secondary Navigation (Marquee) - Optional */}
+                {/* Secondary Navigation (Marquee) - Optional, hidden on mobile for cleaner UX */}
                 {showSecondaryNav && (
-                    <div className="flex flex-col w-full items-center gap-2.5">
+                    <div className="hidden sm:flex flex-col w-full items-center gap-2.5">
                         <Separator className="w-full h-px bg-[#1f392c]/20" />
                         <div className="overflow-hidden w-full group cursor-default">
-                            <div className="inline-flex items-center gap-[50px] animate-marquee whitespace-nowrap group-hover:pause">
-                                <span className="[font-family:'DM_Sans',Helvetica] font-medium text-[#1f392c] text-base tracking-[0] leading-6 whitespace-nowrap">
+                            <div className="inline-flex items-center gap-6 sm:gap-[50px] animate-marquee whitespace-nowrap group-hover:pause">
+                                <span className="[font-family:'DM_Sans',Helvetica] font-medium text-[#1f392c] text-xs sm:text-sm md:text-base tracking-[0] leading-6 whitespace-nowrap">
                                     Trusted by 5000+ Companies Worldwide
                                 </span>
-                                <span className="w-1.5 h-1.5 bg-[#fea38e] rounded-full"></span>
-                                <span className="[font-family:'DM_Sans',Helvetica] font-medium text-[#1f392c] text-base tracking-[0] leading-6 whitespace-nowrap">
+                                <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-[#fea38e] rounded-full flex-shrink-0"></span>
+                                <span className="[font-family:'DM_Sans',Helvetica] font-medium text-[#1f392c] text-xs sm:text-sm md:text-base tracking-[0] leading-6 whitespace-nowrap">
                                     Vérified Freelancers & Safe Payments
                                 </span>
-                                <span className="w-1.5 h-1.5 bg-[#fea38e] rounded-full"></span>
-                                <span className="[font-family:'DM_Sans',Helvetica] font-medium text-[#1f392c] text-base tracking-[0] leading-6 whitespace-nowrap">
+                                <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-[#fea38e] rounded-full flex-shrink-0"></span>
+                                <span className="[font-family:'DM_Sans',Helvetica] font-medium text-[#1f392c] text-xs sm:text-sm md:text-base tracking-[0] leading-6 whitespace-nowrap">
                                     24/7 Premium Support
                                 </span>
-                                <span className="w-1.5 h-1.5 bg-[#fea38e] rounded-full"></span>
-                                <span className="[font-family:'DM_Sans',Helvetica] font-medium text-[#1f392c] text-base tracking-[0] leading-6 whitespace-nowrap">
+                                <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-[#fea38e] rounded-full flex-shrink-0"></span>
+                                <span className="[font-family:'DM_Sans',Helvetica] font-medium text-[#1f392c] text-xs sm:text-sm md:text-base tracking-[0] leading-6 whitespace-nowrap">
                                     Quality Guaranteed
                                 </span>
-                                <span className="w-1.5 h-1.5 bg-[#fea38e] rounded-full"></span>
-                                <span className="[font-family:'DM_Sans',Helvetica] font-medium text-[#1f392c] text-base tracking-[0] leading-6 whitespace-nowrap">
+                                <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-[#fea38e] rounded-full flex-shrink-0"></span>
+                                <span className="[font-family:'DM_Sans',Helvetica] font-medium text-[#1f392c] text-xs sm:text-sm md:text-base tracking-[0] leading-6 whitespace-nowrap">
                                     Trusted by 5000+ Companies Worldwide
                                 </span>
-                                <span className="w-1.5 h-1.5 bg-[#fea38e] rounded-full"></span>
+                                <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-[#fea38e] rounded-full flex-shrink-0"></span>
                             </div>
                         </div>
                         <Separator className="w-full max-w-[1021px] h-0.5 bg-[#1f392c]/20" />

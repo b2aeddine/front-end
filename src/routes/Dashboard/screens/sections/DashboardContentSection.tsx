@@ -221,24 +221,26 @@ export const DashboardContentSection = (): JSX.Element => {
       <section className="relative flex flex-col w-full min-h-screen items-start bg-[#f8f5f0] isolate overflow-hidden">
         <DashboardHeader />
 
-
         <div className="flex flex-col items-start gap-2.5 relative w-full flex-1">
+          {/* Background image - optimized for mobile */}
           <img
-            className="absolute top-0 left-0 w-full h-[1313px] object-cover md:object-none md:object-top -z-10"
+            className="absolute top-0 left-0 w-full h-[800px] sm:h-[1000px] md:h-[1313px] object-cover -z-10 opacity-60 sm:opacity-100"
             alt="Main bg color"
             src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/main-bg-color.svg"
           />
 
-          <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-8">
-            <h1 className="dashboard-title">
+          {/* Header with extra left padding on mobile for burger menu */}
+          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-4 sm:py-6 md:py-8 pl-16 sm:pl-6 lg:pl-8">
+            <h1 className="dashboard-title text-xl sm:text-2xl md:text-3xl font-bold text-[#202224]">
               Dashboard
             </h1>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 w-full max-w-7xl mx-auto px-4 md:px-8 gap-8 pb-12">
+          {/* Main grid - stacked on mobile, side by side on desktop */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 gap-6 md:gap-8 pb-8 md:pb-12">
 
-            {/* LEFT COLUMN (8 cols) - Master Flow: MasterCard → ExpectedResult → Content */}
-            <div className="lg:col-span-8 flex flex-col gap-6">
+            {/* LEFT COLUMN (8 cols on lg) - Master Flow: MasterCard → ExpectedResult → Content */}
+            <div className="lg:col-span-8 flex flex-col gap-4 sm:gap-6 order-2 lg:order-1">
 
               {/* 1. MASTER CARD - Always at top, one headline, one action */}
               <MasterCard
@@ -259,23 +261,23 @@ export const DashboardContentSection = (): JSX.Element => {
                 encouragement={userState.expectedResult.encouragement}
               />
 
-              {/* 3. Welcome message (simplified) */}
+              {/* 3. Welcome message (simplified) - responsive text */}
               <div className="flex flex-col items-start gap-2 w-full">
-                <div className="[font-family:'DM_Sans',Helvetica] font-bold text-xl tracking-[0.25px] text-left w-full">
+                <div className="[font-family:'DM_Sans',Helvetica] font-bold text-lg sm:text-xl tracking-[0.25px] text-left w-full">
                   <span className="text-[#202224]">Salut </span>
                   <span className="text-[#fea38e]">{displayName}</span>
                   <span className="text-[#202224]"> 👋</span>
                 </div>
               </div>
 
-              {/* 2. Your Orders (Moved from right column) */}
-              <div className="flex flex-col w-full items-start gap-2.5 mt-4">
-                <h2 className="[font-family:'DM_Sans',Helvetica] font-bold text-[#202224] text-[25px] tracking-[0.25px]">
+              {/* 2. Your Orders - Full width on mobile */}
+              <div className="flex flex-col w-full items-start gap-2.5 mt-2 sm:mt-4">
+                <h2 className="[font-family:'DM_Sans',Helvetica] font-bold text-[#202224] text-lg sm:text-xl md:text-[25px] tracking-[0.25px]">
                   Vos commandes :
                 </h2>
 
-                <Card className="w-full md:max-w-[400px] rounded-[15px] shadow-[1px_2px_6px_#0000001a,5px_9px_10px_#00000017,12px_20px_14px_#0000000d,22px_36px_17px_#00000003,34px_56px_18px_transparent] bg-[linear-gradient(180deg,rgba(254,163,142,0.7)_0%,rgba(248,245,240,1)_100%)] border-0">
-                  <CardContent className="p-4 flex flex-col gap-[7px]">
+                <Card className="w-full sm:max-w-[400px] rounded-xl sm:rounded-[15px] shadow-lg bg-[linear-gradient(180deg,rgba(254,163,142,0.7)_0%,rgba(248,245,240,1)_100%)] border-0">
+                  <CardContent className="p-3 sm:p-4 flex flex-col gap-2 sm:gap-[7px]">
                     <div className="flex items-start justify-between">
                       <div className="opacity-90 font-semibold text-[#202224] text-sm [font-family:'Nunito_Sans',Helvetica]">
                         {latestOrder?.order_number || '00001'}
@@ -309,7 +311,7 @@ export const DashboardContentSection = (): JSX.Element => {
 
                     <Button
                       variant="outline"
-                      className="w-[126px] h-9 rounded-[10px] border-[1.5px] border-solid border-[#fea38e] bg-transparent [font-family:'DM_Sans',Helvetica] font-bold text-[#303030] text-sm"
+                      className="w-full sm:w-[126px] h-10 sm:h-9 rounded-xl sm:rounded-[10px] border-[1.5px] border-solid border-[#fea38e] bg-transparent [font-family:'DM_Sans',Helvetica] font-bold text-[#303030] text-sm min-h-[44px] sm:min-h-0"
                     >
                       Voir les détails
                     </Button>
@@ -318,39 +320,40 @@ export const DashboardContentSection = (): JSX.Element => {
               </div>
             </div>
 
-            {/* RIGHT COLUMN (4 cols) - Sidebar Widgets */}
-            <div className="lg:col-span-4 flex flex-col gap-8 w-full pr-4 lg:pr-8">
+            {/* RIGHT COLUMN (4 cols on lg) - Sidebar Widgets - Shows first on mobile */}
+            <div className="lg:col-span-4 flex flex-col gap-6 md:gap-8 w-full order-1 lg:order-2">
 
-              {/* 1. Status & Actions */}
-              <div className="flex flex-col w-full items-center lg:items-start gap-4">
-                <Card className="w-full max-w-[391px] bg-[#fea38ec7] rounded-[3.46px] border-[0.43px] border-solid border-[#dcdcdc] shadow-[0px_1.73px_2.6px_-0.87px_#24242408,0px_5.2px_6.93px_-1.73px_#24242414]">
-                  <CardContent className="p-[8.66px] flex items-start gap-[5.2px]">
-                    <div className="flex items-center justify-center w-[20.79px] h-[20.79px] rounded-[3.46px]">
+              {/* 1. Status & Actions - Full width on mobile */}
+              <div className="flex flex-col w-full items-center gap-3 sm:gap-4">
+                {/* Status Card - scales on mobile */}
+                <Card className="w-full bg-[#fea38ec7] rounded-lg border border-[#dcdcdc] shadow-sm">
+                  <CardContent className="p-3 sm:p-4 flex items-start gap-3">
+                    <div className="flex items-center justify-center w-8 h-8 sm:w-6 sm:h-6 rounded-lg bg-white/20 flex-shrink-0">
                       <img
-                        className="w-[17.32px] h-[17.32px]"
+                        className="w-5 h-5 sm:w-4 sm:h-4"
                         alt="Icon rocketlaunch"
                         src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/icon-rocketlaunch.svg"
                       />
                     </div>
 
-                    <div className="flex flex-col items-start gap-[7.85px] flex-1">
-                      <div className="flex items-start justify-between w-full gap-[4.9px]">
-                        <div className="[font-family:'Inter',Helvetica] font-medium text-[#292929] text-[8.8px] leading-[8.8px]">
+                    <div className="flex flex-col items-start gap-2 flex-1 min-w-0">
+                      <div className="flex items-start justify-between w-full gap-2">
+                        <div className="[font-family:'Inter',Helvetica] font-medium text-[#292929] text-xs sm:text-[10px] leading-tight">
                           État utilisateur
                         </div>
-                        <div className="[font-family:'Inter',Helvetica] font-normal text-[#7c7c7c] text-[6.9px] leading-[9.8px]">
+                        <div className="[font-family:'Inter',Helvetica] font-normal text-[#7c7c7c] text-[10px] sm:text-[8px] leading-tight flex-shrink-0">
                           Priorité {userState.priority}
                         </div>
                       </div>
 
-                      <div className="[font-family:'Inter',Helvetica] font-normal text-neutral-600 text-[6.9px] leading-[10.3px]">
+                      <div className="[font-family:'Inter',Helvetica] font-normal text-neutral-600 text-xs sm:text-[10px] leading-relaxed">
                         {userState.message}
                       </div>
 
-                      <div className="flex gap-[7.85px] items-start">
+                      <div className="flex gap-2 items-start">
                         <Button
                           variant="ghost"
-                          className="h-auto p-0 [font-family:'Inter',Helvetica] font-bold text-[#292929] text-[6.9px] leading-[9.8px]"
+                          className="h-auto p-0 [font-family:'Inter',Helvetica] font-bold text-[#292929] text-xs sm:text-[10px] leading-tight underline min-h-[44px] sm:min-h-0"
                           onClick={() => navigate(userState.actionPath)}
                         >
                           {userState.actionLabel}
@@ -360,12 +363,13 @@ export const DashboardContentSection = (): JSX.Element => {
                   </CardContent>
                 </Card>
 
-                <div className="grid grid-cols-4 gap-2 w-full max-w-[391px]">
+                {/* Action Buttons Grid - 2 cols on mobile, 4 on tablet+ */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-2 w-full">
                   {sortedButtons.slice(0, 4).map((button, index) => (
                     <Button
                       key={index}
                       variant="ghost"
-                      className={`flex flex-col w-full items-center h-auto p-0 hover:bg-transparent ${index === 0 ? 'opacity-100' : 'opacity-70'}`}
+                      className={`flex flex-col w-full items-center h-auto p-2 sm:p-0 hover:bg-[#fea38e]/10 rounded-xl sm:hover:bg-transparent ${index === 0 ? 'opacity-100' : 'opacity-70'} min-h-[80px] sm:min-h-0`}
                       onClick={() => {
                         if (button.modal === 'service_creation') {
                           setIsServiceModalOpen(true);
@@ -377,37 +381,38 @@ export const DashboardContentSection = (): JSX.Element => {
                       }}
                     >
                       <img
-                        className="w-[47px] h-[47px]"
+                        className="w-10 h-10 sm:w-[47px] sm:h-[47px]"
                         alt="Frame"
                         src={button.icon}
                       />
-                      <div className="h-[54px] flex items-center justify-center text-center [font-family:'DM_Sans',Helvetica] font-normal text-[#000000] text-[10px] leading-[15px] whitespace-pre-line">
+                      <div className="h-auto sm:h-[54px] flex items-center justify-center text-center [font-family:'DM_Sans',Helvetica] font-normal text-[#000000] text-[11px] sm:text-[10px] leading-tight sm:leading-[15px] whitespace-pre-line mt-1">
                         {button.label}
                       </div>
                     </Button>
                   ))}
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 w-full max-w-[391px]">
+                {/* Stats Cards - Responsive grid */}
+                <div className="grid grid-cols-2 gap-3 sm:gap-2 w-full">
                   {visibleStats.map((stat, index) => (
                     <Card
                       key={index}
-                      className="bg-[#f8f5f0] rounded-[6.64px] border border-solid border-[#97979766] shadow-[2.85px_2.85px_25.61px_#0000000d]"
+                      className="bg-[#f8f5f0] rounded-xl sm:rounded-lg border border-solid border-[#97979766] shadow-sm"
                     >
-                      <CardContent className="p-[7px] flex flex-col gap-2.5">
-                        <div className="flex flex-col gap-0.5">
+                      <CardContent className="p-3 sm:p-2 flex flex-col gap-2">
+                        <div className="flex flex-col gap-1">
                           <div className="flex items-center justify-between gap-2">
-                            <div className="opacity-80 [font-family:'Nunito_Sans',Helvetica] font-semibold text-[#202224] text-[10px] whitespace-pre-line">
+                            <div className="opacity-80 [font-family:'Nunito_Sans',Helvetica] font-semibold text-[#202224] text-xs sm:text-[10px] whitespace-pre-line leading-tight">
                               {stat.title}
                             </div>
                             <img
-                              className="w-[28.45px] h-[28.45px]"
+                              className="w-7 h-7 sm:w-[28.45px] sm:h-[28.45px] flex-shrink-0"
                               alt="Icon"
                               src={stat.icon}
                             />
                           </div>
 
-                          <div className="[font-family:'Nunito_Sans',Helvetica] font-bold text-[#202224] text-[13.3px] tracking-[0.47px]">
+                          <div className="[font-family:'Nunito_Sans',Helvetica] font-bold text-[#202224] text-base sm:text-[13.3px] tracking-[0.47px]">
                             {stat.value}
                           </div>
 
@@ -417,7 +422,7 @@ export const DashboardContentSection = (): JSX.Element => {
                             ) : (
                               <TrendingDownIcon className="w-3 h-3 text-[#f93c65]" />
                             )}
-                            <div className="[font-family:'Nunito_Sans',Helvetica] font-semibold text-[7.6px]">
+                            <div className="[font-family:'Nunito_Sans',Helvetica] font-semibold text-[10px] sm:text-[8px]">
                               <span
                                 className={
                                   stat.trending === "up"
@@ -442,9 +447,9 @@ export const DashboardContentSection = (): JSX.Element => {
 
               {/* 2. Recent Offers (Conditional - user must "earn" access) */}
               {userState.canAccessOffers && (
-                <div className="flex flex-col items-start gap-[30px] w-full max-w-[391px]">
+                <div className="flex flex-col items-start gap-4 sm:gap-6 w-full">
                   <div className="flex items-end justify-between w-full">
-                    <h2 className="[font-family:'DM_Sans',Helvetica] font-bold text-black text-[25px] tracking-[0.25px]">
+                    <h2 className="[font-family:'DM_Sans',Helvetica] font-bold text-black text-lg sm:text-xl md:text-[25px] tracking-[0.25px]">
                       Opportunités récentes :
                     </h2>
                     <img
@@ -453,74 +458,76 @@ export const DashboardContentSection = (): JSX.Element => {
                     />
                   </div>
 
-                  <Card className="w-full bg-[#fea38e4c] rounded-lg border-[0.8px] border-solid border-[#fea38e]">
-                    <CardContent className="p-[7px] flex flex-col gap-2.5">
-                      <div className="flex flex-col gap-[15px]">
-                        <div className="flex items-center justify-between gap-[17px]">
+                  <Card className="w-full bg-[#fea38e4c] rounded-xl border border-solid border-[#fea38e]">
+                    <CardContent className="p-3 sm:p-4 flex flex-col gap-3">
+                      <div className="flex flex-col gap-3 sm:gap-4">
+                        {/* Header with badge - stacks on mobile */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                           <div className="flex flex-col gap-1">
-                            <div className="[font-family:'Poppins',Helvetica] font-medium text-gray-900 text-[14.4px] leading-[14.4px]">
+                            <div className="[font-family:'Poppins',Helvetica] font-medium text-gray-900 text-sm sm:text-[14.4px] leading-tight">
                               Senior UI/UX Designer
                             </div>
-                            <div className="[font-family:'Poppins',Helvetica] font-normal text-gray-500 text-[11.2px] leading-[11.2px]">
+                            <div className="[font-family:'Poppins',Helvetica] font-normal text-gray-500 text-xs sm:text-[11.2px] leading-tight">
                               Salary: $30,000 - $55,000
                             </div>
                           </div>
 
-                          <Badge className="bg-[#fea38e] text-[#f8f5f0] border border-solid border-[#e4e5e7] rounded-full h-[19px] px-[13px] [font-family:'Inter',Helvetica] font-normal text-[10px]">
+                          <Badge className="w-fit bg-[#fea38e] text-[#f8f5f0] border border-solid border-[#e4e5e7] rounded-full h-6 px-3 [font-family:'Inter',Helvetica] font-normal text-xs sm:text-[10px]">
                             Expert Graphiques
                           </Badge>
                         </div>
 
-                        <div className="flex items-start gap-2">
-                          <Avatar className="w-[49.15px] h-[49.15px] border-[0.61px] border-solid border-white">
+                        <div className="flex items-start gap-3">
+                          <Avatar className="w-12 h-12 sm:w-[49.15px] sm:h-[49.15px] border border-solid border-white flex-shrink-0">
                             <AvatarImage src="https://c.animaapp.com/mjs8bxbnJhG6tv/img/joschamayer.png" />
                             <AvatarFallback>A</AvatarFallback>
                           </Avatar>
 
-                          <div className="flex flex-col gap-0.5 pt-0.5">
-                            <div className="[font-family:'Poppins',Helvetica] font-medium text-[#303030] text-[12.8px] leading-[12.8px]">
+                          <div className="flex flex-col gap-1 pt-0.5">
+                            <div className="[font-family:'Poppins',Helvetica] font-medium text-[#303030] text-sm sm:text-[12.8px] leading-tight">
                               Apple
                             </div>
                             <div className="flex items-center gap-1">
-                              <MapPinIcon className="w-3.5 h-3.5 text-gray-500" />
-                              <div className="[font-family:'Poppins',Helvetica] font-normal text-gray-500 text-[11.2px] leading-[11.2px]">
+                              <MapPinIcon className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-gray-500" />
+                              <div className="[font-family:'Poppins',Helvetica] font-normal text-gray-500 text-xs sm:text-[11.2px] leading-tight">
                                 Boston, USA
                               </div>
                             </div>
                           </div>
                         </div>
 
-                        <div className="[font-family:'DM_Sans',Helvetica] font-normal text-[#8e8e93] text-xs tracking-[0.60px] leading-[19.0px]">
+                        <div className="[font-family:'DM_Sans',Helvetica] font-normal text-[#8e8e93] text-xs tracking-[0.60px] leading-relaxed">
                           brief detail de l&apos;appel d&apos;offre.
                         </div>
                       </div>
 
-                      <div className="flex flex-col items-end gap-2.5">
+                      <div className="flex flex-col items-end gap-3">
                         <div className="flex items-center gap-2">
                           <div className="flex items-center">
                             {applicantImages.map((img, index) => (
                               <img
                                 key={index}
-                                className="w-[15px] h-[17px] border-[0.17px] border-solid border-[#6300b3] object-cover -ml-[11px] first:ml-0"
+                                className="w-5 h-5 sm:w-[15px] sm:h-[17px] border border-solid border-[#6300b3] object-cover -ml-2 sm:-ml-[11px] first:ml-0 rounded-full"
                                 alt="Ellipse"
                                 src={img}
                               />
                             ))}
                           </div>
-                          <div className="[font-family:'Poppins',Helvetica] font-medium text-[#303030] text-[9.6px] leading-[9.6px]">
+                          <div className="[font-family:'Poppins',Helvetica] font-medium text-[#303030] text-xs sm:text-[9.6px] leading-tight">
                             9+ applicants
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-[13px] w-full">
+                        {/* Buttons - Stack on mobile, side by side on tablet+ */}
+                        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 w-full">
                           <Button
                             variant="outline"
-                            className="flex-1 h-9 rounded-[10px] border-[1.5px] border-solid border-[#fea38e] bg-transparent [font-family:'DM_Sans',Helvetica] font-bold text-[#303030] text-sm"
+                            className="w-full sm:flex-1 h-11 sm:h-9 rounded-xl sm:rounded-[10px] border-[1.5px] border-solid border-[#fea38e] bg-transparent [font-family:'DM_Sans',Helvetica] font-bold text-[#303030] text-sm"
                           >
                             Voir les détails
                           </Button>
-                          <Button className="flex-1 h-9 rounded-[10px] bg-[#fea38e] hover:bg-[#fea38e]/90 [font-family:'DM_Sans',Helvetica] font-bold text-[#f8f5f0] text-sm">
-                            Voir les details
+                          <Button className="w-full sm:flex-1 h-11 sm:h-9 rounded-xl sm:rounded-[10px] bg-[#fea38e] hover:bg-[#fea38e]/90 [font-family:'DM_Sans',Helvetica] font-bold text-[#f8f5f0] text-sm">
+                            Postuler
                           </Button>
                         </div>
                       </div>

@@ -40,7 +40,11 @@ const bottomMenuItems: MenuItem[] = [
   { label: "Logout", icon: <LogOut className="w-[18px] h-[18px]" /> },
 ];
 
-export const NavigationMenuSection = (): JSX.Element => {
+interface NavigationMenuSectionProps {
+  onNavigate?: () => void; // Callback to close mobile sidebar after navigation
+}
+
+export const NavigationMenuSection = ({ onNavigate }: NavigationMenuSectionProps): JSX.Element => {
   const navigate = useNavigate();
   const location = useLocation();
   const { signOut } = useAuth();
@@ -58,6 +62,8 @@ export const NavigationMenuSection = (): JSX.Element => {
     } else if (item.path) {
       navigate(item.path);
     }
+    // Close mobile sidebar after navigation
+    onNavigate?.();
   };
 
   const renderMenuItem = (item: MenuItem, index: number, isBottom: boolean = false) => {
@@ -117,9 +123,9 @@ export const NavigationMenuSection = (): JSX.Element => {
   };
 
   return (
-    <nav className="flex flex-col w-60 min-h-screen bg-[#f8f5f0] py-6 border-r border-[#e5e5e5]/50">
-      {/* Logo Section */}
-      <div className="px-6 mb-8">
+    <nav className="flex flex-col w-64 sm:w-60 min-h-screen bg-[#f8f5f0] py-6 border-r border-[#e5e5e5]/50 shadow-lg lg:shadow-none">
+      {/* Logo Section - Extra top padding on mobile for the burger button */}
+      <div className="px-6 mb-8 pt-14 lg:pt-0">
         <div className="flex items-center gap-2">
           {/* Logo Icon */}
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#fea38e] to-[#fe8e76] flex items-center justify-center shadow-md shadow-[#fea38e]/30">

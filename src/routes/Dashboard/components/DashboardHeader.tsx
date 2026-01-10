@@ -18,13 +18,14 @@ export const DashboardHeader = (): JSX.Element => {
     };
 
     return (
-        <header className="relative w-full h-[70px] bg-[#f8f5f0] border-b border-solid border-[#e5e5e5] z-10">
-            <div className="flex w-full max-w-[1200px] items-center justify-between mx-auto px-6 h-full">
-                {/* Search Bar */}
-                <form onSubmit={handleSearch} className="relative w-full max-w-[400px]">
+        <header className="relative w-full min-h-[60px] md:min-h-[70px] bg-[#f8f5f0] border-b border-solid border-[#e5e5e5] z-10">
+            {/* Responsive container with flexible padding */}
+            <div className="flex w-full max-w-[1200px] items-center justify-between mx-auto px-3 sm:px-4 md:px-6 h-full py-2 md:py-0 gap-2 sm:gap-4">
+                {/* Search Bar - Full width on mobile, limited on larger screens */}
+                <form onSubmit={handleSearch} className="relative flex-1 max-w-full sm:max-w-[280px] md:max-w-[400px]">
                     <div className={`relative transition-all duration-200 ${isSearchFocused ? 'transform scale-[1.02]' : ''}`}>
                         <Search
-                            className={`absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] transition-colors duration-200 ${isSearchFocused ? 'text-[#fea38e]' : 'text-[#9ca3af]'
+                            className={`absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 sm:w-[18px] h-4 sm:h-[18px] transition-colors duration-200 ${isSearchFocused ? 'text-[#fea38e]' : 'text-[#9ca3af]'
                                 }`}
                         />
                         <Input
@@ -34,7 +35,7 @@ export const DashboardHeader = (): JSX.Element => {
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onFocus={() => setIsSearchFocused(true)}
                             onBlur={() => setIsSearchFocused(false)}
-                            className={`w-full h-[42px] bg-white rounded-full border pl-11 pr-4 text-sm transition-all duration-200 [font-family:'Nunito_Sans',Helvetica] ${isSearchFocused
+                            className={`w-full h-10 sm:h-[42px] bg-white rounded-full border pl-9 sm:pl-11 pr-10 text-sm transition-all duration-200 [font-family:'Nunito_Sans',Helvetica] ${isSearchFocused
                                     ? 'border-[#fea38e] shadow-[0_0_0_3px_rgba(254,163,142,0.1)]'
                                     : 'border-[#e5e7eb] hover:border-[#d1d5db]'
                                 }`}
@@ -43,7 +44,7 @@ export const DashboardHeader = (): JSX.Element => {
                             <button
                                 type="button"
                                 onClick={() => setSearchQuery("")}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-gray-100 transition-colors"
+                                className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full hover:bg-gray-100 transition-colors min-w-[32px] min-h-[32px] flex items-center justify-center"
                             >
                                 <X className="w-4 h-4 text-gray-400" />
                             </button>
@@ -52,7 +53,9 @@ export const DashboardHeader = (): JSX.Element => {
                 </form>
 
                 {/* Right Section: Messages, Notification, Language, Profile */}
-                <HeaderUserMenu />
+                <div className="flex-shrink-0">
+                    <HeaderUserMenu />
+                </div>
             </div>
         </header>
     );
