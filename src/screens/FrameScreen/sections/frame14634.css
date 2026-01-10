@@ -4147,3 +4147,316 @@
   font-weight: 500;
   line-height: 24px;
 }
+
+/* ===========================================
+   MOBILE RESPONSIVE STYLES
+   Desktop (md+) reste STRICTEMENT identique
+   =========================================== */
+
+/* ---- TABLET (max-width: 768px) ---- */
+@media (max-width: 768px) {
+  /* PartnersSection - Catégories */
+  .frame14634-thq-categorie-elm {
+    width: 100%;
+    padding: 32px 16px;
+    gap: 32px;
+  }
+
+  .frame14634-thq-categories-elm {
+    width: 100%;
+    height: auto;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .frame14634-thq-frame43-elm {
+    position: static;
+    order: 2;
+    width: 100%;
+    max-width: 280px;
+  }
+
+  .frame14634-thq-text-elm117 {
+    font-size: 14px;
+  }
+
+  .frame14634-thq-text-elm118 {
+    position: static;
+    font-size: 28px;
+    text-align: center;
+    order: 1;
+  }
+
+  .frame14634-thq-frame14632-elm {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .frame14634-thq-component2-elm,
+  .frame14634-thq-component3-elm,
+  .frame14634-thq-component4-elm,
+  .frame14634-thq-component5-elm,
+  .frame14634-thq-component6-elm,
+  .frame14634-thq-component7-elm {
+    width: 140px;
+    height: 165px;
+  }
+
+  .frame14634-thq-rectangle7-elm1,
+  .frame14634-thq-rectangle7-elm2,
+  .frame14634-thq-rectangle7-elm3,
+  .frame14634-thq-rectangle7-elm4,
+  .frame14634-thq-rectangle7-elm5,
+  .frame14634-thq-rectangle7-elm6 {
+    width: 140px;
+    height: 120px;
+    top: 40px;
+  }
+
+  .frame14634-thq-text-elm119,
+  .frame14634-thq-text-elm120,
+  .frame14634-thq-text-elm121,
+  .frame14634-thq-text-elm122,
+  .frame14634-thq-text-elm123,
+  .frame14634-thq-text-elm124 {
+    font-size: 12px;
+    top: 125px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  /* ReviewSection */
+  .frame14634-thq-review-section-elm {
+    height: auto;
+    padding: 32px 16px;
+    gap: 24px;
+  }
+
+  .frame14634-thq-title-elm2 {
+    align-items: center;
+    text-align: center;
+  }
+
+  .frame14634-thq-frame31-elm1 {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .frame14634-thq-text-elm170,
+  .frame14634-thq-text-elm171 {
+    font-size: 24px;
+  }
+
+  .frame14634-thq-frame30-elm1,
+  .frame14634-thq-frame30-elm2,
+  .frame14634-thq-frame31-elm2 {
+    width: 40px;
+    height: 40px;
+  }
+
+  .frame14634-thq-frame32-elm {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .frame14634-thq-vector-elm17 {
+    display: none;
+  }
+
+  .frame14634-thq-text-elm172,
+  .frame14634-thq-text-elm173 {
+    font-size: 24px;
+  }
+
+  .frame14634-thq-frame14606-elm {
+    width: 100%;
+  }
+
+  .frame14634-thq-text-elm174 {
+    width: 100%;
+    font-size: 24px;
+    text-align: center;
+  }
+
+  .frame14634-thq-vector-elm18 {
+    width: 250px;
+  }
+
+  .frame14634-thq-subtitle-icon-buttons-elm {
+    width: 100%;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .frame14634-thq-text-elm175 {
+    width: 100%;
+    font-size: 18px;
+    text-align: center;
+  }
+
+  .frame14634-thq-cards-elm1 {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .frame14634-thq-cards-elm2 {
+    gap: 16px;
+    padding-bottom: 8px;
+  }
+
+  .frame14634-thq-review-card-elm1,
+  .frame14634-thq-review-card-elm2,
+  .frame14634-thq-review-card-elm3,
+  .frame14634-thq-review-card-elm4 {
+    width: 280px;
+    min-width: 280px;
+    height: auto;
+    min-height: 280px;
+    padding: 20px 24px;
+  }
+
+  .frame14634-thq-text-elm176 {
+    font-size: 22px;
+    line-height: 28px;
+  }
+
+  .frame14634-thq-text-elm177 {
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  .frame14634-thq-frame14600-elm1,
+  .frame14634-thq-frame14600-elm2,
+  .frame14634-thq-frame14600-elm3,
+  .frame14634-thq-frame14601-elm {
+    width: 160px;
+    height: 38px;
+  }
+
+  .frame14634-thq-text-elm178 {
+    font-size: 16px;
+  }
+}
+
+/* ---- MOBILE (max-width: 480px) ---- */
+@media (max-width: 480px) {
+  /* PartnersSection - Catégories */
+  .frame14634-thq-categorie-elm {
+    padding: 24px 12px;
+    gap: 24px;
+  }
+
+  .frame14634-thq-text-elm118 {
+    font-size: 22px;
+  }
+
+  .frame14634-thq-frame14632-elm {
+    gap: 12px;
+  }
+
+  .frame14634-thq-component2-elm,
+  .frame14634-thq-component3-elm,
+  .frame14634-thq-component4-elm,
+  .frame14634-thq-component5-elm,
+  .frame14634-thq-component6-elm,
+  .frame14634-thq-component7-elm {
+    width: 100px;
+    height: 130px;
+  }
+
+  .frame14634-thq-rectangle7-elm1,
+  .frame14634-thq-rectangle7-elm2,
+  .frame14634-thq-rectangle7-elm3,
+  .frame14634-thq-rectangle7-elm4,
+  .frame14634-thq-rectangle7-elm5,
+  .frame14634-thq-rectangle7-elm6 {
+    width: 100px;
+    height: 85px;
+    top: 30px;
+    border-radius: 16px;
+  }
+
+  .frame14634-thq-text-elm119,
+  .frame14634-thq-text-elm120,
+  .frame14634-thq-text-elm121,
+  .frame14634-thq-text-elm122,
+  .frame14634-thq-text-elm123,
+  .frame14634-thq-text-elm124 {
+    font-size: 10px;
+    top: 95px;
+  }
+
+  /* ReviewSection */
+  .frame14634-thq-review-section-elm {
+    padding: 24px 12px;
+    gap: 20px;
+  }
+
+  .frame14634-thq-text-elm170,
+  .frame14634-thq-text-elm171,
+  .frame14634-thq-text-elm172,
+  .frame14634-thq-text-elm173 {
+    font-size: 20px;
+  }
+
+  .frame14634-thq-frame30-elm1,
+  .frame14634-thq-frame30-elm2,
+  .frame14634-thq-frame31-elm2 {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+  }
+
+  .frame14634-thq-text-elm174 {
+    font-size: 20px;
+  }
+
+  .frame14634-thq-vector-elm18 {
+    width: 180px;
+    height: 8px;
+  }
+
+  .frame14634-thq-text-elm175 {
+    font-size: 16px;
+  }
+
+  .frame14634-thq-review-card-elm1,
+  .frame14634-thq-review-card-elm2,
+  .frame14634-thq-review-card-elm3,
+  .frame14634-thq-review-card-elm4 {
+    width: 260px;
+    min-width: 260px;
+    padding: 16px 20px;
+  }
+
+  .frame14634-thq-text-elm176 {
+    font-size: 18px;
+    line-height: 24px;
+  }
+
+  .frame14634-thq-text-elm177 {
+    font-size: 13px;
+    line-height: 20px;
+  }
+
+  .frame14634-thq-frame14600-elm1,
+  .frame14634-thq-frame14600-elm2,
+  .frame14634-thq-frame14600-elm3,
+  .frame14634-thq-frame14601-elm {
+    width: 140px;
+    height: 36px;
+  }
+
+  .frame14634-thq-text-elm178 {
+    font-size: 14px;
+  }
+
+  .frame14634-thq-icon-buttons-elm {
+    gap: 12px;
+  }
+}
