@@ -2,11 +2,6 @@ import { useState } from "react";
 import { useAuth } from "../../../../lib/auth";
 import { DashboardHeader } from "../../components/DashboardHeader";
 import {
-    User,
-    Briefcase,
-    GraduationCap,
-    Award,
-    FileText,
     Mail,
     Phone,
     Globe,
@@ -92,12 +87,21 @@ const mockAttachments: Attachment[] = [
     { id: '2', name: 'CaseStudy-01.pdf', type: 'Portfolio', size: '1.21 MB' },
 ];
 
+// Colorful icons from public page
+const tabIcons = {
+    information: "https://c.animaapp.com/mjs9uq4eaVmanC/img/color-icon-skills.svg", // profile icon
+    experiences: "https://c.animaapp.com/mjs9uq4eaVmanC/img/color-icon-experience.svg",
+    education: "https://c.animaapp.com/mjs9uq4eaVmanC/img/color-icon-education.svg",
+    skills: "https://c.animaapp.com/mjs9uq4eaVmanC/img/color-icon-skills.svg",
+    attachments: "https://c.animaapp.com/mjs9uq4eaVmanC/img/color-icon-experience.svg", // briefcase for docs
+};
+
 const tabs = [
-    { id: 'information' as TabType, label: 'Information', icon: User },
-    { id: 'experiences' as TabType, label: 'Expériences', icon: Briefcase },
-    { id: 'education' as TabType, label: 'Formation', icon: GraduationCap },
-    { id: 'skills' as TabType, label: 'Compétences', icon: Award },
-    { id: 'attachments' as TabType, label: 'Documents', icon: FileText },
+    { id: 'information' as TabType, label: 'Information', icon: tabIcons.information },
+    { id: 'experiences' as TabType, label: 'Expériences', icon: tabIcons.experiences },
+    { id: 'education' as TabType, label: 'Formation', icon: tabIcons.education },
+    { id: 'skills' as TabType, label: 'Compétences', icon: tabIcons.skills },
+    { id: 'attachments' as TabType, label: 'Documents', icon: tabIcons.attachments },
 ];
 
 export const ProfileContentSection = (): JSX.Element => {
@@ -135,7 +139,6 @@ export const ProfileContentSection = (): JSX.Element => {
                                 <CardContent className="p-2">
                                     <nav className="flex flex-col gap-1">
                                         {tabs.map((tab) => {
-                                            const Icon = tab.icon;
                                             const isActive = activeTab === tab.id;
                                             return (
                                                 <button
@@ -147,7 +150,11 @@ export const ProfileContentSection = (): JSX.Element => {
                                                             : 'text-[#606060] hover:bg-gray-50'
                                                     }`}
                                                 >
-                                                    <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-[#9ca3af]'}`} />
+                                                    <img
+                                                        src={tab.icon}
+                                                        alt={tab.label}
+                                                        className={`w-8 h-8 ${isActive ? 'brightness-0 invert' : ''}`}
+                                                    />
                                                     <span className="font-semibold text-sm [font-family:'Nunito_Sans',Helvetica]">
                                                         {tab.label}
                                                     </span>
